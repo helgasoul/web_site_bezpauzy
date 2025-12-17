@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { AskEvaWidget } from '@/components/ui/AskEvaWidget'
+import { BackButton } from '@/components/ui/BackButton'
 import { FAQAccordion } from '@/components/community/FAQAccordion'
-import { JoinCommunityButton } from '@/components/community/JoinCommunityButton'
+import { CommunityAccessButtons } from '@/components/community/CommunityAccessButtons'
 import { Users, MessageCircle, Shield, HeartHandshake, BookOpen, Video, UsersRound, CheckCircle2 } from 'lucide-react'
 
 export const metadata: Metadata = {
@@ -31,20 +33,38 @@ export default function CommunityPage() {
           </div>
 
           <div className="container mx-auto px-4 md:px-6 lg:px-8 relative z-10">
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/20 backdrop-blur-md rounded-full border border-white/30 mb-6">
-                <Users className="w-5 h-5 text-white" />
-                <span className="text-sm font-medium text-white">Бесплатное сообщество</span>
+            <div className="max-w-4xl mx-auto">
+              <div className="mb-4 flex justify-start">
+                <BackButton variant="outline" />
               </div>
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold font-montserrat mb-6 drop-shadow-lg">
+            </div>
+            <div className="max-w-4xl mx-auto text-center">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold font-montserrat mb-6 drop-shadow-lg -mt-2">
                 Сообщество «Без паузы»
               </h1>
-              <p className="text-xl md:text-2xl lg:text-3xl text-white/95 max-w-3xl mx-auto drop-shadow-md leading-relaxed mb-8">
+              <div className="mb-8 flex justify-center">
+                <div className="relative w-full max-w-2xl aspect-video rounded-2xl overflow-hidden shadow-2xl">
+                  <Image
+                    src="/comunity.png"
+                    alt="Сообщество «Без паузы» — поддержка женщин в период менопаузы"
+                    fill
+                    className="object-cover"
+                    priority
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                  />
+                </div>
+              </div>
+              <p className="text-xl md:text-2xl lg:text-3xl text-white/95 max-w-3xl mx-auto drop-shadow-md leading-relaxed mb-8 font-montserrat font-normal">
                 Поддержка и знания для женщин в период менопаузы
               </p>
-              <p className="text-lg md:text-xl text-white/85 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-lg md:text-xl text-white/85 max-w-2xl mx-auto leading-relaxed mb-8">
                 Безопасное пространство, где вы можете задать вопросы, получить научно обоснованные ответы простым языком и почувствовать, что вы не одни в своих переживаниях.
               </p>
+
+              {/* Action Buttons */}
+              <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <CommunityAccessButtons variant="outline" />
+              </div>
             </div>
           </div>
         </section>
@@ -249,9 +269,7 @@ export default function CommunityPage() {
                 Получите доступ к поддержке, экспертным разборам и сообществу женщин, которые понимают вас с полуслова. Участие полностью бесплатное.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <JoinCommunityButton />
-              </div>
+              <CommunityAccessButtons variant="outline" />
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
                 <div className="flex items-center gap-3 text-white/90">
