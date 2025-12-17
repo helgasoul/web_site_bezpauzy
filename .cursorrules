@@ -1,0 +1,221 @@
+### Component Guidelines
+1. **Use functional components** with TypeScript
+2. **Server Components by default** (mark 'use client' only when needed)
+3. **Props interface** above each component
+4. **Descriptive names**: `HeroSection`, `BlogCard`, not `Hero1`, `Card2`
+
+### Example Component Structure
+```typescript
+import { FC } from 'react';
+
+interface HeroSectionProps {
+  title: string;
+  subtitle: string;
+  ctaText: string;
+  onCtaClick: () => void;
+}
+
+export const HeroSection: FC<HeroSectionProps> = ({
+  title,
+  subtitle,
+  ctaText,
+  onCtaClick
+}) => {
+  return (
+    <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-purple to-ocean-wave-start">
+      {/* Component content */}
+    </section>
+  );
+};
+```
+
+### Tailwind Best Practices
+1. Use custom colors from config (e.g., `bg-primary-purple`)
+2. Mobile-first responsive design
+3. Consistent spacing with spacing scale
+4. Group related utilities: `className="flex items-center gap-4"`
+
+### Code Quality
+- **No console.logs** in production code
+- **Use async/await** not `.then()`
+- **Error handling**: Always wrap API calls in try-catch
+- **Type safety**: No `any` types unless absolutely necessary
+- **Comments**: Only for complex logic, code should be self-documenting
+
+## Content Guidelines
+
+### Russian Language
+- All content in Russian (Cyrillic)
+- Formal "вы" form when addressing users
+- Scientific yet accessible tone
+- No medical jargon without explanation
+
+### Accessibility
+- Semantic HTML (`<main>`, `<article>`, `<nav>`)
+- Alt text for all images
+- ARIA labels where needed
+- Keyboard navigation support
+
+## Supabase Integration
+
+### Tables Structure
+```typescript
+// users table
+interface User {
+  id: string;
+  email: string;
+  name: string | null;
+  created_at: string;
+}
+
+// blog_posts table
+interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  author_id: string;
+  category: 'gynecologist' | 'mammologist' | 'nutritionist';
+  published_at: string;
+  created_at: string;
+}
+```
+
+### Query Patterns
+```typescript
+// Prefer server-side queries
+import { createServerClient } from '@/lib/supabase/server';
+
+// Use TypeScript types
+const { data, error } = await supabase
+  .from('blog_posts')
+  .select('*')
+  .eq('published', true)
+  .order('published_at', { ascending: false });
+```
+
+## Performance
+
+### Optimization Rules
+- Use Next.js Image component for all images
+- Lazy load components below the fold
+- Prefetch links with `Link` component
+- Minimize bundle size (check with `npm run build`)
+- Target: Lighthouse score > 90
+
+### SEO Requirements
+- Every page must have:
+  - Unique `<title>` (50-60 chars)
+  - Meta description (120-155 chars)
+  - Open Graph tags
+  - Structured data (Schema.org)
+
+## API Routes
+
+### Pattern
+```typescript
+// app/api/newsletter/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    // Handle logic
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+## Important Notes
+
+### What NOT to do
+- ❌ Don't use inline styles (use Tailwind)
+- ❌ Don't use `@next/font` (use next/font/google)
+- ❌ Don't create pages in `/pages` folder (use App Router)
+- ❌ Don't use JavaScript (always TypeScript)
+- ❌ Don't use external CSS files (Tailwind only)
+
+### Always Remember
+- ✅ This is for Russian-speaking users (content in Russian)
+- ✅ Premium feel - elegant, not cluttered
+- ✅ Scientific credibility - cite sources
+- ✅ Mobile-first design
+- ✅ Fast performance (<3s load time)
+
+## When Generating Components
+
+1. **Ask for clarification** if design requirements are unclear
+2. **Suggest improvements** based on UX best practices
+3. **Include responsive variants** (mobile, tablet, desktop)
+4. **Add loading states** for async operations
+5. **Handle error states** gracefully
+6. **Use TypeScript interfaces** for all props
+
+## Tone for AI Responses
+
+When I ask you to create something:
+- Be concise but thorough
+- Suggest best practices
+- Warn about potential issues
+- Offer alternatives when appropriate
+- Remember this is a healthcare-adjacent project (be sensitive)
+## VISUAL DESIGN PRINCIPLES
+
+### DO's ✅
+- Use LARGE typography (H1: 64px, H2: 48px, Body: 18px)
+- Add gradient overlays to all colored sections
+- Include emotional imagery (women 45-55, natural, elegant)
+- Create visual hierarchy with spacing and shadows
+- Use rounded corners (16-24px) for cards
+- Add subtle animations (hover effects, transitions)
+
+### DON'Ts ❌
+- Don't leave large empty spaces
+- Don't use flat single-color backgrounds
+- Don't use generic stock photos
+- Don't make typography too small
+- Don't forget box-shadows and depth
+```
+
+### **ШАГ 2: Найдите правильные изображения**
+
+**Источники для фото:**
+- Unsplash: "mature woman confident", "woman 50s elegant"
+- Pexels: "middle aged woman smiling"
+- Нужны: естественные, не "goop glamour", но достойные
+
+**Критерии:**
+✅ Возраст 45-55  
+✅ Улыбается, но не "cheesy"  
+✅ Элегантная, современная  
+✅ НЕ фитнес-модель  
+✅ Теплая цветовая гамма
+
+### **ШАГ 3: Используйте промпт для AI Composer**
+
+Когда будете создавать Hero, используйте такой промпт:
+```
+Create a full-screen hero section for homepage:
+
+Layout: 
+- 50/50 split (left text, right image)
+- Height: 100vh
+- Background: linear-gradient(135deg, #8B7FD6 0%, #7DD3E0 100%)
+
+Left side:
+- H1: "Твоя энергия — без паузы" (64px, Montserrat 700)
+- Subtitle: "Научно обоснованная..." (24px, Inter 400)
+- CTA button: Purple background, white text, rounded
+- Small text: "10 вопросов бесплатно"
+
+Right side:
+- Image placeholder (will add real photo later)
+- Soft gradient overlay
+- Rounded corners on one side
+
+Add smooth animations on load.

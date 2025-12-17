@@ -1,0 +1,165 @@
+import type { Metadata } from 'next'
+import Image from 'next/image'
+import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
+import { AskEvaWidget } from '@/components/ui/AskEvaWidget'
+
+export const metadata: Metadata = {
+  title: 'О нас — Кто мы | Без |Паузы',
+  description: 'Узнайте больше о создателе платформы Без |Паузы и нашей миссии помочь женщинам 40+ в период менопаузы.',
+  keywords: ['о нас', 'создатель', 'менопауза', 'женское здоровье', 'команда'],
+  openGraph: {
+    title: 'О нас — Кто мы',
+    description: 'Узнайте больше о создателе платформы Без |Паузы',
+    type: 'website',
+  },
+}
+
+export default function AboutPage() {
+  return (
+    <>
+      <Header />
+      <main className="min-h-screen">
+        {/* Hero Section */}
+        <section className="relative py-16 md:py-24 bg-gradient-purple-ocean text-white overflow-hidden">
+          {/* Background decorative elements */}
+          <div className="absolute inset-0 z-0 opacity-20">
+            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary-purple rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob" />
+            <div className="absolute bottom-1/3 right-1/4 w-72 h-72 bg-ocean-wave-start rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000" />
+          </div>
+
+          <div className="container mx-auto px-4 md:px-6 lg:px-8 relative z-10">
+            <div className="max-w-4xl mx-auto text-center">
+              <h1 className="text-4xl md:text-6xl font-bold font-montserrat mb-6 drop-shadow-lg">
+                О нас
+              </h1>
+              <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
+                Наша миссия — поддержать вас в период менопаузы научно обоснованной информацией и заботой
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Creator Section */}
+        <section className="py-16 md:py-24 bg-soft-white">
+          <div className="container mx-auto px-4 md:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                {/* Photo */}
+                <div className="relative">
+                  <div className="relative w-full aspect-square max-w-md mx-auto rounded-card overflow-hidden shadow-strong">
+                    <Image
+                      src="/Для bloom.jpg"
+                      alt="Создатель платформы Без |Паузы"
+                      fill
+                      className="object-cover object-top"
+                      priority
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-deep-navy/20 to-transparent" />
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="space-y-6">
+                  <h2 className="text-h2 font-bold text-deep-navy">
+                    Кто мы
+                  </h2>
+                  <div className="space-y-4 text-body text-deep-navy/80">
+                    <p>
+                      Меня зовут <strong className="text-primary-purple">Ольга Пучкова</strong>, и я создала платформу <strong className="text-primary-purple">Без |Паузы</strong> с глубоким пониманием того, через что проходят женщины в период менопаузы. Я знаю, как важно иметь доступ к научно обоснованной информации, поддержке и пониманию.
+                    </p>
+                    <p>
+                      Я — специалист с медицинским образованием и многолетним опытом работы в области женского здоровья. Столкнувшись с недостатком качественной информации о менопаузе на русском языке, я решила создать платформу, которая объединяет науку, заботу и практическую поддержку.
+                    </p>
+                    <p>
+                      Я верю, что каждая женщина заслуживает понимания своего тела, доступа к лучшим специалистам и поддержки на каждом этапе этого важного жизненного пути. <strong className="text-primary-purple">Ваша энергия — без паузы.</strong>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Mission Section */}
+        <section className="py-16 md:py-24 bg-lavender-bg">
+          <div className="container mx-auto px-4 md:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-h2 font-bold text-deep-navy text-center mb-12">
+                Наша миссия
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="text-center space-y-4">
+                  <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto shadow-medium">
+                    <span className="text-3xl">🔬</span>
+                  </div>
+                  <h3 className="text-h4 font-semibold text-deep-navy">
+                    Научный подход
+                  </h3>
+                  <p className="text-body text-deep-navy/70">
+                    Вся информация основана на актуальных медицинских исследованиях и рекомендациях ведущих специалистов
+                  </p>
+                </div>
+                <div className="text-center space-y-4">
+                  <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto shadow-medium">
+                    <span className="text-3xl">💜</span>
+                  </div>
+                  <h3 className="text-h4 font-semibold text-deep-navy">
+                    С заботой
+                  </h3>
+                  <p className="text-body text-deep-navy/70">
+                    Мы понимаем, что менопауза — это не просто медицинский процесс, а важный жизненный этап
+                  </p>
+                </div>
+                <div className="text-center space-y-4">
+                  <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto shadow-medium">
+                    <span className="text-3xl">🤝</span>
+                  </div>
+                  <h3 className="text-h4 font-semibold text-deep-navy">
+                    Поддержка 24/7
+                  </h3>
+                  <p className="text-body text-deep-navy/70">
+                    AI-ассистент Ева всегда готова ответить на ваши вопросы и поддержать вас в любое время
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Contact Section */}
+        <section className="py-16 md:py-24 bg-gradient-primary text-white">
+          <div className="container mx-auto px-4 md:px-6 lg:px-8">
+            <div className="max-w-3xl mx-auto text-center space-y-8">
+              <h2 className="text-h2 font-bold text-white">
+                Свяжитесь с нами
+              </h2>
+              <p className="text-body-large text-white/90">
+                У вас есть вопросы или предложения? Мы всегда рады услышать от вас
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a
+                  href="mailto:info@bezpauzy.com"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-primary-purple rounded-full font-semibold hover:shadow-strong hover:scale-105 transition-all duration-300"
+                >
+                  Написать нам
+                </a>
+                <a
+                  href="https://t.me/bezpauzy_bot"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white rounded-full font-semibold hover:bg-white/10 transition-all duration-300"
+                >
+                  Telegram
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <Footer />
+      <AskEvaWidget />
+    </>
+  )
+}
+
