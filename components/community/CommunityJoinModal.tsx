@@ -10,6 +10,7 @@ import * as z from 'zod'
 interface CommunityJoinModalProps {
   isOpen: boolean
   onClose: () => void
+  onSuccess?: (email: string, name: string) => void
 }
 
 const communityJoinSchema = z.object({
@@ -25,7 +26,7 @@ const communityJoinSchema = z.object({
 
 type CommunityJoinFormData = z.infer<typeof communityJoinSchema>
 
-export const CommunityJoinModal: FC<CommunityJoinModalProps> = ({ isOpen, onClose }) => {
+export const CommunityJoinModal: FC<CommunityJoinModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null)
   const [errorMessage, setErrorMessage] = useState<string>('')
@@ -64,10 +65,26 @@ export const CommunityJoinModal: FC<CommunityJoinModalProps> = ({ isOpen, onClos
       const result = await response.json()
 
       if (!response.ok) {
+        // If email already exists, treat it as success and show member modal
+        if (result.error?.includes('уже зарегистрирован') && onSuccess) {
+          // Save email to localStorage
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('bezpauzy_community_email', data.email)
+          }
+          onSuccess(data.email, data.name)
+          onClose()
+          return
+        }
         throw new Error(result.error || 'Произошла ошибка при регистрации')
       }
 
       setSubmitStatus('success')
+      
+      // Call onSuccess callback with email and name
+      if (onSuccess) {
+        onSuccess(data.email, data.name)
+      }
+      
       reset()
       
       // Закрыть модальное окно через 5 секунд после успешной регистрации

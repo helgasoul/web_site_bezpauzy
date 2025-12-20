@@ -15,7 +15,7 @@ export const LatestArticles: FC<LatestArticlesProps> = () => {
       category: 'Гинеколог',
       slug: 'prilivy-prichiny-i-resheniya',
       // Photo: Mature confident woman, professional setting
-      image: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=800&h=600&fit=crop&q=80',
+      image: '/article_1.png',
       overlay: 'from-primary-purple/50 to-transparent',
     },
     {
@@ -25,7 +25,7 @@ export const LatestArticles: FC<LatestArticlesProps> = () => {
       category: 'Гинеколог',
       slug: 'zgt-pokazaniya-i-protivopokazaniya',
       // Photo: Professional woman in medical/healthcare context
-      image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=600&fit=crop&q=80',
+      image: '/article_2.png',
       overlay: 'from-warm-accent/50 to-transparent',
     },
     {
@@ -35,7 +35,7 @@ export const LatestArticles: FC<LatestArticlesProps> = () => {
       category: 'Нутрициолог',
       slug: 'pitanie-v-menopauze',
       // Photo: Mature woman with healthy food, nutrition context
-      image: 'https://images.unsplash.com/photo-1504674900247-0877df9c836f?w=800&h=600&fit=crop&q=80',
+      image: '/article_3.png',
       overlay: 'from-ocean-wave-start/50 to-transparent',
     },
   ]

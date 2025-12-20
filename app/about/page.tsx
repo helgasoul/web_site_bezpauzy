@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
+import { BackButton } from '@/components/ui/BackButton'
 import { AskEvaWidget } from '@/components/ui/AskEvaWidget'
 
 export const metadata: Metadata = {
@@ -18,8 +17,6 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <>
-      <Header />
-      <main className="min-h-screen">
         {/* Hero Section */}
         <section className="relative py-16 md:py-24 bg-gradient-purple-ocean text-white overflow-hidden">
           {/* Background decorative elements */}
@@ -29,6 +26,9 @@ export default function AboutPage() {
           </div>
 
           <div className="container mx-auto px-4 md:px-6 lg:px-8 relative z-10">
+            <div className="max-w-4xl mx-auto mb-6">
+              <BackButton variant="outline" />
+            </div>
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="text-4xl md:text-6xl font-bold font-montserrat mb-6 drop-shadow-lg">
                 О нас
@@ -145,7 +145,7 @@ export default function AboutPage() {
                   Написать нам
                 </a>
                 <a
-                  href="https://t.me/bezpauzy_bot"
+                  href="https://t.me/bezpauzy_bot?start=website_about"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white rounded-full font-semibold hover:bg-white/10 transition-all duration-300"
@@ -156,8 +156,6 @@ export default function AboutPage() {
             </div>
           </div>
         </section>
-      </main>
-      <Footer />
       <AskEvaWidget />
     </>
   )

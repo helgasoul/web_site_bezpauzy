@@ -49,6 +49,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Trigger to automatically update updated_at
+DROP TRIGGER IF EXISTS update_menohub_community_members_updated_at ON menohub_community_members;
 CREATE TRIGGER update_menohub_community_members_updated_at
     BEFORE UPDATE ON menohub_community_members
     FOR EACH ROW

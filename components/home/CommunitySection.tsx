@@ -1,6 +1,8 @@
+'use client'
+
 import { FC } from 'react'
-import Link from 'next/link'
 import { Users, MessageCircle, Shield, HeartHandshake } from 'lucide-react'
+import { CommunityAccessButtons } from '@/components/community/CommunityAccessButtons'
 
 interface CommunitySectionProps {}
 
@@ -150,13 +152,9 @@ export const CommunitySection: FC<CommunitySectionProps> = () => {
                   </li>
                 </ul>
 
-                <Link
-                  href="/community"
-                  className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-base md:text-lg font-semibold text-primary-purple shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-warm-accent hover:text-white"
-                  aria-label="Присоединиться к сообществу «Без паузы»"
-                >
-                  <span>Присоединиться к сообществу</span>
-                </Link>
+                <div className="w-full max-w-full overflow-hidden">
+                  <CommunityAccessButtons variant="default" className="w-full flex-col" />
+                </div>
 
                 <p className="text-center text-xs text-white/70">
                   Научно обоснованный подход, уважение к вашим решениям и никакого

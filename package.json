@@ -6,34 +6,43 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "pdf-to-md": "node scripts/pdf-to-markdown.js",
+    "install-pdf-fonts": "node scripts/install-pdf-fonts.js",
+    "version:patch": "npm version patch --no-git-tag-version",
+    "version:minor": "npm version minor --no-git-tag-version",
+    "version:major": "npm version major --no-git-tag-version"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.3.0",
+    "@react-email/render": "^2.0.0",
+    "@react-pdf/renderer": "^4.3.1",
+    "@supabase/supabase-js": "^2.39.0",
+    "clsx": "^2.0.0",
+    "framer-motion": "^10.16.0",
+    "jspdf": "^3.0.4",
+    "jspdf-autotable": "^5.0.2",
+    "lucide-react": "^0.294.0",
+    "mammoth": "^1.11.0",
+    "next": "^14.0.0",
+    "pdf-parse": "^1.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "next": "^14.0.0",
-    "@supabase/supabase-js": "^2.39.0",
-    "framer-motion": "^10.16.0",
-    "lucide-react": "^0.294.0",
     "react-hook-form": "^7.48.0",
-    "zod": "^3.22.0",
-    "@hookform/resolvers": "^3.3.0",
-    "zustand": "^4.4.0",
-    "clsx": "^2.0.0",
-    "tailwind-merge": "^2.0.0",
     "resend": "^6.6.0",
-    "@react-email/render": "^2.0.0"
+    "tailwind-merge": "^2.0.0",
+    "zod": "^3.22.0",
+    "zustand": "^4.4.0"
   },
   "devDependencies": {
-    "typescript": "^5.2.2",
     "@types/node": "^20.9.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "autoprefixer": "^10.4.16",
+    "eslint": "^8.52.0",
+    "eslint-config-next": "^14.0.0",
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.5",
-    "eslint": "^8.52.0",
-    "eslint-config-next": "^14.0.0"
+    "typescript": "^5.2.2"
   }
 }
-

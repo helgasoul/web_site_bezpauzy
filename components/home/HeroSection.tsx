@@ -101,16 +101,6 @@ export const HeroSection: FC<HeroSectionProps> = () => {
               </div>
             </motion.div>
 
-            {/* Small text with icon */}
-            <motion.div
-              className="flex items-center gap-2 text-white/70 text-sm md:text-base"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.9 }}
-            >
-              <div className="w-1.5 h-1.5 bg-warm-accent rounded-full" />
-              <span>10 вопросов в день бесплатно • Без регистрации</span>
-            </motion.div>
           </motion.div>
 
           {/* Right: Rich Visual with Image */}

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
-import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
+import { BackButton } from '@/components/ui/BackButton'
 import { BotHero } from '@/components/bot/BotHero'
 import { BotHowItWorks } from '@/components/bot/BotHowItWorks'
 import { BotExampleConversation } from '@/components/bot/BotExampleConversation'
@@ -25,19 +24,18 @@ export const metadata: Metadata = {
 export default function BotPage() {
   return (
     <>
-      <Header />
-      <main className="min-h-screen">
-        <BotHero />
-        <BotHowItWorks />
-        <BotExampleConversation />
-        <BotFeatures />
-        <BotPricing />
-        <BotTrust />
-        <BotFAQ />
-        <BotCTA />
-        <AskEvaWidget />
-      </main>
-      <Footer />
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 pt-8 relative z-20">
+        <BackButton variant="ghost" />
+      </div>
+      <BotHero />
+      <BotHowItWorks />
+      <BotExampleConversation />
+      <BotFeatures />
+      <BotPricing />
+      <BotTrust />
+      <BotFAQ />
+      <BotCTA />
+      <AskEvaWidget />
     </>
   )
 }

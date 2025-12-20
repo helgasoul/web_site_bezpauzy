@@ -1,14 +1,46 @@
 'use client'
 
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { ArrowRight, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 interface BotCTAProps {}
 
 export const BotCTA: FC<BotCTAProps> = () => {
+  const router = useRouter()
+  const [isChecking, setIsChecking] = useState(false)
+
+  const handleAskEvaClick = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    setIsChecking(true)
+
+    try {
+      // Проверяем авторизацию
+      const response = await fetch('/api/auth/telegram/get-session')
+      const data = await response.json()
+      const authenticated = data.authenticated || false
+      const subscription = data.user?.subscriptionStatus === 'active' || false
+
+      if (authenticated && subscription) {
+        // Пользователь авторизован и имеет подписку - открываем чат
+        router.push('/chat')
+      } else if (authenticated && !subscription) {
+        // Пользователь авторизован, но нет подписки - открываем чат (там покажется сообщение о подписке)
+        router.push('/chat')
+      } else {
+        // Пользователь не авторизован - открываем чат (там покажется форма регистрации/входа)
+        router.push('/chat')
+      }
+    } catch (error) {
+      // В случае ошибки просто переходим в чат
+      router.push('/chat')
+    } finally {
+      setIsChecking(false)
+    }
+  }
   return (
     <section className="py-16 md:py-24 bg-deep-navy text-white relative overflow-hidden">
       {/* Wave pattern background */}
@@ -59,19 +91,18 @@ export const BotCTA: FC<BotCTAProps> = () => {
             </h2>
             
             <p className="text-body-large text-white/80 max-w-xl mx-auto lg:mx-0">
-              10 бесплатных вопросов в день. Без регистрации. Просто откройте ассистента и начните диалог.
+              Зарегистрируйтесь и получите доступ к Еве. Персонализированные ответы на основе международных медицинских исследований, рекомендации врачей и видео-курсы от экспертов.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
-              <Link
-                href="https://t.me/bezpauzy_bot"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-3 bg-white text-primary-purple px-10 py-5 rounded-full text-lg md:text-xl font-semibold hover:shadow-strong hover:scale-105 transition-all duration-300"
+              <button
+                onClick={handleAskEvaClick}
+                disabled={isChecking}
+                className="group inline-flex items-center gap-3 bg-white text-primary-purple px-10 py-5 rounded-full text-lg md:text-xl font-semibold hover:shadow-strong hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span>Спросить Еву</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
+                <span>{isChecking ? 'Проверка...' : 'Спросить Еву'}</span>
+                {!isChecking && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+              </button>
             </div>
 
             <p className="text-body-small text-white/60">

@@ -20,7 +20,7 @@ export const RelatedArticles: FC<RelatedArticlesProps> = ({ currentSlug, categor
       slug: 'zgt-pokazaniya-i-protivopokazaniya',
       excerpt: 'Полное руководство по заместительной гормональной терапии при менопаузе.',
       categoryName: 'Кабинет гинеколога',
-      image: '/hero-women.jpg',
+      image: '/article_2.png',
       gradient: 'from-warm-accent/40 via-primary-purple/30 to-ocean-wave-end/20',
     },
     {
@@ -29,7 +29,7 @@ export const RelatedArticles: FC<RelatedArticlesProps> = ({ currentSlug, categor
       slug: 'bessonnitsa-v-menopauze',
       excerpt: 'Нарушения сна — частый спутник менопаузы. Узнайте о причинах и эффективных способах.',
       categoryName: 'Кабинет гинеколога',
-      image: '/hero-women.jpg',
+      image: '/article_5.png',
       gradient: 'from-ocean-wave-start/40 via-warm-accent/30 to-primary-purple/20',
     },
     {
@@ -38,7 +38,7 @@ export const RelatedArticles: FC<RelatedArticlesProps> = ({ currentSlug, categor
       slug: 'ves-i-metabolizm-v-menopauze',
       excerpt: 'Почему в менопаузе так сложно контролировать вес? Научное объяснение и рекомендации.',
       categoryName: 'Кухня нутрициолога',
-      image: '/hero-women.jpg',
+      image: '/article_6.png',
       gradient: 'from-warm-accent/40 via-ocean-wave-start/30 to-primary-purple/20',
     },
   ]

@@ -1,7 +1,5 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
 import { AskEvaWidget } from '@/components/ui/AskEvaWidget'
 import { BackButton } from '@/components/ui/BackButton'
 import { FAQAccordion } from '@/components/community/FAQAccordion'
@@ -22,8 +20,6 @@ export const metadata: Metadata = {
 export default function CommunityPage() {
   return (
     <>
-      <Header />
-      <main className="min-h-screen">
         {/* Hero Section */}
         <section className="relative py-16 md:py-24 lg:py-32 bg-gradient-to-br from-primary-purple via-ocean-wave-start to-warm-accent/30 text-white overflow-hidden">
           {/* Background decorative elements */}
@@ -292,8 +288,6 @@ export default function CommunityPage() {
             </div>
           </div>
         </section>
-      </main>
-      <Footer />
       <AskEvaWidget />
     </>
   )

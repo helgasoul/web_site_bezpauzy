@@ -2,8 +2,12 @@
 
 import { FC, useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { MessageCircle, X, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { RegisterModal } from '@/components/auth/RegisterModal'
+import { WebsiteLoginModal } from '@/components/auth/WebsiteLoginModal'
+import { TelegramLinkModal } from '@/components/auth/TelegramLinkModal'
 
 interface AskEvaWidgetProps {
   articleTitle?: string
@@ -11,8 +15,21 @@ interface AskEvaWidgetProps {
 }
 
 export const AskEvaWidget: FC<AskEvaWidgetProps> = ({ articleTitle, articleSlug }) => {
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [hasSubscription, setHasSubscription] = useState(false)
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
+  const [showRegisterModal, setShowRegisterModal] = useState(false)
+  const [showWebsiteLogin, setShowWebsiteLogin] = useState(false)
+  const [showTelegramLink, setShowTelegramLink] = useState(false)
+  const [userTelegramId, setUserTelegramId] = useState<number | null>(null)
+
+  // Check authentication status
+  useEffect(() => {
+    checkAuth()
+  }, [])
 
   // Show widget after user scrolls down a bit
   useEffect(() => {
@@ -28,9 +45,44 @@ export const AskEvaWidget: FC<AskEvaWidgetProps> = ({ articleTitle, articleSlug 
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const botLink = articleSlug
-    ? `https://t.me/bezpauzy_bot?start=website_article_${articleSlug}`
-    : 'https://t.me/bezpauzy_bot'
+  const checkAuth = async () => {
+    try {
+      const response = await fetch('/api/auth/telegram/get-session')
+      const data = await response.json()
+      const authenticated = data.authenticated || false
+      const subscription = data.user?.subscriptionStatus === 'active' || false
+      const telegramId = data.user?.telegramId || null
+      setIsAuthenticated(authenticated)
+      setHasSubscription(subscription)
+      setUserTelegramId(telegramId)
+      return { authenticated, subscription, telegramId }
+    } catch (error) {
+      setIsAuthenticated(false)
+      setHasSubscription(false)
+      setUserTelegramId(null)
+      return { authenticated: false, subscription: false, telegramId: null }
+    } finally {
+      setIsCheckingAuth(false)
+    }
+  }
+
+  const handleAskEvaClick = async () => {
+    // Всегда проверяем авторизацию перед открытием виджета
+    const { authenticated, subscription } = await checkAuth()
+
+    if (authenticated && subscription) {
+      // Пользователь авторизован и имеет подписку - открываем чат
+      router.push('/chat')
+      setIsOpen(false)
+    } else if (authenticated && !subscription) {
+      // Пользователь авторизован, но нет подписки - открываем чат (там покажется сообщение о подписке)
+      router.push('/chat')
+      setIsOpen(false)
+    } else {
+      // Пользователь не авторизован - показываем виджет с кнопками регистрации/входа
+      setIsOpen(true)
+    }
+  }
 
   return (
     <>
@@ -45,7 +97,7 @@ export const AskEvaWidget: FC<AskEvaWidgetProps> = ({ articleTitle, articleSlug 
             transition={{ duration: 0.3 }}
           >
             <button
-              onClick={() => setIsOpen(true)}
+              onClick={handleAskEvaClick}
               className="group relative w-16 h-16 bg-gradient-primary rounded-full shadow-strong flex items-center justify-center hover:scale-110 transition-transform duration-300"
               aria-label="Спросить Еву"
             >
@@ -129,11 +181,11 @@ export const AskEvaWidget: FC<AskEvaWidgetProps> = ({ articleTitle, articleSlug 
                     <div className="bg-lavender-bg rounded-2xl p-4 space-y-2">
                       <div className="flex items-center gap-2 text-sm text-deep-navy/70">
                         <span className="w-2 h-2 bg-primary-purple rounded-full" />
-                        <span>10 бесплатных вопросов в день</span>
+                        <span>Ответы на основе науки</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-deep-navy/70">
                         <span className="w-2 h-2 bg-primary-purple rounded-full" />
-                        <span>Ответы на основе науки</span>
+                        <span>Персонализированные ответы</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-deep-navy/70">
                         <span className="w-2 h-2 bg-primary-purple rounded-full" />
@@ -142,23 +194,74 @@ export const AskEvaWidget: FC<AskEvaWidgetProps> = ({ articleTitle, articleSlug 
                     </div>
                   </div>
 
-                  {/* CTA Button */}
-                  <Link
-                    href={botLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <div className="w-full bg-gradient-primary text-white px-6 py-4 rounded-full text-center font-semibold hover:shadow-strong hover:scale-105 transition-all duration-300">
-                      Спросить Еву →
+                  {/* CTA Buttons */}
+                  {isCheckingAuth ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="w-8 h-8 border-4 border-primary-purple border-t-transparent rounded-full animate-spin" />
                     </div>
-                  </Link>
-
-                  {/* Small text */}
-                  <p className="text-caption text-deep-navy/60 text-center">
-                    Откроется в Telegram
-                  </p>
+                  ) : isAuthenticated ? (
+                    <>
+                      {userTelegramId && userTelegramId !== 0 ? (
+                        <>
+                          <Link
+                            href="/chat"
+                            className="block w-full"
+                            onClick={() => setIsOpen(false)}
+                          >
+                            <div className="w-full bg-gradient-primary text-white px-6 py-4 rounded-full text-center font-semibold hover:shadow-strong hover:scale-105 transition-all duration-300">
+                              Спросить Еву →
+                            </div>
+                          </Link>
+                          <p className="text-caption text-deep-navy/60 text-center">
+                            Откроется чат на сайте
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-sm text-deep-navy/70 text-center mb-4">
+                            Чтобы общаться с Евой, привяжите ваш Telegram аккаунт. Это позволит синхронизировать диалоги между сайтом и ботом.
+                          </p>
+                          <button
+                            onClick={() => {
+                              setShowTelegramLink(true)
+                              setIsOpen(false)
+                            }}
+                            className="w-full bg-gradient-primary text-white px-6 py-4 rounded-full text-center font-semibold hover:shadow-strong hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+                          >
+                            <MessageCircle className="w-5 h-5" />
+                            Синхронизировать с Telegram
+                          </button>
+                          <p className="text-xs text-deep-navy/60 text-center mt-2">
+                            После привязки вы сможете общаться с Евой на сайте
+                          </p>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => {
+                          setShowRegisterModal(true)
+                          setIsOpen(false)
+                        }}
+                        className="w-full bg-gradient-primary text-white px-6 py-4 rounded-full text-center font-semibold hover:shadow-strong hover:scale-105 transition-all duration-300"
+                      >
+                        Зарегистрироваться
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowWebsiteLogin(true)
+                          setIsOpen(false)
+                        }}
+                        className="w-full bg-white border-2 border-primary-purple text-primary-purple px-6 py-3 rounded-full text-center font-semibold hover:bg-primary-purple hover:text-white transition-all duration-300"
+                      >
+                        Войти через логин/пароль
+                      </button>
+                      <p className="text-caption text-deep-navy/60 text-center">
+                        Зарегистрируйтесь, чтобы общаться с Евой
+                      </p>
+                    </>
+                  )}
                 </div>
 
                 {/* Footer */}
@@ -172,6 +275,66 @@ export const AskEvaWidget: FC<AskEvaWidgetProps> = ({ articleTitle, articleSlug 
           </>
         )}
       </AnimatePresence>
+
+      {/* Auth Modals */}
+      <RegisterModal
+        isOpen={showRegisterModal}
+        onClose={() => {
+          setShowRegisterModal(false)
+          checkAuth()
+        }}
+        onSuccess={() => {
+          setShowRegisterModal(false)
+          checkAuth().then(({ telegramId }) => {
+            // После регистрации проверяем telegram_id
+            if (!telegramId || telegramId === 0) {
+              // Показываем виджет с кнопкой синхронизации
+              setIsOpen(true)
+            } else {
+              // Есть telegram_id - можно переходить в чат
+              router.push('/chat')
+            }
+          })
+        }}
+      />
+      <WebsiteLoginModal
+        isOpen={showWebsiteLogin}
+        onClose={() => {
+          setShowWebsiteLogin(false)
+          checkAuth()
+        }}
+        onSuccess={() => {
+          setShowWebsiteLogin(false)
+          checkAuth().then(({ telegramId }) => {
+            // После входа проверяем telegram_id
+            if (!telegramId || telegramId === 0) {
+              // Показываем кнопку синхронизации
+              setIsOpen(true)
+            } else {
+              // Есть telegram_id - можно переходить в чат
+              router.push('/chat')
+            }
+          })
+        }}
+        onSwitchToRegister={() => {
+          setShowWebsiteLogin(false)
+          setShowRegisterModal(true)
+        }}
+      />
+      <TelegramLinkModal
+        isOpen={showTelegramLink}
+        onClose={() => {
+          setShowTelegramLink(false)
+          checkAuth()
+        }}
+        onSuccess={() => {
+          setShowTelegramLink(false)
+          checkAuth().then(() => {
+            // После привязки можно переходить в чат
+            router.push('/chat')
+          })
+        }}
+      />
     </>
   )
 }

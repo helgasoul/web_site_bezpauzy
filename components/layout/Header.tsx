@@ -1,14 +1,46 @@
 'use client'
 
-import { FC, useState } from 'react'
+import { FC, useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, User } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { AuthModal } from '@/components/auth/AuthModal'
 
 interface HeaderProps {}
 
 export const Header: FC<HeaderProps> = () => {
+  const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
+
+  // Проверяем сессию при загрузке
+  useEffect(() => {
+    checkSession()
+  }, [])
+
+  const checkSession = async () => {
+    try {
+      const response = await fetch('/api/auth/telegram/get-session')
+      const data = await response.json()
+      setIsAuthenticated(data.authenticated || false)
+    } catch (error) {
+      console.error('Error checking session:', error)
+      setIsAuthenticated(false)
+    } finally {
+      setIsCheckingAuth(false)
+    }
+  }
+
+  const handleAuthClick = () => {
+    if (isAuthenticated) {
+      router.push('/account')
+    } else {
+      setIsAuthModalOpen(true)
+    }
+  }
 
   const navItems = [
     { label: 'Журнал', href: '/blog' },
@@ -50,12 +82,20 @@ export const Header: FC<HeaderProps> = () => {
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-ocean-wave-start group-hover:w-full transition-all duration-300" />
               </Link>
             ))}
-            <Link
-              href="/login"
-              className="px-6 py-2 text-body font-medium text-deep-navy hover:text-primary-purple transition-colors"
+            <button
+              onClick={handleAuthClick}
+              className="px-6 py-2 text-body font-medium text-deep-navy hover:text-primary-purple transition-colors flex items-center gap-2"
+              disabled={isCheckingAuth}
             >
-              Войти в аккаунт
-            </Link>
+              {isAuthenticated ? (
+                <>
+                  <User size={18} />
+                  <span>Личный кабинет</span>
+                </>
+              ) : (
+                <span>Войти в аккаунт</span>
+              )}
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -82,17 +122,28 @@ export const Header: FC<HeaderProps> = () => {
                   {item.label}
                 </Link>
               ))}
-              <Link
-                href="/login"
-                className="text-body font-medium text-deep-navy hover:text-primary-purple transition-colors py-2"
-                onClick={() => setIsMenuOpen(false)}
+              <button
+                onClick={() => {
+                  setIsMenuOpen(false)
+                  handleAuthClick()
+                }}
+                className="text-body font-medium text-deep-navy hover:text-primary-purple transition-colors py-2 text-left flex items-center gap-2"
+                disabled={isCheckingAuth}
               >
-                Войти в аккаунт
-              </Link>
+                {isAuthenticated ? (
+                  <>
+                    <User size={18} />
+                    <span>Личный кабинет</span>
+                  </>
+                ) : (
+                  <span>Войти в аккаунт</span>
+                )}
+              </button>
             </div>
           </div>
         )}
       </nav>
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </header>
   )
 }

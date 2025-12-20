@@ -1,14 +1,46 @@
 'use client'
 
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { ArrowRight, Sparkles, MessageCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 interface BotHeroProps {}
 
 export const BotHero: FC<BotHeroProps> = () => {
+  const router = useRouter()
+  const [isChecking, setIsChecking] = useState(false)
+
+  const handleStartDialog = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    setIsChecking(true)
+
+    try {
+      // Проверяем авторизацию
+      const response = await fetch('/api/auth/telegram/get-session')
+      const data = await response.json()
+      const authenticated = data.authenticated || false
+      const subscription = data.user?.subscriptionStatus === 'active' || false
+
+      if (authenticated && subscription) {
+        // Пользователь авторизован и имеет подписку - открываем чат
+        router.push('/chat')
+      } else if (authenticated && !subscription) {
+        // Пользователь авторизован, но нет подписки - открываем чат (там покажется сообщение о подписке)
+        router.push('/chat')
+      } else {
+        // Пользователь не авторизован - открываем чат (там покажется форма регистрации/входа)
+        router.push('/chat')
+      }
+    } catch (error) {
+      // В случае ошибки просто переходим в чат
+      router.push('/chat')
+    } finally {
+      setIsChecking(false)
+    }
+  }
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-lavender">
       {/* Decorative elements */}
@@ -66,15 +98,14 @@ export const BotHero: FC<BotHeroProps> = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.7 }}
             >
-              <Link
-                href="https://t.me/bezpauzy_bot"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-3 bg-primary-purple text-white px-10 py-5 rounded-full text-lg md:text-xl font-semibold hover:shadow-strong hover:scale-105 transition-all duration-300"
+              <button
+                onClick={handleStartDialog}
+                disabled={isChecking}
+                className="group inline-flex items-center gap-3 bg-primary-purple text-white px-10 py-5 rounded-full text-lg md:text-xl font-semibold hover:shadow-strong hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span>Начать диалог в Telegram</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
+                <span>{isChecking ? 'Проверка...' : 'Начать диалог'}</span>
+                {!isChecking && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+              </button>
               
               <Link
                 href="#example"
@@ -152,16 +183,6 @@ export const BotHero: FC<BotHeroProps> = () => {
               </div>
             </div>
 
-            {/* Floating badge */}
-            <motion.div
-              className="absolute -bottom-6 -right-6 bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-strong border border-white/50"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1 }}
-            >
-              <div className="text-2xl font-bold text-primary-purple">10</div>
-              <div className="text-xs text-deep-navy/70">Бесплатных вопросов/день</div>
-            </motion.div>
           </motion.div>
         </div>
       </div>

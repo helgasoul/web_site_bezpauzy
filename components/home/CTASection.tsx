@@ -21,7 +21,7 @@ export const CTASection: FC<CTASectionProps> = () => {
             10 бесплатных вопросов в день
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/bot">
+            <Link href="/chat">
               <Button variant="ghost" className="w-full sm:w-auto">
                 Спросить Еву →
               </Button>

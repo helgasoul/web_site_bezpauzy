@@ -7,14 +7,13 @@ import { BookTeaser } from '@/components/home/BookTeaser'
 import { HowItWorks } from '@/components/home/HowItWorks'
 import { Testimonials } from '@/components/home/Testimonials'
 import { CTASection } from '@/components/home/CTASection'
-import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
 import { AskEvaWidget } from '@/components/ui/AskEvaWidget'
+import { DeepLinkHandler } from '@/components/auth/DeepLinkHandler'
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen">
-      <Header />
+    <>
+      <DeepLinkHandler />
       <HeroSection />
       <ProblemSolution />
       <SocialProof />
@@ -24,9 +23,8 @@ export default function HomePage() {
       <HowItWorks />
       <Testimonials />
       <CTASection />
-      <Footer />
       <AskEvaWidget />
-    </main>
+    </>
   )
 }
 

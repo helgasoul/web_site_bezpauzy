@@ -80,7 +80,7 @@ export const Footer: FC<FooterProps> = () => {
               </li>
               <li>
                 <a
-                  href="https://t.me/bezpauzy_bot"
+                  href="https://t.me/bezpauzy_bot?start=website_footer"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-ocean-wave-start transition-colors"

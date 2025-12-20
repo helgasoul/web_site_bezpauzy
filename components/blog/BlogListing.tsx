@@ -33,7 +33,7 @@ export const BlogListing: FC<BlogListingProps> = () => {
       },
       publishedAt: '2024-12-15',
       readTime: 8,
-      image: '/hero-women.jpg', // Placeholder
+      image: '/article_1.png',
       gradient: 'from-primary-purple/40 via-ocean-wave-start/30 to-warm-accent/20',
     },
     {
@@ -50,7 +50,7 @@ export const BlogListing: FC<BlogListingProps> = () => {
       },
       publishedAt: '2024-12-10',
       readTime: 12,
-      image: '/hero-women.jpg',
+      image: '/article_2.png',
       gradient: 'from-warm-accent/40 via-primary-purple/30 to-ocean-wave-end/20',
     },
     {
@@ -67,7 +67,7 @@ export const BlogListing: FC<BlogListingProps> = () => {
       },
       publishedAt: '2024-12-05',
       readTime: 10,
-      image: '/hero-women.jpg',
+      image: '/article_3.png',
       gradient: 'from-ocean-wave-start/40 via-primary-purple/30 to-warm-accent/20',
     },
     {
@@ -84,7 +84,7 @@ export const BlogListing: FC<BlogListingProps> = () => {
       },
       publishedAt: '2024-11-28',
       readTime: 7,
-      image: '/hero-women.jpg',
+      image: '/article_4.png',
       gradient: 'from-primary-purple/40 via-warm-accent/30 to-ocean-wave-end/20',
     },
     {
@@ -101,7 +101,7 @@ export const BlogListing: FC<BlogListingProps> = () => {
       },
       publishedAt: '2024-11-20',
       readTime: 9,
-      image: '/hero-women.jpg',
+      image: '/article_5.png',
       gradient: 'from-ocean-wave-start/40 via-warm-accent/30 to-primary-purple/20',
     },
     {
@@ -118,7 +118,7 @@ export const BlogListing: FC<BlogListingProps> = () => {
       },
       publishedAt: '2024-11-15',
       readTime: 11,
-      image: '/hero-women.jpg',
+      image: '/article_6.png',
       gradient: 'from-warm-accent/40 via-ocean-wave-start/30 to-primary-purple/20',
     },
   ]
@@ -135,28 +135,42 @@ export const BlogListing: FC<BlogListingProps> = () => {
   return (
     <section className="py-8 md:py-16 bg-soft-white">
       {/* Hero Section */}
-      <div className="bg-gradient-lavender py-16 md:py-24 mb-12 md:mb-16">
-        <div className="container mx-auto px-4 md:px-6 lg:px-8">
+      <div className="relative py-16 md:py-24 mb-12 md:mb-16 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/ChatGPT Image Dec 17, 2025 at 09_35_22 PM.png"
+            alt="Журнал — статьи о менопаузе"
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+          />
+          {/* Overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-deep-navy/60 via-deep-navy/40 to-deep-navy/60" />
+        </div>
+
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 relative z-10">
           <motion.div
             className="max-w-3xl mx-auto text-center"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-h1 md:text-display font-bold text-deep-navy mb-6">
+            <h1 className="text-h1 md:text-display font-bold text-white mb-6 drop-shadow-lg">
               Журнал
             </h1>
-            <p className="text-body-large text-deep-navy/70 mb-8">
+            <p className="text-body-large text-white/95 mb-8 drop-shadow-md">
               Научно обоснованные статьи о менопаузе от гинекологов, маммологов и нутрициологов
             </p>
             
             {/* Search bar */}
             <div className="relative max-w-2xl mx-auto">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-deep-navy/40" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-deep-navy/40 z-10" />
               <input
                 type="text"
                 placeholder="Поиск статей..."
-                className="w-full pl-12 pr-4 py-4 rounded-full border-2 border-lavender-bg focus:border-primary-purple focus:outline-none bg-white shadow-card"
+                className="w-full pl-12 pr-4 py-4 rounded-full border-2 border-white/30 focus:border-primary-purple focus:outline-none bg-white/95 backdrop-blur-sm shadow-card"
               />
             </div>
           </motion.div>
