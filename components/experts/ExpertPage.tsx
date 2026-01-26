@@ -227,7 +227,6 @@ export const ExpertPage: FC<ExpertPageProps> = ({ expertData }) => {
                     />
                   ) : expert.cv ? (
                     <div className="prose prose-lg max-w-none">
-                      {/* @ts-expect-error - react-markdown has React 18 type compatibility issues with ReactNode */}
                       <ReactMarkdown
                         components={{
                           h2: ({ children }: any) => (

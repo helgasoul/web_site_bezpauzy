@@ -250,7 +250,6 @@ export const KnowledgeBaseTopicList: FC<KnowledgeBaseTopicListProps> = ({ catego
                     {/* Short content if available (для карточки "Приливы") */}
                     {topic.shortContent && (
                       <div className="text-body-small text-deep-navy/60 mb-4 line-clamp-3 group-hover:text-deep-navy/75 transition-colors duration-300">
-                        {/* @ts-expect-error - react-markdown has React 18 type compatibility issues with ReactNode */}
                         <ReactMarkdown
                           components={{
                             p: ({ children }: any) => <span>{children}</span>,
