@@ -38,7 +38,7 @@ export const BookTeaser: FC<BookTeaserProps> = () => {
           {/* Right: Content */}
           <div className="space-y-6 lg:order-2 order-1">
             <h2 className="text-h2 font-bold text-soft-white">
-              КНИГА &quot;МЕНОПАУЗА БЕЗ|ПАУЗЫ&quot;
+              КНИГА {'"'}МЕНОПАУЗА БЕЗ|ПАУЗЫ{'"'}
             </h2>
             <p className="text-body-large text-soft-white/90">
               Новая жизнь - прежняя ты

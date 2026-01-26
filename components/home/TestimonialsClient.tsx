@@ -68,7 +68,7 @@ export const TestimonialsClient: FC<TestimonialsClientProps> = ({ testimonials }
                 )}
 
                 <div className="text-quote font-accent text-deep-navy mb-6 text-center">
-                  &quot;{testimonial.quote}&quot;
+                  {'"'}{testimonial.quote}{'"'}
                 </div>
                 <div className="text-body-small text-deep-navy/70 text-center">
                   — {testimonial.author_name}
