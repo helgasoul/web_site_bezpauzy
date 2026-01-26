@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.0",
+    "adm-zip": "^0.5.16",
     "@react-email/render": "^2.0.0",
     "@react-pdf/renderer": "^4.3.1",
     "@supabase/supabase-js": "^2.39.0",
@@ -33,6 +34,8 @@
     "bcryptjs": "^2.4.3",
     "clsx": "^2.0.0",
     "framer-motion": "^10.16.0",
+    "fast-xml-parser": "^4.3.2",
+    "isomorphic-dompurify": "^2.9.0",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.4",
     "jspdf-autotable": "^5.0.2",
