@@ -38,7 +38,7 @@ export const BuyResourceButton: FC<BuyResourceButtonProps> = ({
       type: 'resource',
       title: resource.title,
       description: resource.description || undefined,
-      thumbnail_url: resource.thumbnailUrl || undefined,
+      thumbnail_url: resource.coverImage || undefined,
       price: price,
       metadata: {
         resource_slug: resource.slug,
@@ -79,7 +79,7 @@ export const BuyResourceButton: FC<BuyResourceButtonProps> = ({
             type="resource"
             title={resource.title}
             description={resource.description || undefined}
-            thumbnail_url={resource.thumbnailUrl || undefined}
+            thumbnail_url={resource.coverImage || undefined}
             price={price}
             metadata={{
               resource_slug: resource.slug,
