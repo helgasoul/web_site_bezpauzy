@@ -30,8 +30,10 @@ export const RegisterModal: FC<RegisterModalProps> = ({ isOpen, onClose, onSucce
     e.preventDefault()
     setError(null)
 
+    const trimmedUsername = username.trim()
+
     // Валидация
-    if (username.length < 3) {
+    if (trimmedUsername.length < 3) {
       setError('Логин должен содержать минимум 3 символа')
       return
     }
@@ -46,8 +48,8 @@ export const RegisterModal: FC<RegisterModalProps> = ({ isOpen, onClose, onSucce
       return
     }
 
-    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-      setError('Логин может содержать только буквы, цифры и подчеркивание')
+    if (!/^[a-zA-Z0-9_]+$/.test(trimmedUsername)) {
+      setError('Логин может содержать только латинские буквы (a–z), цифры и подчёркивание. Проверьте, что нет пробелов и русских букв.')
       return
     }
 
@@ -58,7 +60,7 @@ export const RegisterModal: FC<RegisterModalProps> = ({ isOpen, onClose, onSucce
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username: trimmedUsername, password }),
       })
 
       const data = await response.json()
@@ -251,13 +253,17 @@ export const RegisterModal: FC<RegisterModalProps> = ({ isOpen, onClose, onSucce
                       setUsername(e.target.value)
                       setError(null)
                     }}
+                    onBlur={(e) => {
+                      const v = e.target.value.trim()
+                      if (v !== e.target.value) setUsername(v)
+                    }}
                     placeholder="придумайте_логин"
                     className="w-full px-4 py-3 bg-white border-2 border-lavender-bg rounded-xl focus:outline-none focus:border-primary-purple transition-colors text-deep-navy placeholder:text-deep-navy/50"
                     autoFocus
                     required
                   />
                   <p className="text-xs text-deep-navy/60 mt-1">
-                    Только буквы, цифры и подчеркивание
+                    Только латинские буквы (a–z), цифры и подчёркивание, без пробелов
                   </p>
                 </div>
 

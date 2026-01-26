@@ -16,7 +16,9 @@ import { logger } from '@/lib/logger'
  */
 export async function POST(request: NextRequest) {
   try {
-    const { username, password } = await request.json()
+    const body = await request.json()
+    const username = typeof body.username === 'string' ? body.username.trim() : ''
+    const password = body.password
 
     // Валидация
     if (!username || username.length < 3) {
@@ -33,10 +35,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Проверка формата логина (только буквы, цифры, подчеркивание)
+    // Проверка формата логина (только латинские буквы, цифры, подчеркивание)
     if (!/^[a-zA-Z0-9_]+$/.test(username)) {
       return NextResponse.json(
-        { error: 'Логин может содержать только буквы, цифры и подчеркивание' },
+        { error: 'Логин может содержать только латинские буквы (a–z), цифры и подчёркивание. Без пробелов и русских букв.' },
         { status: 400 }
       )
     }
