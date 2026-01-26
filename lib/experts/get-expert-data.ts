@@ -115,81 +115,72 @@ export async function getExpertByCategory(
 
 /**
  * Получить все данные для страницы эксперта (эксперт + статьи + видео).
- * Если в menohub_experts нет записи — используем статичные данные со страницы «Эксперты проекта».
+ * Если в menohub_experts нет записи или Supabase недоступен — используем статичные данные.
  */
 export async function getExpertPageData(
   category: 'gynecologist' | 'mammologist' | 'nutritionist'
 ): Promise<ExpertPageData | null> {
-  let expert = await getExpertByCategory(category)
-  if (!expert) {
+  let expert: Expert
+  let expertArticles: ExpertPageData['articles'] = []
+  let expertVideos: ExpertPageData['videos'] = []
+
+  try {
+    expert = (await getExpertByCategory(category)) ?? STATIC_EXPERTS[category]
+  } catch {
     expert = STATIC_EXPERTS[category]
   }
 
-  // Получаем статьи эксперта (по категории)
-  const allArticles = await getArticlesByCategory(category)
-  const expertArticles = allArticles
-    .map((article) => ({
-      id: article.id,
-      title: article.title,
-      slug: article.slug,
-      excerpt: article.excerpt,
-      image: article.image,
-      published_at: article.publishedAt || article.createdAt,
-      read_time: article.readTime ?? undefined,
-    }))
-    .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())
-
-  // Получаем видео с участием эксперта
-  const supabase = createServiceRoleClient()
-  
-  // Сначала получаем все опубликованные видео
-  const { data: allVideos, error: videosError } = await supabase
-    .from('menohub_video_content')
-    .select('*')
-    .eq('published', true)
-    .lte('published_at', new Date().toISOString())
-    .order('published_at', { ascending: false })
-
-  if (videosError) {
-    console.error('Error fetching videos:', videosError)
+  try {
+    const allArticles = await getArticlesByCategory(category)
+    expertArticles = allArticles
+      .map((article) => ({
+        id: article.id,
+        title: article.title,
+        slug: article.slug,
+        excerpt: article.excerpt,
+        image: article.image,
+        published_at: article.publishedAt || article.createdAt,
+        read_time: article.readTime ?? undefined,
+      }))
+      .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())
+  } catch {
+    expertArticles = []
   }
 
-  // Фильтруем видео по эксперту
-  const expertVideos = (allVideos || [])
-    .filter((video) => {
-      // Проверяем, упоминается ли эксперт как гость
-      const isGuest = video.guest_expert_name?.toLowerCase().includes(expert.name.toLowerCase())
-      
-      // Для подкастов фильтруем по имени гостя
-      if (video.content_type === 'podcast') {
-        return isGuest
-      }
-      
-      // Для "Ева объясняет" фильтруем по категории видео
-      // Связываем категорию эксперта с категорией видео
-      if (category === 'nutritionist' && video.category === 'nutrition') {
-        return true
-      }
-      if (category === 'gynecologist' && (video.category === 'hormones' || video.category === 'menopause')) {
-        return true
-      }
-      if (category === 'mammologist' && video.category === 'general') {
-        return true
-      }
-      
-      return false
-    })
-    .map((video) => ({
-      id: video.id,
-      title: video.title,
-      slug: video.slug,
-      description: video.description,
-      thumbnail_url: video.thumbnail_url,
-      video_url: video.video_url,
-      duration: video.duration,
-      content_type: video.content_type as 'podcast' | 'eva_explains',
-      published_at: video.published_at || video.created_at,
-    }))
+  try {
+    const supabase = createServiceRoleClient()
+    const { data: allVideos, error: videosError } = await supabase
+      .from('menohub_video_content')
+      .select('*')
+      .eq('published', true)
+      .lte('published_at', new Date().toISOString())
+      .order('published_at', { ascending: false })
+
+    if (!videosError && allVideos) {
+      expertVideos = allVideos
+        .filter((video: any) => {
+          const isGuest = video.guest_expert_name?.toLowerCase().includes(expert.name.toLowerCase())
+          if (video.content_type === 'podcast') return isGuest
+          if (category === 'nutritionist' && video.category === 'nutrition') return true
+          if (category === 'gynecologist' && (video.category === 'hormones' || video.category === 'menopause')) return true
+          if (category === 'mammologist' && video.category === 'general') return true
+          return false
+        })
+        .map((video: any) => ({
+          id: video.id,
+          title: video.title,
+          slug: video.slug,
+          description: video.description,
+          thumbnail_url: video.thumbnail_url,
+          video_url: video.video_url,
+          duration: video.duration,
+          content_type: video.content_type as 'podcast' | 'eva_explains',
+          published_at: video.published_at || video.created_at,
+        }))
+    }
+  } catch {
+    expertVideos = []
+  }
 
   return {
     expert,
