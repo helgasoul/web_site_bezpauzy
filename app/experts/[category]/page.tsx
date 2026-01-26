@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { ExpertPage } from '@/components/experts/ExpertPage'
-import { getExpertPageData, getAllExperts } from '@/lib/experts/get-expert-data'
+import { getExpertPageData } from '@/lib/experts/get-expert-data'
 
 type Category = 'gynecologist' | 'mammologist' | 'nutritionist'
 
@@ -11,16 +11,9 @@ interface PageProps {
   }>
 }
 
-// Revalidate страницы каждые 60 секунд (для обновления данных из базы)
-export const revalidate = 60
-
-// Генерируем статические пути для всех категорий
-export async function generateStaticParams() {
-  const experts = await getAllExperts()
-  return experts.map((expert) => ({
-    category: expert.category,
-  }))
-}
+// Страница рендерится по запросу, чтобы не требовать SUPABASE_SERVICE_ROLE_KEY на этапе сборки
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 // Генерируем метаданные для каждой страницы
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
