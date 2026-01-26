@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { BookOpen, FileText, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { assetUrl } from '@/lib/assets'
 
 interface BookHeroProps {}
 
@@ -23,7 +24,7 @@ export const BookHero: FC<BookHeroProps> = () => {
           >
             <div className="relative w-full max-w-md mx-auto aspect-[2/3] rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300 overflow-hidden">
               <Image
-                src="/oblozhka.png"
+                src={assetUrl('/oblozhka.png')}
                 alt="Обложка книги Менопауза: Новое видение"
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 448px"

@@ -6,6 +6,8 @@ import { RelatedArticles } from '@/components/blog/RelatedArticles'
 import { NewsletterSubscription } from '@/components/blog/NewsletterSubscription'
 import { AskEvaWidget } from '@/components/ui/AskEvaWidget'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Маммография после 40: что нужно знать | Без |Паузы',
   description: 'Всё о безопасности маммографии, плотной груди и дополнительных методах скрининга. Научно обоснованная информация для женщин 40+.',

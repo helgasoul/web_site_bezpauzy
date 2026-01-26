@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, Sparkles, Heart, Shield } from 'lucide-react'
 import { initFadeInAnimations } from '@/lib/utils/intersection-observer'
+import { assetUrl } from '@/lib/assets'
 
 interface HeroSectionProps {}
 
@@ -114,7 +115,7 @@ export const HeroSection: FC<HeroSectionProps> = () => {
                 {/* Image or placeholder */}
                 <div className="relative w-full aspect-[4/5] bg-gradient-to-br from-primary-purple/40 via-ocean-wave-start/30 to-warm-accent/20">
                   <Image
-                    src="/hero-women.jpg"
+                    src={assetUrl('/hero-women.jpg')}
                     alt="Женщины 40+ - наша аудитория"
                     width={800}
                     height={1000}

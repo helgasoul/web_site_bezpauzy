@@ -6,6 +6,9 @@ import { RelatedArticles } from '@/components/blog/RelatedArticles'
 import { NewsletterSubscription } from '@/components/blog/NewsletterSubscription'
 import { AskEvaWidget } from '@/components/ui/AskEvaWidget'
 import { getExpertByCategory } from '@/lib/experts'
+import { assetUrl } from '@/lib/assets'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Aging и менопауза: 5 правил вечной молодости | Без |Паузы',
@@ -28,16 +31,16 @@ async function getArticle() {
     categoryName: 'Кухня нутрициолога',
     author: (() => {
       const expert = getExpertByCategory('nutritionist')
-      return expert || {
+      return expert ? { ...expert, avatar: assetUrl(expert.avatar || '/hero-women.jpg') } : {
         name: 'Климкова Марина',
         role: 'Эксперт-нутрициолог',
-        avatar: '/hero-women.jpg',
+        avatar: assetUrl('/hero-women.jpg'),
       }
     })(),
     publishedAt: '2024-12-25',
     updatedAt: '2024-12-25',
     readTime: 15,
-    image: '/article_7.png',
+    image: assetUrl('/article_7.png'),
     keyTakeaways: [
       'Здоровое старение в менопаузе — это не борьба с возрастом, а осознанный выбор образа жизни',
       'Правильное питание с акцентом на противовоспалительные продукты — основа долголетия',

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Send, Loader2, Bot, User, MessageCircle, History } from 'lucide-react'
 import Image from 'next/image'
 import { ChatHistorySidebar } from './ChatHistorySidebar'
+import { assetUrl } from '@/lib/assets'
 
 interface Message {
   id: string
@@ -286,7 +287,7 @@ export const ChatInterface: FC<ChatInterfaceProps> = ({ userId, telegramId, quiz
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center overflow-hidden">
                 <Image
-                  src="/ChatGPT Image Dec 19, 2025 at 10_44_36 PM.png"
+                  src={assetUrl('/ChatGPT Image Dec 19, 2025 at 10_44_36 PM.png')}
                   alt="Ева"
                   width={48}
                   height={48}
@@ -331,7 +332,7 @@ export const ChatInterface: FC<ChatInterfaceProps> = ({ userId, telegramId, quiz
                 {message.sender === 'bot' && (
                   <div className="w-10 h-10 bg-gradient-to-br from-primary-purple to-ocean-wave-start rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden">
                     <Image
-                      src="/ChatGPT Image Dec 19, 2025 at 10_44_36 PM.png"
+                      src={assetUrl('/ChatGPT Image Dec 19, 2025 at 10_44_36 PM.png')}
                       alt="Ева"
                       width={40}
                       height={40}

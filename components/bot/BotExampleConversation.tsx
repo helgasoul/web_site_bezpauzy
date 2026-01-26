@@ -3,6 +3,7 @@
 import { FC } from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
+import { assetUrl } from '@/lib/assets'
 
 interface BotExampleConversationProps {}
 
@@ -42,7 +43,7 @@ export const BotExampleConversation: FC<BotExampleConversationProps> = () => {
             <div className="flex items-center gap-3 pb-4 border-b border-lavender-bg mb-6">
               <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center overflow-hidden">
                 <Image
-                  src="/ChatGPT Image Dec 19, 2025 at 10_44_36 PM.png"
+                  src={assetUrl('/ChatGPT Image Dec 19, 2025 at 10_44_36 PM.png')}
                   alt="Ева"
                   width={48}
                   height={48}

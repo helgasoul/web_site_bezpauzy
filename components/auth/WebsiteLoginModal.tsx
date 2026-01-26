@@ -1,6 +1,7 @@
 'use client'
 
-import { FC, useState } from 'react'
+import { FC, useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Loader2, AlertCircle, User, Lock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -163,11 +164,14 @@ export const WebsiteLoginModal: FC<WebsiteLoginModalProps> = ({
     }
   }
 
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
   if (!isOpen) return null
 
-  return (
+  const modalContent = (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none">
+      <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 pointer-events-none">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -304,5 +308,7 @@ export const WebsiteLoginModal: FC<WebsiteLoginModalProps> = ({
       </div>
     </AnimatePresence>
   )
+
+  return mounted && typeof document !== 'undefined' ? createPortal(modalContent, document.body) : null
 }
 

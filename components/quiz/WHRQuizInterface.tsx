@@ -12,6 +12,7 @@ import { SaveResultsButton } from './SaveResultsButton'
 import { AskEvaQuizButton } from './AskEvaQuizButton'
 import { DownloadQuizPDFButton } from './DownloadQuizPDFButton'
 import { BackButton } from '@/components/ui/BackButton'
+import { assetUrl } from '@/lib/assets'
 
 type QuizStep = 'intro' | 'questions' | 'results'
 
@@ -129,7 +130,7 @@ export const WHRQuizInterface: FC = () => {
                 <div className="text-center space-y-8">
                   <div className="flex items-center justify-center mx-auto">
                     <Image
-                      src="/logo.png"
+                      src={assetUrl('/logo.png')}
                       alt="Без |Паузы"
                       width={80}
                       height={80}

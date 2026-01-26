@@ -7,6 +7,7 @@ import { ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { getCategoryName } from '@/lib/utils/blog'
 import type { BlogPost } from '@/lib/blog/get-articles'
+import { assetUrl } from '@/lib/assets'
 
 interface RelatedArticlesClientProps {
   articles: BlogPost[]
@@ -44,7 +45,7 @@ export const RelatedArticlesClient: FC<RelatedArticlesClientProps> = ({ articles
           {articles.map((article, index) => {
             const categoryName = article.categoryName || getCategoryName(article.category)
             const gradient = getGradientForCategory(article.category)
-            const imageUrl = article.image || '/article_1.png' // Fallback изображение
+            const imageUrl = assetUrl(article.image || '/article_1.png') // Fallback изображение
 
             return (
               <motion.article

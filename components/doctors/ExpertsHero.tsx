@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Image from 'next/image'
+import { assetUrl } from '@/lib/assets'
 
 export const ExpertsHero = () => {
   return (
@@ -9,7 +10,7 @@ export const ExpertsHero = () => {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/project_experts.png"
+          src={assetUrl('/project_experts.png')}
           alt="Фон секции экспертов"
           fill
           className="object-cover"

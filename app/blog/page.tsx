@@ -5,6 +5,8 @@ import { NewsletterSubscription } from '@/components/blog/NewsletterSubscription
 import { AskEvaWidget } from '@/components/ui/AskEvaWidget'
 import { getPublishedArticles, getArticlesByCategory } from '@/lib/blog/get-articles'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Журнал — Статьи о менопаузе от врачей | Без |Паузы',
   description: 'Научно обоснованные статьи о менопаузе от гинекологов, маммологов и нутрициологов. Приливы, ЗГТ, питание, сон и многое другое.',

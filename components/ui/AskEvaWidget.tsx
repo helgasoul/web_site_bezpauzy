@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { RegisterModal } from '@/components/auth/RegisterModal'
 import { WebsiteLoginModal } from '@/components/auth/WebsiteLoginModal'
 import { TelegramLinkModal } from '@/components/auth/TelegramLinkModal'
+import { assetUrl } from '@/lib/assets'
 
 interface AskEvaWidgetProps {
   articleTitle?: string
@@ -125,7 +126,7 @@ export const AskEvaWidget: FC<AskEvaWidgetProps> = ({ articleTitle, articleSlug 
                   {hasEvaPhoto ? (
                     <div className="relative w-28 h-28 rounded-full overflow-hidden ring-2 ring-white/40 shadow-2xl">
                       <Image
-                        src="/eva-avatar.png"
+                        src={assetUrl('/eva-avatar.png')}
                         alt="Ева - AI-консультант"
                         fill
                         className="object-cover rounded-full"

@@ -4,6 +4,7 @@ import { VideoListing } from '@/components/video/VideoListing'
 import { getEvaExplainsVideos } from '@/lib/supabase/video'
 import { PlayCircle, Sparkles, Headphones } from 'lucide-react'
 import Link from 'next/link'
+import { assetUrl } from '@/lib/assets'
 
 export const metadata: Metadata = {
   title: 'Ева Объясняет | Без |Паузы',
@@ -34,7 +35,7 @@ export default async function EvaExplainsPage() {
             <div className="max-w-3xl mx-auto text-center">
               <div className="inline-flex items-center justify-center w-24 h-24 md:w-28 md:h-28 rounded-full mb-6 overflow-hidden ring-4 ring-white/40 shadow-xl bg-white/10 backdrop-blur-sm">
                 <Image
-                  src="/ChatGPT Image Dec 19, 2025 at 10_44_36 PM.png"
+                  src={assetUrl('/ChatGPT Image Dec 19, 2025 at 10_44_36 PM.png')}
                   alt="Ева"
                   width={112}
                   height={112}

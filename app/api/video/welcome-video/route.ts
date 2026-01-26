@@ -1,14 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createReadStream, statSync } from 'fs'
+import { createReadStream, statSync, existsSync } from 'fs'
 import { join } from 'path'
 
 // Явно указываем, что этот route динамический (использует request.headers)
 export const dynamic = 'force-dynamic'
 
+/** URL видео в Supabase Storage (или любой CDN). Если задан — всегда редирект на него. */
+const WELCOME_VIDEO_URL = process.env.WELCOME_VIDEO_URL
+
 export async function GET(request: NextRequest) {
+  // Если задан URL видео в Supabase Storage — редирект на него
+  if (WELCOME_VIDEO_URL?.startsWith('http')) {
+    return NextResponse.redirect(WELCOME_VIDEO_URL, 302)
+  }
+
   try {
     const filePath = join(process.cwd(), 'public', 'welcome-video.mp4')
-    
+
+    if (!existsSync(filePath)) {
+      return NextResponse.json(
+        {
+          error: 'Video file not found',
+          hint: 'Add welcome-video.mp4 to public/ or set WELCOME_VIDEO_URL to your Supabase Storage URL',
+          path: filePath,
+        },
+        { status: 404 }
+      )
+    }
+
     // Проверяем, существует ли файл
     const stats = statSync(filePath)
     

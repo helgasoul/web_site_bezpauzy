@@ -3,6 +3,7 @@
 import { FC } from 'react'
 import { motion } from 'framer-motion'
 import { BookOpen, Search } from 'lucide-react'
+import { assetUrl } from '@/lib/assets'
 
 interface KnowledgeBaseHeroProps {}
 
@@ -20,7 +21,7 @@ export const KnowledgeBaseHero: FC<KnowledgeBaseHeroProps> = () => {
         playsInline
         className="absolute inset-0 w-full h-full object-cover z-[1]"
       >
-        <source src="/social_helgasoul_Elegant_abstract_illustration_of_gentle_waves_of_wa_2cfafba4-18e8-478c-92ca-924cc8c21cf1_0.mp4" type="video/mp4" />
+        <source src={assetUrl('/social_helgasoul_Elegant_abstract_illustration_of_gentle_waves_of_wa_2cfafba4-18e8-478c-92ca-924cc8c21cf1_0.mp4')} type="video/mp4" />
       </video>
 
       {/* Overlay для читаемости текста */}

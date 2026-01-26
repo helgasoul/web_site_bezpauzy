@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
+
+export const dynamic = 'force-dynamic'
 import Image from 'next/image'
 import { BackButton } from '@/components/ui/BackButton'
 import { getTopicBySlug } from '@/lib/knowledge-base/config'

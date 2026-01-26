@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button'
 import { getPublishedArticles } from '@/lib/blog/get-articles'
 import { getCategoryName, getCategoryOverlay } from '@/lib/utils/blog'
 import type { BlogPost } from '@/lib/blog/get-articles'
+import { assetUrl } from '@/lib/assets'
 
 interface LatestArticlesProps {}
 
@@ -34,7 +35,7 @@ export async function LatestArticles() {
     excerpt: article.excerpt || '',
     category: getCategoryName(article.category),
     slug: article.slug,
-    image: article.image || '/article_1.png', // Fallback изображение
+    image: assetUrl(article.image || '/article_1.png'), // Fallback изображение
     overlay: getCategoryOverlay(article.category),
     isFirst: index === 0, // Для priority загрузки изображения
   }))

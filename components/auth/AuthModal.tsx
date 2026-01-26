@@ -26,7 +26,8 @@ export const AuthModal: FC<AuthModalProps> = ({ isOpen, onClose }) => {
     onClose()
   }
 
-  const modalContent = isOpen && (
+  // Первый экран (выбор «Регистрация» / «Вход») показываем только когда не открыты подмодалки
+  const modalContent = isOpen && !showRegisterModal && !showWebsiteLogin && (
     <AnimatePresence>
       <div key="auth-modal" className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none">
         <motion.div

@@ -11,6 +11,7 @@ import { BuyResourceButton } from './BuyResourceButton'
 import { BackButton } from '@/components/ui/BackButton'
 import { AskEvaWidget } from '@/components/ui/AskEvaWidget'
 import type { LucideIcon } from 'lucide-react'
+import { assetUrl } from '@/lib/assets'
 
 interface GuidesPageClientProps {
   resources: Resource[]
@@ -59,7 +60,7 @@ export const GuidesPageClient: FC<GuidesPageClientProps> = ({ resources }) => {
         {/* Фоновое изображение */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/helgasoul_Elegant_abstract_illustration_of_gentle_waves_of_wa_7eb544cb-1f34-43b0-a75f-69583713dac0_3.png"
+            src={assetUrl('/helgasoul_Elegant_abstract_illustration_of_gentle_waves_of_wa_7eb544cb-1f34-43b0-a75f-69583713dac0_3.png')}
             alt="Декоративный фон с волнами"
             fill
             className="object-cover"

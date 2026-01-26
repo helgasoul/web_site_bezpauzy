@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle2, ArrowRight, ArrowLeft } from 'lucide-react'
 import Image from 'next/image'
 import { MRSResults } from './MRSResults'
+import { assetUrl } from '@/lib/assets'
 
 interface MRSQuestion {
   id: number
@@ -243,7 +244,7 @@ export const MRSQuiz: FC<MRSQuizProps> = ({ onComplete }) => {
         >
           <div className="relative w-16 h-16 md:w-20 md:h-20">
             <Image
-              src="/logo.png"
+              src={assetUrl('/logo.png')}
               alt="Без |Паузы"
               fill
               className="object-contain opacity-10"

@@ -5,6 +5,7 @@ import { BackButton } from '@/components/ui/BackButton'
 import { FAQAccordion } from '@/components/community/FAQAccordion'
 import { CommunityAccessButtons } from '@/components/community/CommunityAccessButtons'
 import { Users, MessageCircle, Shield, HeartHandshake, BookOpen, Video, UsersRound, CheckCircle2 } from 'lucide-react'
+import { assetUrl } from '@/lib/assets'
 
 export const metadata: Metadata = {
   title: 'Сообщество «Без паузы» — Бесплатная поддержка | Без |Паузы',
@@ -48,7 +49,7 @@ export default function CommunityPage() {
               <div className="mb-8 flex justify-center">
                 <div className="relative w-full max-w-2xl aspect-video rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/comunity.png"
+                    src={assetUrl('/comunity.png')}
                     alt="Сообщество «Без паузы» — поддержка женщин в период менопаузы"
                     fill
                     className="object-cover"

@@ -10,6 +10,7 @@ import { getCategoryName, getCategoryOverlay } from '@/lib/utils/blog'
 import { getExpertByCategory, getExpertByName } from '@/lib/experts'
 import type { BlogPost } from '@/lib/blog/get-articles'
 import type { ExpertCategory } from '@/lib/experts'
+import { assetUrl } from '@/lib/assets'
 
 interface BlogListingProps {
   articles: BlogPost[]
@@ -136,7 +137,7 @@ export const BlogListing: FC<BlogListingProps> = ({ articles, categoryCounts }) 
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/journal page.png"
+            src={assetUrl('/journal page.png')}
             alt="Журнал — статьи о менопаузе"
             fill
             className="object-cover"
@@ -222,7 +223,7 @@ export const BlogListing: FC<BlogListingProps> = ({ articles, categoryCounts }) 
                 const author = getAuthor(article)
                 const categoryName = article.categoryName || getCategoryName(article.category)
                 const gradient = getGradient(article.category)
-                const imageUrl = article.image || '/article_1.png'
+                const imageUrl = assetUrl(article.image || '/article_1.png')
 
                 return (
                   <motion.article
@@ -289,7 +290,7 @@ export const BlogListing: FC<BlogListingProps> = ({ articles, categoryCounts }) 
                           <div className="flex items-center gap-3 pt-4 border-t border-lavender-bg">
                             <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-lavender-bg flex-shrink-0 shadow-sm">
                               <Image
-                                src={author.avatar}
+                                src={assetUrl(author.avatar)}
                                 alt={author.name}
                                 fill
                                 className="object-cover"

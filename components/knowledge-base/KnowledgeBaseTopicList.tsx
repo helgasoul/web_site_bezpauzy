@@ -15,6 +15,7 @@ import { HeartVesselsTopicModal } from './HeartVesselsTopicModal'
 import { HotFlashesTopicModal } from './HotFlashesTopicModal'
 import { WeightMetabolismTopicModal } from './WeightMetabolismTopicModal'
 import { SkinHairTopicModal } from './SkinHairTopicModal'
+import { assetUrl } from '@/lib/assets'
 
 interface KnowledgeBaseTopicListProps {
   category: KnowledgeBaseCategory
@@ -81,7 +82,7 @@ export const KnowledgeBaseTopicList: FC<KnowledgeBaseTopicListProps> = ({ catego
                   {topic.image && (
                     <div className="relative w-full h-48 mb-4 overflow-hidden">
                       <Image
-                        src={topic.image}
+                        src={assetUrl(topic.image)}
                         alt={topic.title}
                         fill
                         className="object-cover"
@@ -94,7 +95,7 @@ export const KnowledgeBaseTopicList: FC<KnowledgeBaseTopicListProps> = ({ catego
                   {!topic.image && isPrilivyTopic && (
                     <div className="relative w-full h-48 mb-4 overflow-hidden">
                       <Image
-                        src="/для карточки базы знаний -1.png"
+                        src={assetUrl('/для карточки базы знаний -1.png')}
                         alt={topic.title}
                         fill
                         className="object-cover"
@@ -107,7 +108,7 @@ export const KnowledgeBaseTopicList: FC<KnowledgeBaseTopicListProps> = ({ catego
                   {!topic.image && isSleepTopic && (
                     <div className="relative w-full h-48 mb-4 overflow-hidden">
                       <Image
-                        src="/Карточка сон-2.png"
+                        src={assetUrl('/Карточка сон-2.png')}
                         alt={topic.title}
                         fill
                         className="object-cover"
@@ -120,7 +121,7 @@ export const KnowledgeBaseTopicList: FC<KnowledgeBaseTopicListProps> = ({ catego
                   {!topic.image && isMoodTopic && (
                     <div className="relative w-full h-48 mb-4 overflow-hidden">
                       <Image
-                        src="/Настроение Карточка 3.png"
+                        src={assetUrl('/Настроение Карточка 3.png')}
                         alt={topic.title}
                         fill
                         className="object-cover"
@@ -133,7 +134,7 @@ export const KnowledgeBaseTopicList: FC<KnowledgeBaseTopicListProps> = ({ catego
                   {!topic.image && isLibidoTopic && (
                     <div className="relative w-full h-48 mb-4 overflow-hidden">
                       <Image
-                        src="/карточка  либидо -4.png"
+                        src={assetUrl('/карточка  либидо -4.png')}
                         alt={topic.title}
                         fill
                         className="object-cover"
@@ -146,7 +147,7 @@ export const KnowledgeBaseTopicList: FC<KnowledgeBaseTopicListProps> = ({ catego
                   {!topic.image && isVesMetabolizmTopic && (
                     <div className="relative w-full h-48 mb-4 overflow-hidden">
                       <Image
-                        src="/Вес и метаболизм карточка -5.png"
+                        src={assetUrl('/Вес и метаболизм карточка -5.png')}
                         alt={topic.title}
                         fill
                         className="object-cover"
@@ -159,7 +160,7 @@ export const KnowledgeBaseTopicList: FC<KnowledgeBaseTopicListProps> = ({ catego
                   {!topic.image && isKozhaVolosyTopic && (
                     <div className="relative w-full h-48 mb-4 overflow-hidden">
                       <Image
-                        src="/Волосы карточка -6.png"
+                        src={assetUrl('/Волосы карточка -6.png')}
                         alt={topic.title}
                         fill
                         className="object-cover"
@@ -172,7 +173,7 @@ export const KnowledgeBaseTopicList: FC<KnowledgeBaseTopicListProps> = ({ catego
                   {!topic.image && isBonesJointsTopic && (
                     <div className="relative w-full h-48 mb-4 overflow-hidden">
                       <Image
-                        src="/Кости и суставы карточка -7 .png"
+                        src={assetUrl('/Кости и суставы карточка -7 .png')}
                         alt={topic.title}
                         fill
                         className="object-cover"
@@ -185,7 +186,7 @@ export const KnowledgeBaseTopicList: FC<KnowledgeBaseTopicListProps> = ({ catego
                   {!topic.image && isSerdtseSosudyTopic && (
                     <div className="relative w-full h-48 mb-4 overflow-hidden">
                       <Image
-                        src="/карточка -8 сердце и сосуды.png"
+                        src={assetUrl('/карточка -8 сердце и сосуды.png')}
                         alt={topic.title}
                         fill
                         className="object-cover"
@@ -198,7 +199,7 @@ export const KnowledgeBaseTopicList: FC<KnowledgeBaseTopicListProps> = ({ catego
                   {!topic.image && isZgtTopic && (
                     <div className="relative w-full h-48 mb-4 overflow-hidden">
                       <Image
-                        src="/card_ZGT.png"
+                        src={assetUrl('/card_ZGT.png')}
                         alt={topic.title}
                         fill
                         className="object-cover"
@@ -211,7 +212,7 @@ export const KnowledgeBaseTopicList: FC<KnowledgeBaseTopicListProps> = ({ catego
                   {!topic.image && isAlternativyTopic && (
                     <div className="relative w-full h-48 mb-4 overflow-hidden">
                       <Image
-                        src="/card_alter_m.png"
+                        src={assetUrl('/card_alter_m.png')}
                         alt={topic.title}
                         fill
                         className="object-cover"
@@ -224,7 +225,7 @@ export const KnowledgeBaseTopicList: FC<KnowledgeBaseTopicListProps> = ({ catego
                   {!topic.image && isObrazZhizniTopic && (
                     <div className="relative w-full h-48 mb-4 overflow-hidden">
                       <Image
-                        src="/card_obraz_zh.png"
+                        src={assetUrl('/card_obraz_zh.png')}
                         alt={topic.title}
                         fill
                         className="object-cover"

@@ -7,6 +7,7 @@ import { BookOpen, Download, CheckCircle2, Heart, UtensilsCrossed, Sparkles, Fil
 import { DownloadGuideButton } from '@/components/quiz/DownloadGuideButton'
 import { ResourcePurchaseStatus } from '@/components/resources/ResourcePurchaseStatus'
 import { BackButton } from '@/components/ui/BackButton'
+import { assetUrl } from '@/lib/assets'
 
 interface Guide {
   id: string
@@ -81,7 +82,7 @@ export const GuidesPage: FC = () => {
         {/* Фоновое изображение */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/helgasoul_Elegant_abstract_illustration_of_gentle_waves_of_wa_7eb544cb-1f34-43b0-a75f-69583713dac0_3.png"
+            src={assetUrl('/helgasoul_Elegant_abstract_illustration_of_gentle_waves_of_wa_7eb544cb-1f34-43b0-a75f-69583713dac0_3.png')}
             alt="Декоративный фон с волнами"
             fill
             className="object-cover"
@@ -136,7 +137,7 @@ export const GuidesPage: FC = () => {
                       {/* Обложка - занимает большую часть карточки */}
                       <div className="relative w-full aspect-[2/3] flex-shrink-0 overflow-hidden">
                         <Image
-                          src={guide.coverImage!}
+                          src={assetUrl(guide.coverImage!)}
                           alt={guide.title}
                           fill
                           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"

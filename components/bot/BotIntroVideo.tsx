@@ -4,6 +4,7 @@ import { FC, useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Volume2, VolumeX, Volume1, Play, Pause, Square } from 'lucide-react'
+import { assetUrl } from '@/lib/assets'
 
 interface BotIntroVideoProps {}
 
@@ -235,7 +236,7 @@ export const BotIntroVideo: FC<BotIntroVideoProps> = () => {
                     
                     // Устанавливаем сообщение об ошибке
                     if (video.error.code === 4) {
-                      setVideoError('Файл видео не найден. Убедитесь, что файл welcome-video.mp4 находится в папке public/')
+                      setVideoError('Файл видео не найден. Добавьте welcome-video.mp4 в public/ или укажите WELCOME_VIDEO_URL в настройках (URL из Supabase Storage).')
                     } else {
                       setVideoError(`Ошибка загрузки видео: код ${video.error.code}`)
                     }
@@ -250,7 +251,7 @@ export const BotIntroVideo: FC<BotIntroVideoProps> = () => {
                     <p className="font-semibold mb-2">Ошибка загрузки видео</p>
                     <p className="text-xs">{videoError}</p>
                     <p className="text-xs mt-2 text-red-500">
-                      Проверьте, что файл welcome-video.mp4 находится в папке public/
+                      Либо загрузите welcome-video.mp4 в public/, либо задайте WELCOME_VIDEO_URL (URL в Supabase Storage).
                     </p>
                   </div>
                 </div>
@@ -263,7 +264,7 @@ export const BotIntroVideo: FC<BotIntroVideoProps> = () => {
                   <div className="relative w-full h-full flex items-center justify-center">
                     <div className="relative w-3/4 h-3/4 rounded-full overflow-hidden">
                       <Image
-                        src="/ChatGPT Image Dec 19, 2025 at 10_44_36 PM.png"
+                        src={assetUrl('/ChatGPT Image Dec 19, 2025 at 10_44_36 PM.png')}
                         alt="Ева"
                         fill
                         className="object-cover"

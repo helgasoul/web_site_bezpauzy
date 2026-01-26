@@ -4,6 +4,7 @@ import { FC } from 'react'
 import { motion } from 'framer-motion'
 import { User, Award, BookOpen, ExternalLink } from 'lucide-react'
 import Image from 'next/image'
+import { assetUrl } from '@/lib/assets'
 
 interface BookAuthorBioProps {}
 
@@ -42,7 +43,7 @@ export const BookAuthorBio: FC<BookAuthorBioProps> = () => {
             >
               <div className="relative w-full max-w-sm mx-auto aspect-square rounded-3xl overflow-hidden shadow-2xl">
                 <Image
-                  src="/puchkova-olga.png"
+                  src={assetUrl('/puchkova-olga.png')}
                   alt="Ольга Пучкова — автор книги"
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 384px"

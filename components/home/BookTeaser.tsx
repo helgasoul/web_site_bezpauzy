@@ -2,6 +2,7 @@ import { FC } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
+import { assetUrl } from '@/lib/assets'
 
 interface BookTeaserProps {}
 
@@ -14,7 +15,7 @@ export const BookTeaser: FC<BookTeaserProps> = () => {
           <div className="relative lg:order-1 order-2">
             <div className="relative w-full max-w-md mx-auto aspect-[2/3] rounded-card shadow-2xl transform hover:scale-105 transition-transform duration-300 overflow-hidden">
               <Image
-                src="/oblozhka.png"
+                src={assetUrl('/oblozhka.png')}
                 alt="Обложка книги Менопауза Без |Паузы"
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 448px"

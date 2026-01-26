@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, Sparkles, MessageCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { assetUrl } from '@/lib/assets'
 
 interface BotHeroProps {}
 
@@ -152,7 +153,7 @@ export const BotHero: FC<BotHeroProps> = () => {
             <div className="relative rounded-3xl overflow-hidden shadow-strong aspect-[2/3] max-h-[500px]">
               <div className="relative w-full h-full">
                 <Image
-                  src="/oblozhka.png"
+                  src={assetUrl('/oblozhka.png')}
                   alt="Обложка книги Менопауза Без |Паузы"
                   fill
                   className="object-cover object-top"

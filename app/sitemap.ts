@@ -106,46 +106,52 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
-  // Динамические страницы: статьи блога
+  // Динамические страницы: только если Supabase доступен при сборке (чтобы сборка не падала без env)
+  const hasSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+
   let blogPages: MetadataRoute.Sitemap = []
-  try {
-    const articles = await getPublishedArticles()
-    blogPages = articles.map((article) => ({
-      url: `${SITE_URL}/blog/${article.slug}`,
-      lastModified: article.updatedAt ? new Date(article.updatedAt) : new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
-    }))
-  } catch (error) {
-    console.error('Error fetching blog articles for sitemap:', error)
+  if (hasSupabase) {
+    try {
+      const articles = await getPublishedArticles()
+      blogPages = articles.map((article) => ({
+        url: `${SITE_URL}/blog/${article.slug}`,
+        lastModified: article.updatedAt ? new Date(article.updatedAt) : new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
+      }))
+    } catch (error) {
+      console.error('Error fetching blog articles for sitemap:', error)
+    }
   }
 
-  // Динамические страницы: подкасты
   let podcastPages: MetadataRoute.Sitemap = []
-  try {
-    const { data: podcasts } = await getPodcastEpisodes()
-    podcastPages = (podcasts || []).map((podcast) => ({
-      url: `${SITE_URL}/podcasts/nopause/${podcast.slug}`,
-      lastModified: podcast.updated_at ? new Date(podcast.updated_at) : new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    }))
-  } catch (error) {
-    console.error('Error fetching podcasts for sitemap:', error)
+  if (hasSupabase) {
+    try {
+      const { data: podcasts } = await getPodcastEpisodes()
+      podcastPages = (podcasts || []).map((podcast) => ({
+        url: `${SITE_URL}/podcasts/nopause/${podcast.slug}`,
+        lastModified: podcast.updated_at ? new Date(podcast.updated_at) : new Date(),
+        changeFrequency: 'monthly' as const,
+        priority: 0.7,
+      }))
+    } catch (error) {
+      console.error('Error fetching podcasts for sitemap:', error)
+    }
   }
 
-  // Динамические страницы: видео "Ева объясняет"
   let videoPages: MetadataRoute.Sitemap = []
-  try {
-    const { data: videos } = await getEvaExplainsVideos()
-    videoPages = (videos || []).map((video) => ({
-      url: `${SITE_URL}/videos/eva-explains/${video.slug}`,
-      lastModified: video.updated_at ? new Date(video.updated_at) : new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    }))
-  } catch (error) {
-    console.error('Error fetching videos for sitemap:', error)
+  if (hasSupabase) {
+    try {
+      const { data: videos } = await getEvaExplainsVideos()
+      videoPages = (videos || []).map((video) => ({
+        url: `${SITE_URL}/videos/eva-explains/${video.slug}`,
+        lastModified: video.updated_at ? new Date(video.updated_at) : new Date(),
+        changeFrequency: 'monthly' as const,
+        priority: 0.7,
+      }))
+    } catch (error) {
+      console.error('Error fetching videos for sitemap:', error)
+    }
   }
 
   // Динамические страницы: категории базы знаний

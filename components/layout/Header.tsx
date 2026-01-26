@@ -8,6 +8,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { AuthModal } from '@/components/auth/AuthModal'
 import { SearchModal } from '@/components/search/SearchModal'
 import { useCartStore } from '@/lib/stores/cart-store'
+import { assetUrl } from '@/lib/assets'
 
 interface HeaderProps {}
 
@@ -193,7 +194,7 @@ export const Header: FC<HeaderProps> = () => {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3 flex-shrink-0">
             <Image
-              src="/logo.png"
+              src={assetUrl('/logo.png')}
               alt="Без |Паузы"
               width={48}
               height={48}

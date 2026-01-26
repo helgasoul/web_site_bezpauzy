@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import dynamic from 'next/dynamic'
+import dynamicImport from 'next/dynamic'
 import { ArticleHeader } from '@/components/blog/ArticleHeader'
 import { RelatedArticles } from '@/components/blog/RelatedArticles'
 import { NewsletterSubscription } from '@/components/blog/NewsletterSubscription'
@@ -9,14 +9,17 @@ import { StructuredData } from '@/components/seo/StructuredData'
 import { getArticleBySlug } from '@/lib/blog/get-articles'
 import { getCategoryName } from '@/lib/utils/blog'
 import { generateArticleSchema, generateBreadcrumbListSchema } from '@/lib/seo/schema'
+import { assetUrl } from '@/lib/assets'
+
+export const dynamic = 'force-dynamic'
 
 // Динамический импорт клиентских компонентов с framer-motion
-const EnhancedArticleContent = dynamic(
+const EnhancedArticleContent = dynamicImport(
   () => import('@/components/blog/EnhancedArticleContent').then(mod => ({ default: mod.EnhancedArticleContent })),
   { ssr: true }
 )
 
-const AskEvaWidget = dynamic(
+const AskEvaWidget = dynamicImport(
   () => import('@/components/ui/AskEvaWidget').then(mod => ({ default: mod.AskEvaWidget })),
   { ssr: false }
 )
@@ -44,10 +47,12 @@ export async function generateMetadata({
   const metaDescription = article.metaDescription || article.excerpt
   const keywords = article.metaKeywords || [categoryName, 'менопауза', 'климакс', 'женское здоровье']
 
-  // Формируем URL изображения для Open Graph
-  const imageUrl = article.image 
-    ? (article.image.startsWith('http') ? article.image : `${process.env.NEXT_PUBLIC_SITE_URL || 'https://bezpauzy.com'}${article.image}`)
-    : `${process.env.NEXT_PUBLIC_SITE_URL || 'https://bezpauzy.com'}/og-default.png`
+  // Формируем URL изображения для Open Graph (поддержка Supabase Storage через assetUrl)
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://bezpauzy.com'
+  const relPath = article.image || '/og-default.png'
+  const imageUrl = relPath.startsWith('http')
+    ? relPath
+    : (assetUrl(relPath).startsWith('http') ? assetUrl(relPath) : siteUrl + assetUrl(relPath))
 
   const articleUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://bezpauzy.com'}/blog/${article.slug}`
 
@@ -113,11 +118,11 @@ export default async function BlogPostPage({
   // Преобразуем данные из Supabase в формат, ожидаемый компонентами
   const categoryName = article.categoryName || getCategoryName(article.category)
   
-  // Формируем объект автора
+  // Формируем объект автора (avatar через assetUrl для Supabase Storage)
   const author = {
     name: article.authorName || 'Автор',
     role: article.authorRole || 'Эксперт',
-    avatar: article.authorAvatar || '/hero-women.jpg',
+    avatar: assetUrl(article.authorAvatar || '/hero-women.jpg'),
   }
 
   // Формируем объект статьи для компонентов
@@ -132,7 +137,7 @@ export default async function BlogPostPage({
     publishedAt: article.publishedAt || article.createdAt,
     updatedAt: article.updatedAt,
     readTime: article.readTime,
-    image: article.image || '/article_1.png',
+    image: assetUrl(article.image || '/article_1.png'),
     content: article.content,
     keyTakeaways: article.keyTakeaways,
     articleReferences: article.articleReferences,

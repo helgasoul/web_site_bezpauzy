@@ -1,6 +1,8 @@
 import { Metadata } from 'next'
 import { GuidesPageServer } from '@/components/resources/GuidesPageServer'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Гайды | Без |Паузы',
   description: 'Скачайте гайды по здоровью в период менопаузы: противовоспалительное питание, управление симптомами и многое другое.',

@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { BackButton } from '@/components/ui/BackButton'
 import { AskEvaWidget } from '@/components/ui/AskEvaWidget'
 import { PenTool, GraduationCap, Microscope, Video } from 'lucide-react'
+import { assetUrl } from '@/lib/assets'
 
 export const metadata: Metadata = {
   title: 'О нас — Кто мы | Без |Паузы',
@@ -57,7 +58,7 @@ export default function AboutPage() {
                 <div className="relative">
                   <div className="relative w-full aspect-square max-w-md mx-auto rounded-card overflow-hidden shadow-strong">
                     <Image
-                      src="/Для bloom.jpg"
+                      src={assetUrl('/Для bloom.jpg')}
                       alt="Создатель платформы Без |Паузы"
                       fill
                       className="object-cover object-top"

@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { assetUrl } from '@/lib/assets'
 
 interface BotCTAProps {}
 
@@ -44,7 +45,7 @@ export const BotCTA: FC<BotCTAProps> = () => {
           >
             <div className="relative w-full aspect-square rounded-full overflow-hidden shadow-strong">
               <Image
-                src="/ChatGPT Image Dec 19, 2025 at 10_44_36 PM.png"
+                src={assetUrl('/ChatGPT Image Dec 19, 2025 at 10_44_36 PM.png')}
                 alt="Ева — ваш AI-консультант по менопаузе"
                 fill
                 className="object-cover"

@@ -1,6 +1,8 @@
 import { Metadata } from 'next'
 import { ChecklistsPageServer } from '@/components/resources/ChecklistsPageServer'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Бесплатные чек-листы | Без |Паузы',
   description: 'Скачайте бесплатные чек-листы для подготовки к визиту к врачу, отслеживания симптомов и управления здоровьем в период менопаузы.',

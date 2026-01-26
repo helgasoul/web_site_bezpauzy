@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Calendar, Clock, ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { assetUrl } from '@/lib/assets'
 
 interface Article {
   id: number
@@ -97,7 +98,7 @@ export const TopicArticles: FC<TopicArticlesProps> = ({ articleSlugs = [] }) => 
                   {/* Image */}
                   <div className="w-full h-48 relative overflow-hidden bg-lavender-bg">
                     <Image
-                      src={article.image}
+                      src={assetUrl(article.image)}
                       alt={article.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"

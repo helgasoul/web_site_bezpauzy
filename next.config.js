@@ -30,6 +30,17 @@ const nextConfig = {
         hostname: '*.supabase.co',
         pathname: '/storage/v1/object/public/**',
       },
+      // Хост из NEXT_PUBLIC_ASSETS_BASE_URL (Supabase через свой домен, CDN и т.п.)
+      ...(function () {
+        const u = process.env.NEXT_PUBLIC_ASSETS_BASE_URL
+        if (!u || !u.startsWith('http')) return []
+        try {
+          const { protocol, hostname } = new URL(u)
+          return [{ protocol: protocol.replace(':', ''), hostname, pathname: '/**' }]
+        } catch {
+          return []
+        }
+      })(),
     ],
   },
   
