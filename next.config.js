@@ -1,7 +1,3 @@
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-})
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -243,5 +239,16 @@ const nextConfig = {
   },
 }
 
-module.exports = withBundleAnalyzer(nextConfig)
+// Use bundle-analyzer only when ANALYZE=true and the package is installed (e.g. locally)
+let config = nextConfig
+if (process.env.ANALYZE === 'true') {
+  try {
+    const withBundleAnalyzer = require('@next/bundle-analyzer')({ enabled: true })
+    config = withBundleAnalyzer(nextConfig)
+  } catch (_) {
+    // @next/bundle-analyzer not installed — use plain config (e.g. on Vercel)
+  }
+}
+
+module.exports = config
 
