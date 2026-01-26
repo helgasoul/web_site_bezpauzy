@@ -17,6 +17,11 @@ interface PageProps {
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
+// Явно задаём допустимые категории — на части хостингов это предотвращает 404 по /experts/:category
+export function generateStaticParams() {
+  return VALID_CATEGORIES.map((category) => ({ category }))
+}
+
 // Генерируем метаданные для каждой страницы
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const resolved = await params

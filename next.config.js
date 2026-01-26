@@ -48,6 +48,14 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   
+  // Редиректы: старые/ошибочные ссылки вида /doctors/:category -> /experts/:category
+  async redirects() {
+    return [
+      { source: '/doctors/mammologist', destination: '/experts/mammologist', permanent: true },
+      { source: '/doctors/gynecologist', destination: '/experts/gynecologist', permanent: true },
+      { source: '/doctors/nutritionist', destination: '/experts/nutritionist', permanent: true },
+    ]
+  },
   // Для ngrok: добавляем заголовок для обхода предупреждающей страницы
   async rewrites() {
     return []

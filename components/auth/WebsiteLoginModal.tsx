@@ -171,24 +171,28 @@ export const WebsiteLoginModal: FC<WebsiteLoginModalProps> = ({
 
   const modalContent = (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 pointer-events-none">
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="absolute inset-0 bg-deep-navy/60 backdrop-blur-sm pointer-events-auto"
-        />
+      {/* Оверлей с overflow-y-auto: на мобильных форма остаётся в зоне видимости при клавиатуре */}
+      <div className="fixed inset-0 z-[110] overflow-y-auto overflow-x-hidden p-4 pointer-events-none">
+        <div className="min-h-full flex items-center justify-center py-6 pointer-events-none">
+          <div className="w-full max-w-md flex items-center justify-center pointer-events-none">
+            {/* Backdrop — на всю область оверлея */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={onClose}
+              className="fixed inset-0 bg-deep-navy/60 backdrop-blur-sm pointer-events-auto z-0"
+              aria-hidden
+            />
 
-        {/* Modal */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          onClick={(e) => e.stopPropagation()}
-          className="relative bg-white rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto p-8 md:p-10 z-10 pointer-events-auto"
-        >
+            {/* Окно формы: pointer-events-auto, ограничение по высоте и внутренний скролл */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative bg-white rounded-3xl shadow-2xl w-full max-h-[min(90vh,560px)] overflow-y-auto p-8 md:p-10 z-10 pointer-events-auto my-auto"
+            >
           {/* Close button */}
           <button
             onClick={onClose}
@@ -305,6 +309,8 @@ export const WebsiteLoginModal: FC<WebsiteLoginModalProps> = ({
             </div>
           </div>
         </motion.div>
+          </div>
+        </div>
       </div>
     </AnimatePresence>
   )

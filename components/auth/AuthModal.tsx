@@ -20,30 +20,44 @@ export const AuthModal: FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
 
+  // Блокировка прокрутки страницы, пока открыт любой экран (выбор входа / регистрация / логин)
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    if (isOpen) {
+      const prev = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = prev
+      }
+    }
+  }, [isOpen])
+
   const handleClose = () => {
     setShowRegisterModal(false)
     setShowWebsiteLogin(false)
     onClose()
   }
 
-  // Первый экран (выбор «Регистрация» / «Вход») показываем только когда не открыты подмодалки
+  // Первый экран (выбор «Регистрация» / «Вход»): оверлей с overflow, чтобы содержимое не «уезжало»
   const modalContent = isOpen && !showRegisterModal && !showWebsiteLogin && (
     <AnimatePresence>
-      <div key="auth-modal" className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={handleClose}
-          className="absolute inset-0 bg-deep-navy/60 backdrop-blur-sm pointer-events-auto"
-        />
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          onClick={(e) => e.stopPropagation()}
-          className="relative bg-soft-white rounded-2xl md:rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto p-8 md:p-10 z-10 pointer-events-auto"
-        >
+      <div key="auth-modal" className="fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden p-4">
+        <div className="min-h-full flex items-center justify-center py-6">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={handleClose}
+            className="fixed inset-0 bg-deep-navy/60 backdrop-blur-sm z-0 cursor-pointer"
+            aria-hidden
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative bg-soft-white rounded-2xl md:rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto p-8 md:p-10 z-10 my-auto"
+          >
           {/* Close button */}
           <button
             onClick={handleClose}
@@ -83,7 +97,8 @@ export const AuthModal: FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 </button>
               </div>
             </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
     </AnimatePresence>
   )

@@ -30,6 +30,19 @@ const iconMap = {
   apple: Apple,
 }
 
+/** Единственный источник правды: роль → путь страницы эксперта (должен совпадать с app/experts/[category]) */
+const ROLE_TO_EXPERT_PATH: Record<string, string> = {
+  'Маммолог': '/experts/mammologist',
+  'Гинеколог': '/experts/gynecologist',
+  'Нутрициолог': '/experts/nutritionist',
+}
+
+const ROLE_TO_CATEGORY: Record<string, 'mammologist' | 'gynecologist' | 'nutritionist'> = {
+  'Маммолог': 'mammologist',
+  'Гинеколог': 'gynecologist',
+  'Нутрициолог': 'nutritionist',
+}
+
 export const ExpertCard: FC<ExpertCardProps> = ({ expert, index }) => {
   const Icon = iconMap[expert.iconName]
   const [isConsentModalOpen, setIsConsentModalOpen] = useState(false)
@@ -130,14 +143,8 @@ export const ExpertCard: FC<ExpertCardProps> = ({ expert, index }) => {
           </p>
         </div>
         <div className="space-y-3 pt-4 border-t border-lavender-bg">
-          <Link 
-            href={
-              expert.role === 'Маммолог' 
-                ? '/experts/mammologist'
-                : expert.role === 'Гинеколог'
-                ? '/experts/gynecologist'
-                : '/experts/nutritionist'
-            }
+          <Link
+            href={ROLE_TO_EXPERT_PATH[expert.role] ?? '/doctors'}
             className="block"
             prefetch={false}
           >
@@ -161,13 +168,7 @@ export const ExpertCard: FC<ExpertCardProps> = ({ expert, index }) => {
         onClose={() => setIsConsentModalOpen(false)}
         expertName={expert.name}
         expertRole={expert.role}
-        expertCategory={
-          expert.role === 'Маммолог' 
-            ? 'mammologist' 
-            : expert.role === 'Гинеколог' 
-            ? 'gynecologist' 
-            : 'nutritionist'
-        }
+        expertCategory={ROLE_TO_CATEGORY[expert.role] ?? 'mammologist'}
         botLink={getBotLink()}
       />
     </motion.div>
