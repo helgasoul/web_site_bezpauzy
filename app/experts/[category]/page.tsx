@@ -5,6 +5,8 @@ import { getExpertPageData } from '@/lib/experts/get-expert-data'
 
 type Category = 'gynecologist' | 'mammologist' | 'nutritionist'
 
+const VALID_CATEGORIES: readonly Category[] = ['gynecologist', 'mammologist', 'nutritionist']
+
 interface PageProps {
   params: Promise<{
     category: string
@@ -17,19 +19,21 @@ export const revalidate = 0
 
 // Генерируем метаданные для каждой страницы
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { category } = await params
+  const resolved = await params
+  const category = typeof resolved?.category === 'string' ? resolved.category.trim().toLowerCase() : ''
   const categoryMap: Record<string, string> = {
     gynecologist: 'Кабинет гинеколога',
     mammologist: 'Кабинет маммолога',
     nutritionist: 'Кухня нутрициолога',
   }
 
+  if (!VALID_CATEGORIES.includes(category as Category)) {
+    return { title: 'Эксперт не найден | Без |Паузы' }
+  }
+
   const expertData = await getExpertPageData(category as Category)
-  
   if (!expertData) {
-    return {
-      title: 'Эксперт не найден | Без |Паузы',
-    }
+    return { title: 'Эксперт не найден | Без |Паузы' }
   }
 
   const expertName = expertData.expert.name
@@ -68,15 +72,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ExpertCategoryPage({ params }: PageProps) {
-  const { category } = await params
+  const resolved = await params
+  const category = typeof resolved?.category === 'string' ? resolved.category.trim().toLowerCase() : ''
 
-  // Валидация категории
-  if (!['gynecologist', 'mammologist', 'nutritionist'].includes(category)) {
+  if (!VALID_CATEGORIES.includes(category as Category)) {
     notFound()
   }
 
   const expertData = await getExpertPageData(category as Category)
-
   if (!expertData) {
     notFound()
   }

@@ -139,6 +139,7 @@ export const ExpertCard: FC<ExpertCardProps> = ({ expert, index }) => {
                 : '/experts/nutritionist'
             }
             className="block"
+            prefetch={false}
           >
             <Button variant="primary" className="w-full">
               Подробнее об эксперте
