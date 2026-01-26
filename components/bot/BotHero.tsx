@@ -18,22 +18,8 @@ export const BotHero: FC<BotHeroProps> = () => {
     setIsChecking(true)
 
     try {
-      // Проверяем авторизацию
-      const response = await fetch('/api/auth/telegram/get-session')
-      const data = await response.json()
-      const authenticated = data.authenticated || false
-      const subscription = data.user?.subscriptionStatus === 'active' || false
-
-      if (authenticated && subscription) {
-        // Пользователь авторизован и имеет подписку - открываем чат
-        router.push('/chat')
-      } else if (authenticated && !subscription) {
-        // Пользователь авторизован, но нет подписки - открываем чат (там покажется сообщение о подписке)
-        router.push('/chat')
-      } else {
-        // Пользователь не авторизован - открываем чат (там покажется форма регистрации/входа)
-        router.push('/chat')
-      }
+      // Всегда ведем в чат - там ChatAuthGate проверит авторизацию и покажет нужный экран
+      router.push('/chat')
     } catch (error) {
       // В случае ошибки просто переходим в чат
       router.push('/chat')
@@ -93,26 +79,40 @@ export const BotHero: FC<BotHeroProps> = () => {
 
             {/* CTAs */}
             <motion.div
-              className="flex flex-col sm:flex-row gap-4 items-center lg:items-start"
+              className="flex flex-col gap-4 items-center lg:items-start"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.7 }}
             >
-              <button
-                onClick={handleStartDialog}
-                disabled={isChecking}
-                className="group inline-flex items-center gap-3 bg-primary-purple text-white px-10 py-5 rounded-full text-lg md:text-xl font-semibold hover:shadow-strong hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <span>{isChecking ? 'Проверка...' : 'Начать диалог'}</span>
-                {!isChecking && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
-              </button>
+              <div className="flex flex-col sm:flex-row gap-4 items-center lg:items-start">
+                <button
+                  onClick={handleStartDialog}
+                  disabled={isChecking}
+                  className="group inline-flex items-center gap-3 bg-primary-purple text-white px-10 py-5 rounded-full text-lg md:text-xl font-semibold hover:shadow-strong hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span>{isChecking ? 'Проверка...' : 'Начать диалог'}</span>
+                  {!isChecking && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                </button>
+                
+                <Link
+                  href="#example"
+                  className="text-body text-deep-navy/70 hover:text-primary-purple transition-colors underline"
+                >
+                  Посмотреть пример диалога
+                </Link>
+              </div>
               
-              <Link
-                href="#example"
-                className="text-body text-deep-navy/70 hover:text-primary-purple transition-colors underline"
-              >
-                Посмотреть пример диалога
-              </Link>
+              <p className="text-body-small text-deep-navy/70 max-w-2xl mx-auto lg:mx-0 pt-2 border-t border-deep-navy/10">
+                Начиная общение с Евой, вы соглашаетесь с{' '}
+                <Link href="/bot/terms" target="_blank" rel="noopener noreferrer" className="text-primary-purple hover:underline transition-colors">
+                  пользовательским соглашением
+                </Link>
+                {' '}и{' '}
+                <Link href="/bot/privacy" target="_blank" rel="noopener noreferrer" className="text-primary-purple hover:underline transition-colors">
+                  политикой конфиденциальности
+                </Link>
+                {' '}Telegram-бота.
+              </p>
             </motion.div>
 
             {/* Trust indicators */}
@@ -139,7 +139,7 @@ export const BotHero: FC<BotHeroProps> = () => {
 
           {/* Right: Visual with Photo */}
           <motion.div
-            className="relative w-full max-w-lg mx-auto lg:mx-0"
+            className="relative w-full max-w-xs mx-auto lg:mx-0"
             initial={{ opacity: 0, x: 50, scale: 0.95 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             transition={{ duration: 1, delay: 0.4 }}
@@ -149,38 +149,19 @@ export const BotHero: FC<BotHeroProps> = () => {
             <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-ocean-wave-start/20 rounded-full blur-2xl" />
             
             {/* Photo with overlay */}
-            <div className="relative rounded-3xl overflow-hidden shadow-strong">
-              <Image
-                src="/hero-women.jpg"
-                alt="Женщины, которые доверяют Еве"
-                width={600}
-                height={800}
-                className="w-full h-auto object-cover"
-                priority
-              />
+            <div className="relative rounded-3xl overflow-hidden shadow-strong aspect-[2/3] max-h-[500px]">
+              <div className="relative w-full h-full">
+                <Image
+                  src="/oblozhka.png"
+                  alt="Обложка книги Менопауза Без |Паузы"
+                  fill
+                  className="object-cover object-top"
+                  priority
+                  sizes="(max-width: 768px) 100vw, 320px"
+                />
+              </div>
               {/* Gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-primary-purple/40 via-transparent to-transparent" />
-              
-              {/* Chat mockup overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-white/95 backdrop-blur-md">
-                <div className="space-y-3">
-                  {/* User message */}
-                  <div className="flex justify-end">
-                    <div className="bg-primary-purple text-white rounded-2xl rounded-tr-none px-4 py-2.5 max-w-[85%] shadow-md">
-                      <p className="text-xs md:text-sm">У меня приливы по 10 раз в день, это нормально?</p>
-                    </div>
-                  </div>
-                  
-                  {/* Bot response */}
-                  <div className="flex justify-start">
-                    <div className="bg-lavender-bg border border-primary-purple/20 rounded-2xl rounded-tl-none px-4 py-2.5 max-w-[90%] shadow-md">
-                      <p className="text-xs md:text-sm text-deep-navy">
-                        Приливы 10 раз в день — это довольно часто, но не редкость...
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
 
           </motion.div>

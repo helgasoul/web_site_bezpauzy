@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
+import { setSessionCookie } from '@/lib/auth/session'
 
 /**
  * Вход по email
@@ -41,24 +41,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Создаем сессию (используем тот же подход, что и для Telegram)
-    const sessionToken = Buffer.from(JSON.stringify({
-      userId: user.id,
-      telegramId: user.telegram_id,
-      email: user.email || null,
-      ageRange: user.age_range || null,
-    })).toString('base64')
-
-    // Устанавливаем cookie (действителен 30 дней)
-    cookies().set('telegram_session', sessionToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 30, // 30 дней
-      path: '/',
-    })
-
-    return NextResponse.json({
+    // Создаем безопасную JWT сессию
+    const response = NextResponse.json({
       success: true,
       user: {
         id: user.id,
@@ -70,6 +54,15 @@ export async function POST(request: NextRequest) {
         subscriptionPlan: user.subscription_plan,
       },
     })
+
+    setSessionCookie({
+      userId: user.id,
+      telegramId: user.telegram_id,
+      email: user.email || null,
+      ageRange: user.age_range || null,
+    }, response)
+
+    return response
   } catch (error) {
     console.error('Error in email login API:', error)
     return NextResponse.json(

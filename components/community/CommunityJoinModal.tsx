@@ -105,12 +105,13 @@ export const CommunityJoinModal: FC<CommunityJoinModalProps> = ({ isOpen, onClos
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          onClick={onClose}
           className="absolute inset-0 bg-black/50 backdrop-blur-sm pointer-events-auto"
         />
 
@@ -120,7 +121,7 @@ export const CommunityJoinModal: FC<CommunityJoinModalProps> = ({ isOpen, onClos
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           onClick={(e) => e.stopPropagation()}
-          className="relative bg-white rounded-3xl shadow-strong max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+          className="relative bg-white rounded-3xl shadow-strong max-w-2xl w-full max-h-[90vh] overflow-y-auto pointer-events-auto"
         >
           {/* Close button */}
           <button

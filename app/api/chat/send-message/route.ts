@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
+import { getSession } from '@/lib/auth/session'
+import { sanitizeInput } from '@/lib/utils/sanitize'
+import { z } from 'zod'
+
+const sendMessageSchema = z.object({
+  message: z.string().min(1).max(4000, 'Сообщение не может быть длиннее 4000 символов'),
+  userId: z.number().int().positive().optional(),
+  telegramId: z.number().int().positive().optional(),
+})
 
 /**
  * Отправляет сообщение боту и получает ответ
@@ -14,36 +22,40 @@ import { cookies } from 'next/headers'
  */
 export async function POST(request: NextRequest) {
   try {
-    const { message, userId, telegramId } = await request.json()
+    const body = await request.json()
 
-    if (!message || typeof message !== 'string' || message.trim().length === 0) {
+    // Валидация входных данных с помощью Zod
+    const validationResult = sendMessageSchema.safeParse(body)
+
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'Сообщение не может быть пустым' },
+        {
+          error: 'Неверные данные запроса',
+          ...(process.env.NODE_ENV === 'development' && {
+            details: validationResult.error.errors.map((err) => ({
+              path: err.path.join('.'),
+              message: err.message,
+            })),
+          }),
+        },
         { status: 400 }
       )
     }
 
+    const { message, userId: paramUserId, telegramId: paramTelegramId } = validationResult.data
+
     const supabase = await createClient()
 
     // Получаем информацию о пользователе из сессии или параметров
-    let userTelegramId = telegramId
-    let dbUserId = userId
+    let userTelegramId = paramTelegramId || null
+    let dbUserId = paramUserId || null
 
     if (!dbUserId) {
-      // Пытаемся получить из cookie сессии
-      const cookieStore = cookies()
-      const sessionToken = cookieStore.get('telegram_session')?.value
-
-      if (sessionToken) {
-        try {
-          const sessionData = JSON.parse(
-            Buffer.from(sessionToken, 'base64').toString()
-          )
-          userTelegramId = sessionData.telegramId || null
-          dbUserId = sessionData.userId
-        } catch (e) {
-          // Сессия невалидна
-        }
+      // Пытаемся получить из безопасной JWT сессии
+      const sessionData = await getSession()
+      if (sessionData) {
+        userTelegramId = sessionData.telegramId || null
+        dbUserId = sessionData.userId
       }
     }
 
@@ -76,12 +88,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Санитизация сообщения перед сохранением
+    const sanitizedMessage = sanitizeInput(message, 4000)
+
     // Сохраняем запрос в БД
     const { data: queryRecord, error: queryError } = await supabase
       .from('menohub_queries')
       .insert({
         user_id: user.id,
-        query_text: message.trim(),
+        query_text: sanitizedMessage,
         query_status: 'processing',
         response_text: 'processing',
       })
@@ -108,7 +123,7 @@ export async function POST(request: NextRequest) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            message: message.trim(),
+            message: sanitizedMessage,
             telegram_id: user.telegram_id,
             user_id: user.id,
             query_id: queryRecord.id,
@@ -161,7 +176,31 @@ export async function POST(request: NextRequest) {
       note: 'Для полной функциональности настройте n8n webhook или используйте polling из БД',
     })
   } catch (error) {
-    console.error('Error in send-message API:', error)
+    // Логируем только в development
+    if (process.env.NODE_ENV === 'development') {
+      if (error instanceof z.ZodError) {
+        console.error('Validation error in send-message API:', error.errors)
+      } else {
+        console.error('Error in send-message API:', error)
+      }
+    }
+    
+    // Если это ошибка валидации, возвращаем 400
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          error: 'Неверные данные запроса',
+          ...(process.env.NODE_ENV === 'development' && {
+            details: error.errors.map((err) => ({
+              path: err.path.join('.'),
+              message: err.message,
+            })),
+          }),
+        },
+        { status: 400 }
+      )
+    }
+    
     return NextResponse.json(
       { error: 'Внутренняя ошибка сервера' },
       { status: 500 }

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 
+// Явно указываем, что этот route динамический (использует searchParams и cookies)
+export const dynamic = 'force-dynamic'
+
 /**
  * Polling endpoint для проверки новых ответов на запросы
  * Используется для обновления интерфейса чата в реальном времени

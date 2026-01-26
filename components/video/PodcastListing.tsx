@@ -1,0 +1,90 @@
+'use client'
+
+import { FC, useState, useEffect } from 'react'
+import { PodcastCard } from './PodcastCard'
+import type { PodcastEpisode } from '@/lib/types/video'
+import { Loader2 } from 'lucide-react'
+
+interface PodcastListingProps {
+  initialEpisodes?: PodcastEpisode[]
+}
+
+export const PodcastListing: FC<PodcastListingProps> = ({ initialEpisodes = [] }) => {
+  const [episodes, setEpisodes] = useState<PodcastEpisode[]>(initialEpisodes)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+
+  const categories = [
+    { value: 'all', label: 'Все эпизоды' },
+    { value: 'menopause', label: 'Менопауза' },
+    { value: 'hormones', label: 'Гормоны и ЗГТ' },
+    { value: 'nutrition', label: 'Питание' },
+    { value: 'sports', label: 'Спорт и фитнес' },
+    { value: 'mental_health', label: 'Психоэмоциональное здоровье' },
+  ]
+
+  useEffect(() => {
+    // Filter episodes by category
+    if (selectedCategory === 'all') {
+      setEpisodes(initialEpisodes)
+    } else {
+      setEpisodes(initialEpisodes.filter((ep) => ep.category === selectedCategory))
+    }
+  }, [selectedCategory, initialEpisodes])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <Loader2 className="w-8 h-8 text-primary-purple animate-spin" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border-2 border-red-200 rounded-lg p-6 text-center">
+        <p className="text-body text-red-600">{error}</p>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      {/* Category Filter */}
+      <div className="flex flex-wrap gap-3 mb-8">
+        {categories.map((category) => (
+          <button
+            key={category.value}
+            onClick={() => setSelectedCategory(category.value)}
+            className={`px-4 py-2 rounded-full text-body font-medium transition-colors ${
+              selectedCategory === category.value
+                ? 'bg-primary-purple text-white'
+                : 'bg-lavender-bg text-deep-navy hover:bg-primary-purple/10'
+            }`}
+          >
+            {category.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Episodes Grid */}
+      {episodes.length === 0 ? (
+        <div className="text-center py-16 bg-lavender-bg rounded-2xl">
+          <p className="text-body text-deep-navy/70">
+            {selectedCategory === 'all'
+              ? 'Эпизоды скоро появятся'
+              : 'Нет эпизодов в этой категории'}
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {episodes.map((episode) => (
+            <PodcastCard key={episode.id} episode={episode} />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+

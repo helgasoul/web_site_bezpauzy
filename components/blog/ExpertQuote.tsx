@@ -18,7 +18,7 @@ export const ExpertQuote: FC<ExpertQuoteProps> = ({ quote, author, role }) => {
       </div>
 
       <blockquote className="font-playfair text-quote text-deep-navy italic mb-6 relative z-10">
-        "{quote}"
+        &quot;{quote}&quot;
       </blockquote>
 
       <div className="flex items-center gap-3 pt-4 border-t border-lavender-bg">

@@ -48,8 +48,12 @@ export async function POST(request: NextRequest) {
     )
   } catch (error) {
     if (error instanceof z.ZodError) {
+      // Детали валидации можно показывать, но только в development для безопасности
       return NextResponse.json(
-        { error: 'Неверный формат email', details: error.errors },
+        {
+          error: 'Неверный формат email',
+          ...(process.env.NODE_ENV === 'development' && { details: error.errors }),
+        },
         { status: 400 }
       )
     }

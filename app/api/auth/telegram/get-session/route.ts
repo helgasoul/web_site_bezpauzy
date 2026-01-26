@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { getSession, deleteSessionCookie } from '@/lib/auth/session'
 import { createClient } from '@/lib/supabase/server'
 
 /**
@@ -7,60 +7,61 @@ import { createClient } from '@/lib/supabase/server'
  */
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = cookies()
-    const sessionToken = cookieStore.get('telegram_session')?.value
+    // Получаем сессию через безопасную JWT проверку
+    const sessionData = await getSession()
 
-    console.log('get-session: checking cookie', { 
-      hasCookie: !!sessionToken,
-      cookieLength: sessionToken?.length 
-    })
-
-    if (!sessionToken) {
-      console.log('get-session: no cookie found')
-      return NextResponse.json({ authenticated: false })
+    if (!sessionData) {
+      return NextResponse.json({ authenticated: false, error: 'No valid session' })
     }
 
-    try {
-      const sessionData = JSON.parse(
-        Buffer.from(sessionToken, 'base64').toString()
-      )
-
-      // Проверяем, что пользователь все еще существует
-      const supabase = await createClient()
+    // Проверяем, что пользователь все еще существует
+    const supabase = await createClient()
+    const userId = sessionData.userId
+      
       const { data: user, error } = await supabase
         .from('menohub_users')
-        .select('id, telegram_id, email, username, age_range, city, subscription_status, subscription_plan')
-        .eq('id', sessionData.userId)
+        .select('id, telegram_id, username, age_range, city, is_subscribed, subscription_plan, payment_status')
+        .eq('id', userId)
         .single()
 
-      if (error || !user) {
-        // Пользователь не найден, удаляем сессию
-        cookieStore.delete('telegram_session')
-        return NextResponse.json({ authenticated: false })
+      if (error) {
+        // Ошибка при запросе к базе - НЕ удаляем cookie, возможно временная проблема
+        // Логируем только в development
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[get-session] Database error:', error.message, error.code)
+        }
+        return NextResponse.json({ 
+          authenticated: false,
+          error: 'Database error'
+        })
       }
 
+      if (!user) {
+        const response = NextResponse.json({ authenticated: false, error: 'User not found' })
+        deleteSessionCookie(response)
+        return response
+      }
+      
       return NextResponse.json({
         authenticated: true,
         user: {
           id: user.id,
           telegramId: user.telegram_id,
-          email: user.email,
           username: user.username,
           ageRange: user.age_range,
           city: user.city,
-          subscriptionStatus: user.subscription_status,
+          isSubscribed: user.is_subscribed,
           subscriptionPlan: user.subscription_plan,
+          paymentStatus: user.payment_status,
         },
       })
-    } catch (parseError) {
-      // Неверный формат токена
-      cookieStore.delete('telegram_session')
-      return NextResponse.json({ authenticated: false })
+  } catch (error: any) {
+    // Логируем только в development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[get-session] Unexpected error:', error.message)
     }
-  } catch (error) {
-    console.error('Error in get-session API:', error)
     return NextResponse.json(
-      { error: 'Внутренняя ошибка сервера' },
+      { error: 'Internal server error' },
       { status: 500 }
     )
   }

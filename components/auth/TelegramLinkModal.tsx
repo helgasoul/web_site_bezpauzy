@@ -2,7 +2,8 @@
 
 import { FC, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Bot, Copy, CheckCircle2, ExternalLink, Loader2, AlertCircle } from 'lucide-react'
+import { X, Bot, ExternalLink, Loader2, AlertCircle, Copy, Check, FileText } from 'lucide-react'
+import Link from 'next/link'
 
 interface TelegramLinkModalProps {
   isOpen: boolean
@@ -16,6 +17,8 @@ export const TelegramLinkModal: FC<TelegramLinkModalProps> = ({ isOpen, onClose,
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [codeCopied, setCodeCopied] = useState(false)
+  const [consentGiven, setConsentGiven] = useState(false)
+  const [showConsentForm, setShowConsentForm] = useState(true)
 
   useEffect(() => {
     if (isOpen) {
@@ -23,20 +26,28 @@ export const TelegramLinkModal: FC<TelegramLinkModalProps> = ({ isOpen, onClose,
       setLinkCode('')
       setDeepLink('')
       setError(null)
-      setCodeCopied(false)
-      setLoading(true)
-      // Генерируем новый код
-      generateLinkCode()
+      setConsentGiven(false)
+      setShowConsentForm(true)
+      setLoading(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
   const generateLinkCode = async () => {
+    if (!consentGiven) {
+      setError('Необходимо дать согласие на обработку персональных данных')
+      return
+    }
+
     setLoading(true)
     setError(null)
     try {
       const response = await fetch('/api/auth/link-telegram/generate-code', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ consentGiven: true }),
       })
 
       const data = await response.json()
@@ -53,7 +64,18 @@ export const TelegramLinkModal: FC<TelegramLinkModalProps> = ({ isOpen, onClose,
       }
 
       setLinkCode(data.code)
-      setDeepLink(data.deepLink)
+      setShowConsentForm(false)
+      
+      // Определяем формат ссылки в зависимости от устройства
+      // На мобильных устройствах лучше использовать tg:// протокол
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+      
+      // Используем нативный формат, если он доступен и мы на мобильном
+      const finalDeepLink = (isMobile && data.nativeDeepLink) 
+        ? data.nativeDeepLink
+        : data.deepLink
+      
+      setDeepLink(finalDeepLink)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка при создании кода')
     } finally {
@@ -61,19 +83,24 @@ export const TelegramLinkModal: FC<TelegramLinkModalProps> = ({ isOpen, onClose,
     }
   }
 
-  const copyCode = () => {
-    if (linkCode) {
-      navigator.clipboard.writeText(linkCode)
-      setCodeCopied(true)
-      setTimeout(() => setCodeCopied(false), 2000)
+  const handleConsentAccept = () => {
+    if (consentGiven) {
+      generateLinkCode()
+    } else {
+      setError('Необходимо дать согласие на обработку персональных данных')
     }
+  }
+
+  const handleConsentDecline = () => {
+    onClose()
   }
 
   const handleClose = () => {
     setLinkCode('')
     setDeepLink('')
     setError(null)
-    setCodeCopied(false)
+    setConsentGiven(false)
+    setShowConsentForm(true)
     onClose()
   }
 
@@ -96,7 +123,7 @@ export const TelegramLinkModal: FC<TelegramLinkModalProps> = ({ isOpen, onClose,
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 md:p-10 z-10"
+          className="relative bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 md:p-10 z-10 max-h-[90vh] overflow-y-auto"
         >
           {/* Close button */}
           <button
@@ -107,7 +134,99 @@ export const TelegramLinkModal: FC<TelegramLinkModalProps> = ({ isOpen, onClose,
             <X size={24} />
           </button>
 
-          {loading ? (
+          {/* Форма согласия */}
+          {showConsentForm ? (
+            <div>
+              <div className="w-16 h-16 bg-gradient-to-br from-primary-purple to-ocean-wave-start rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Bot className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-h3 font-bold text-deep-navy mb-2 text-center">
+                Привяжите Telegram
+              </h2>
+              <p className="text-body text-deep-navy/70 mb-6 text-center">
+                Чтобы общаться с Евой, привяжите ваш Telegram аккаунт
+              </p>
+
+              {/* Согласие на обработку данных */}
+              <div className="bg-lavender-bg/50 border border-primary-purple/20 rounded-2xl p-6 mb-6">
+                <div className="flex items-start gap-3 mb-4">
+                  <input
+                    type="checkbox"
+                    id="consent"
+                    checked={consentGiven}
+                    onChange={(e) => setConsentGiven(e.target.checked)}
+                    className="mt-1 w-5 h-5 text-primary-purple border-deep-navy/30 rounded focus:ring-primary-purple focus:ring-2"
+                  />
+                  <label htmlFor="consent" className="flex-1 text-sm text-deep-navy/80 cursor-pointer">
+                    Я даю согласие на{' '}
+                    <Link
+                      href="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary-purple hover:text-ocean-wave-start underline font-medium"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      обработку персональных данных
+                    </Link>
+                    {' '}и согласен с{' '}
+                    <Link
+                      href="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary-purple hover:text-ocean-wave-start underline font-medium"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      политикой конфиденциальности
+                    </Link>
+                  </label>
+                </div>
+                
+                <Link
+                  href="/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-primary-purple hover:text-ocean-wave-start transition-colors"
+                >
+                  <FileText className="w-4 h-4" />
+                  <span>Ознакомиться с политикой конфиденциальности</span>
+                </Link>
+              </div>
+
+              {error && (
+                <div className="mb-4 p-3 bg-error/10 border border-error/20 rounded-xl">
+                  <p className="text-sm text-error">{error}</p>
+                </div>
+              )}
+
+              {/* Кнопки действий */}
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={handleConsentAccept}
+                  disabled={!consentGiven || loading}
+                  className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary-purple to-ocean-wave-start text-white px-6 py-4 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>Создаем код...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Bot className="w-5 h-5" />
+                      <span>Согласиться и привязать</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={handleConsentDecline}
+                  disabled={loading}
+                  className="w-full text-sm text-deep-navy/60 hover:text-deep-navy transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Отказаться
+                </button>
+              </div>
+            </div>
+          ) : loading ? (
             <div className="text-center py-8">
               <Loader2 className="w-12 h-12 text-primary-purple animate-spin mx-auto mb-4" />
               <p className="text-body text-deep-navy/70">Создаем код привязки...</p>
@@ -139,38 +258,76 @@ export const TelegramLinkModal: FC<TelegramLinkModalProps> = ({ isOpen, onClose,
               </p>
 
               <div className="bg-primary-purple/10 border-2 border-primary-purple/20 rounded-2xl p-6 mb-6">
-                <p className="text-sm text-deep-navy/70 mb-3 text-center">
-                  Скопируйте код и откройте бота:
+                <p className="text-sm text-deep-navy/70 mb-4 text-center">
+                  Нажмите кнопку ниже, чтобы открыть бота и автоматически привязать ваш Telegram аккаунт:
                 </p>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="flex-1 bg-white rounded-xl p-4 border-2 border-primary-purple/30">
-                    <p className="text-2xl font-bold text-primary-purple text-center font-mono">
-                      {linkCode}
-                    </p>
-                  </div>
-                  <button
-                    onClick={copyCode}
-                    className="p-3 bg-primary-purple text-white rounded-xl hover:bg-primary-purple/90 transition-colors"
-                    title="Скопировать код"
-                  >
-                    {codeCopied ? (
-                      <CheckCircle2 className="w-5 h-5" />
-                    ) : (
-                      <Copy className="w-5 h-5" />
-                    )}
-                  </button>
-                </div>
                 <a
                   href={deepLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary-purple to-ocean-wave-start text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 mb-3"
+                  onClick={(e) => {
+                    console.log('[TelegramLinkModal] Link clicked:', deepLink)
+                    console.log('[TelegramLinkModal] Code:', linkCode)
+                    // Для мобильных устройств можно попробовать открыть через tg:// напрямую
+                    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                      const tgLink = deepLink.includes('tg://') 
+                        ? deepLink 
+                        : deepLink.replace('https://t.me/', 'tg://resolve?domain=').replace('?start=', '&start=')
+                      
+                      console.log('[TelegramLinkModal] Mobile detected, using tg:// link:', tgLink)
+                      // Пробуем открыть через tg://, если не получится - откроется обычная ссылка
+                      try {
+                        window.location.href = tgLink
+                        e.preventDefault()
+                      } catch (err) {
+                        console.log('[TelegramLinkModal] Failed to open tg://, using https://')
+                      }
+                    }
+                  }}
+                  className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary-purple to-ocean-wave-start text-white px-6 py-4 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 mb-4"
                 >
+                  <Bot className="w-5 h-5" />
+                  <span>Привязать Telegram</span>
                   <ExternalLink className="w-5 h-5" />
-                  <span>Открыть бота</span>
                 </a>
-                <p className="text-xs text-deep-navy/60 text-center">
-                  Бот автоматически обработает код и привяжет ваш аккаунт. После этого вернитесь на сайт.
+                
+                {/* Альтернативный способ: копирование кода */}
+                <div className="border-t border-primary-purple/20 pt-4 mt-4">
+                  <p className="text-xs text-deep-navy/60 mb-2 text-center">
+                    Или скопируйте код и отправьте боту сообщение:
+                  </p>
+                  <div className="flex items-center gap-2 bg-white rounded-xl p-3 border border-primary-purple/20">
+                    <code className="flex-1 text-center font-mono text-lg font-bold text-primary-purple">
+                      link_{linkCode}
+                    </code>
+                    <button
+                      onClick={async () => {
+                        const command = `link_${linkCode}`
+                        try {
+                          await navigator.clipboard.writeText(command)
+                          setCodeCopied(true)
+                          setTimeout(() => setCodeCopied(false), 2000)
+                        } catch (err) {
+                          console.error('Failed to copy:', err)
+                        }
+                      }}
+                      className="p-2 hover:bg-primary-purple/10 rounded-lg transition-colors"
+                      title="Скопировать код"
+                    >
+                      {codeCopied ? (
+                        <Check className="w-5 h-5 text-green-600" />
+                      ) : (
+                        <Copy className="w-5 h-5 text-primary-purple" />
+                      )}
+                    </button>
+                  </div>
+                  <p className="text-xs text-deep-navy/50 mt-2 text-center">
+                    Откройте бота и отправьте это сообщение (можно без /start)
+                  </p>
+                </div>
+                
+                <p className="text-xs text-deep-navy/60 text-center mt-4">
+                  Бот автоматически обработает привязку. После этого вернитесь на сайт.
                 </p>
               </div>
 

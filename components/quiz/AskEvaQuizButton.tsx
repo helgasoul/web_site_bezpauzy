@@ -6,20 +6,60 @@ import { motion } from 'framer-motion'
 import { MessageCircle, Sparkles } from 'lucide-react'
 
 interface AskEvaQuizButtonProps {
-  quizType: 'inflammation' | 'mrs'
+  quizType: 'inflammation' | 'mrs' | 'phenoage' | 'frax' | 'whr'
   quizResult?: {
     level?: string
     score?: number
+    phenoAge?: number
+    difference?: number
+    riskLevel?: string
+    hipFractureRisk?: number
+    majorFractureRisk?: number
+    bmi?: number
+    whr?: number
+    whtr?: number
+    overallRisk?: string
   }
+  result?: any
+  answers?: any
 }
 
-export const AskEvaQuizButton: FC<AskEvaQuizButtonProps> = ({ quizType, quizResult }) => {
+export const AskEvaQuizButton: FC<AskEvaQuizButtonProps> = ({ quizType, quizResult, result, answers }) => {
   // Build chat link with quiz context
-  const chatLink = `/chat?quiz=${quizType}${quizResult?.level ? `&level=${quizResult.level}` : ''}${quizResult?.score ? `&score=${quizResult.score}` : ''}`
+  // Если передан result, используем его данные, иначе используем quizResult
+  const effectiveResult = result || quizResult
+  
+  const chatLink = `/chat?quiz=${quizType}${
+    effectiveResult?.level ? `&level=${effectiveResult.level}` : ''
+  }${
+    effectiveResult?.score ? `&score=${effectiveResult.score}` : ''
+  }${
+    effectiveResult?.phenoAge ? `&phenoAge=${effectiveResult.phenoAge}` : ''
+  }${
+    effectiveResult?.difference ? `&difference=${effectiveResult.difference}` : ''
+  }${
+    effectiveResult?.riskLevel || effectiveResult?.overallRisk ? `&riskLevel=${effectiveResult.riskLevel || effectiveResult.overallRisk}` : ''
+  }${
+    effectiveResult?.hipFractureRisk ? `&hipFractureRisk=${effectiveResult.hipFractureRisk}` : ''
+  }${
+    effectiveResult?.majorFractureRisk ? `&majorFractureRisk=${effectiveResult.majorFractureRisk}` : ''
+  }${
+    effectiveResult?.bmi ? `&bmi=${effectiveResult.bmi}` : ''
+  }${
+    effectiveResult?.whr ? `&whr=${effectiveResult.whr}` : ''
+  }${
+    effectiveResult?.whtr ? `&whtr=${effectiveResult.whtr}` : ''
+  }`
 
   const getQuizTitle = () => {
     if (quizType === 'inflammation') {
       return 'Индекс воспаления'
+    } else if (quizType === 'phenoage') {
+      return 'Биологический возраст PhenoAge'
+    } else if (quizType === 'frax') {
+      return 'Оценка риска переломов (FRAX)'
+    } else if (quizType === 'whr') {
+      return 'Калькулятор метаболического здоровья'
     }
     return 'Шкала MRS'
   }
@@ -27,6 +67,12 @@ export const AskEvaQuizButton: FC<AskEvaQuizButtonProps> = ({ quizType, quizResu
   const getQuizDescription = () => {
     if (quizType === 'inflammation') {
       return 'Спросите Еву о результатах вашего квиза "Индекс воспаления" — она поможет составить персональный план по снижению воспаления и улучшению питания.'
+    } else if (quizType === 'phenoage') {
+      return 'Спросите Еву о результатах вашего квиза "Биологический возраст PhenoAge" — она объяснит ваши биомаркеры и поможет составить план по замедлению старения.'
+    } else if (quizType === 'frax') {
+      return 'Спросите Еву о результатах вашего квиза "Оценка риска переломов (FRAX)" — она объяснит ваши риски и поможет составить план по укреплению костей и профилактике переломов.'
+    } else if (quizType === 'whr') {
+      return 'Спросите Еву о результатах вашего квиза "Калькулятор метаболического здоровья" — она объяснит ваши показатели (ИМТ, WHR, WHtR) и поможет составить план по улучшению метаболического здоровья.'
     }
     return 'Спросите Еву о результатах вашего квиза "Шкала MRS" — она объяснит ваши симптомы и поможет подобрать подходящие методы облегчения.'
   }

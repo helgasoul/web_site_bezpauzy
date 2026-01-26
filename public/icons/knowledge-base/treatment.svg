@@ -1,0 +1,30 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="treatmentShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.3)"/>
+    </filter>
+  </defs>
+  <!-- Сердце для лечения и решений -->
+  <path d="M20 12 C20 12, 15 10, 15 15 C15 19, 20 28, 20 28 C20 28, 25 19, 25 15 C25 10, 20 12, 20 12 Z" 
+        fill="white" 
+        fill-opacity="0.95"
+        stroke="white" 
+        stroke-width="2.5" 
+        stroke-linejoin="round"
+        filter="url(#treatmentShadow)"/>
+  <!-- Плюс в центре (медицинский/позитивный символ) -->
+  <path d="M20 16 L20 24 M16 20 L24 20" 
+        stroke="url(#treatmentGradient)" 
+        stroke-width="3" 
+        stroke-linecap="round"
+        opacity="0.9"/>
+  <defs>
+    <linearGradient id="treatmentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFFFFF;stop-opacity:0.8" />
+    </linearGradient>
+  </defs>
+  <!-- Маленькие точки для декора -->
+  <circle cx="18" cy="18" r="1" fill="white" opacity="0.6"/>
+  <circle cx="22" cy="18" r="1" fill="white" opacity="0.6"/>
+</svg>

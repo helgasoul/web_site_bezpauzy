@@ -1,7 +1,5 @@
 import { FC } from 'react'
 import { MessageSquare, Brain, CheckCircle } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
-import Link from 'next/link'
 
 interface HowItWorksProps {}
 
@@ -48,14 +46,6 @@ export const HowItWorks: FC<HowItWorksProps> = () => {
               </div>
             )
           })}
-        </div>
-
-        <div className="text-center">
-          <Link href="/bot">
-            <Button variant="primary">
-              Попробовать бесплатно →
-            </Button>
-          </Link>
         </div>
       </div>
     </section>

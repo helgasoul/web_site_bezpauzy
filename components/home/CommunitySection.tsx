@@ -29,7 +29,7 @@ export const CommunitySection: FC<CommunitySectionProps> = () => {
             id="community-heading"
             className="mt-6 font-montserrat text-3xl md:text-5xl lg:text-6xl font-bold text-deep-navy"
           >
-            Сообщество «Без&nbsp;паузы»
+            Сообщество «Без&nbsp;|Паузы»
           </h2>
           <p className="mt-4 md:mt-6 font-inter text-lg md:text-xl lg:text-2xl text-deep-navy/80 leading-relaxed">
             Поддержка и знания для женщин в период менопаузы.
@@ -128,7 +128,7 @@ export const CommunitySection: FC<CommunitySectionProps> = () => {
                   Присоединиться к сообществу
                 </h3>
                 <p className="mt-3 font-inter text-sm md:text-base text-white/85 leading-relaxed">
-                  Получите доступ к поддержке, экспертным разбором и
+                  Получите доступ к поддержке, экспертным разборам и
                   сообществу женщин, которые понимают вас с полуслова.
                 </p>
                 <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full border border-white/30">

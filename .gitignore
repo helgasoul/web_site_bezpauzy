@@ -18,6 +18,10 @@
 # misc
 .DS_Store
 *.pem
+# office temp files
+~$*
+# word/docs in project root (keep in repo only if needed)
+/*.docx
 
 # debug
 npm-debug.log*

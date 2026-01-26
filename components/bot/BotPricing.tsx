@@ -12,7 +12,7 @@ export const BotPricing: FC<BotPricingProps> = () => {
   const plans = [
     {
       name: 'Paid1',
-      price: '800₽',
+      price: '599₽',
       period: 'в месяц',
       description: 'Для активных пользователей',
       features: [
@@ -28,7 +28,7 @@ export const BotPricing: FC<BotPricingProps> = () => {
   ]
 
   return (
-    <section className="py-16 md:py-24 bg-gradient-purple-ocean text-white relative overflow-hidden">
+    <section id="pricing" className="py-16 md:py-24 bg-gradient-purple-ocean text-white relative overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute w-full h-full opacity-10">
         <div className="absolute top-20 left-20 w-64 h-64 bg-white rounded-full blur-3xl" />

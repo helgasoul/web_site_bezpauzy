@@ -28,8 +28,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        896,
-        1216
+        848,
+        912
       ],
       "id": "c1f92bf0-af49-45b4-9313-e03920eb8ccd",
       "name": "If",
@@ -71,8 +71,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        1120,
-        1120
+        1520,
+        976
       ],
       "id": "0abe787f-55da-4bc2-878a-c23c2b75741a",
       "name": "Send a text message",
@@ -918,7 +918,7 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 2.2,
       "position": [
-        3936,
+        4144,
         1120
       ],
       "id": "5160aba8-fa30-4d57-9ddb-06280a619c00",
@@ -937,7 +937,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        3536,
+        3744,
         1344
       ],
       "id": "15bec2b6-78a6-461d-8959-67d45bbd4dea",
@@ -954,7 +954,7 @@
       "type": "@n8n/n8n-nodes-langchain.toolThink",
       "typeVersion": 1.1,
       "position": [
-        3664,
+        3872,
         1344
       ],
       "id": "e41c3cb3-8722-4323-9c29-fa2e5c5dc048",
@@ -975,7 +975,7 @@
       "type": "n8n-nodes-base.perplexityTool",
       "typeVersion": 1,
       "position": [
-        3792,
+        4000,
         1344
       ],
       "id": "0925c4d2-a6eb-49d6-957a-9dea88045394",
@@ -998,7 +998,7 @@
       "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
       "typeVersion": 1.2,
       "position": [
-        4000,
+        4208,
         1552
       ],
       "id": "7ce15d44-5f2f-496f-afde-3c06105b803f",
@@ -1028,7 +1028,7 @@
       "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
       "typeVersion": 1.3,
       "position": [
-        3920,
+        4128,
         1344
       ],
       "id": "11f383fa-43bd-476a-a664-0ac6c8038fe9",
@@ -1067,7 +1067,13 @@
                     "additionalFields": {
                       "callback_data": "=doctor_{{ $('Create a row1').item.json.id }}"
                     }
-                  },
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
                   {
                     "text": "Послушать подкаст ",
                     "additionalFields": {
@@ -1087,7 +1093,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        5568,
+        5776,
         928
       ],
       "id": "a68c2b5b-3453-4ea6-9bbd-15a26f8097e9",
@@ -1118,7 +1124,7 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        4208,
+        4416,
         1344
       ],
       "id": "2a593231-6a8f-4aa9-aac8-ee09abcc42ca",
@@ -1137,7 +1143,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        5344,
+        5552,
         928
       ],
       "id": "fdb61a7b-f196-4903-a5d9-feb97d74ba93",
@@ -1208,7 +1214,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1120,
+        1328,
         1312
       ],
       "id": "c3313d1d-7645-4f69-b962-3ca777b03aaf",
@@ -1228,7 +1234,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        1344,
+        1552,
         1440
       ],
       "id": "46558577-da62-4aec-b1ad-c13176f94afd",
@@ -1297,7 +1303,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1344,
+        1552,
         1216
       ],
       "id": "55aff0dc-d5fb-4816-9895-acedd99317d8",
@@ -1317,7 +1323,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        1568,
+        1776,
         1344
       ],
       "id": "def10c95-535e-4e53-988a-7a58c04d9c94",
@@ -1359,8 +1365,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        2240,
-        1024
+        2448,
+        1264
       ],
       "id": "18105bfa-e7dd-41ce-b895-2292d8f6b801",
       "name": "Create a row1",
@@ -1378,8 +1384,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2016,
-        1024
+        2240,
+        1136
       ],
       "id": "227a8900-3cb4-4ee0-b7c6-0a1cbe027391",
       "name": "Code1"
@@ -1413,7 +1419,7 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        4896,
+        5104,
         1024
       ],
       "id": "12dc17d5-a3bb-4c33-835c-76fca12371d0",
@@ -1803,8 +1809,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2672,
-        1024
+        2800,
+        1312
       ],
       "id": "f8dd3b95-0c56-49a0-a605-0ba0e592f084",
       "name": "Lakera Guard",
@@ -1839,7 +1845,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        3088,
+        3296,
         1024
       ],
       "id": "34ceb2f7-a26c-408b-9342-020d16c17bbc",
@@ -1856,7 +1862,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        3312,
+        3520,
         928
       ],
       "id": "212b926e-8aee-403b-be83-4c2a566e1e49",
@@ -1989,7 +1995,7 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        4336,
+        4544,
         1344
       ],
       "id": "c7169ad8-e797-48bc-a03a-67cee2772ec8",
@@ -2057,7 +2063,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        4672,
+        4880,
         1120
       ],
       "id": "ad5f3da6-9903-46fe-9a4d-13e03205a8e2",
@@ -2071,7 +2077,7 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        4464,
+        4672,
         1344
       ],
       "id": "69ba31f4-a8c8-4986-bb30-5d0def387437",
@@ -2246,8 +2252,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1568,
-        1120
+        1792,
+        1200
       ],
       "id": "c14bd7c3-4855-4156-bbdc-2482dd4928ff",
       "name": "If8",
@@ -2283,7 +2289,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        2016,
+        2224,
         1248
       ],
       "id": "1e9e288b-7edc-4e8e-92e4-94d8c71ab7d4",
@@ -2845,7 +2851,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        5344,
+        5552,
         1312
       ],
       "id": "61704f12-9de2-4334-8f56-2dd2d3dd2055",
@@ -2977,7 +2983,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1792,
+        2000,
         1200
       ],
       "id": "17ade1ff-c796-4c40-aae1-fbad12f12be6",
@@ -3011,7 +3017,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        5120,
+        5328,
         1024
       ],
       "id": "fe8f9ff1-0730-4fe8-987b-d4996c796259",
@@ -3029,7 +3035,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        5344,
+        5552,
         1120
       ],
       "id": "8a116e21-a2ce-4bbc-8973-78ae78625c13",
@@ -3654,7 +3660,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        3312,
+        3520,
         1120
       ],
       "id": "7bfcc68b-e629-4d48-815f-1cf02fa9abb9",
@@ -3914,15 +3920,329 @@
           "name": "Telegram account 2"
         }
       }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "89f661d4-156e-4204-b416-df527c956ba8",
+              "leftValue": "={{ $('Telegram Trigger').item.json.message.text }}",
+              "rightValue": "link_",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1072,
+        672
+      ],
+      "id": "4406450c-1ba5-4b5a-a2a1-9d83c08bc290",
+      "name": "IF Link_?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const messageText = $('Telegram Trigger').first().json.message.text || '';\nconst telegramId = $('Telegram Trigger').first().json.message.from.id;\n\n// Проверяем формат: /start link_КОД (может быть с пробелом или без)\nconst linkMatch = messageText.match(/\\/start\\s+link_([A-Z0-9]{6})/i);\n\nif (!linkMatch || !linkMatch[1]) {\n  return [{\n    json: {\n      error: 'Invalid link code format',\n      telegram_id: telegramId,\n      message_text: messageText\n    }\n  }];\n}\n\nconst code = linkMatch[1].toUpperCase();\n\nreturn [{\n  json: {\n    code: code,\n    telegram_id: telegramId,\n    user_id: null // Будет заполнено из БД\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        656
+      ],
+      "id": "55066e5c-a570-4d04-8c1e-945e737836a0",
+      "name": "Extract link code"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "menohub_telegram_auth_codes",
+        "limit": 1,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "code",
+              "condition": "eq",
+              "keyValue": "=={{ $json.code }}"
+            },
+            {
+              "keyName": "used",
+              "condition": "eq",
+              "keyValue": "false"
+            },
+            {
+              "keyName": "expires_at",
+              "condition": "gt",
+              "keyValue": "={{ $now }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1728,
+        656
+      ],
+      "id": "7e7eaaab-e922-48ea-acf1-f96e8c525606",
+      "name": "Get link code from DB",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "CaID56jtaDBjrVGP",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7a991fc9-79d9-4999-9887-e88f41dfbb0e",
+              "leftValue": "=={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1936,
+        656
+      ],
+      "id": "6dac7a3a-67fe-41a3-93fb-d0b8129b82b0",
+      "name": "If code found"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "menohub_telegram_auth_codes",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "=={{ $json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "telegram_id",
+              "fieldValue": "=={{ $('Extract link code').item.json.telegram_id }}"
+            },
+            {
+              "fieldId": "used",
+              "fieldValue": "true"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2208,
+        608
+      ],
+      "id": "6edc746a-a38f-4df6-8043-af4ba16748c5",
+      "name": "Update code with telegram_id",
+      "credentials": {
+        "supabaseApi": {
+          "id": "CaID56jtaDBjrVGP",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "menohub_users",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "=={{ $json.user_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "telegram_id",
+              "fieldValue": "=={{ $('Extract link code').item.json.telegram_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2416,
+        624
+      ],
+      "id": "ecda40f8-10b8-4863-8004-d3733076424e",
+      "name": "Update user telegram_id",
+      "credentials": {
+        "supabaseApi": {
+          "id": "CaID56jtaDBjrVGP",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "=={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "✅ Аккаунт успешно привязан!  \nВаш Telegram ID теперь связан с аккаунтом на сайте. \nВы можете: \n• Общаться с Евой на сайте \n• Сохранять результаты квизов \n• Получить доступ в коммьюнити  \n\nВернитесь на сайт, чтобы продолжить работу.",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "🌐 Вернуться на сайт",
+                    "additionalFields": {
+                      "url": "=={{ $json.website_link }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2832,
+        624
+      ],
+      "id": "ee98c4d7-052a-4293-b025-d726eaedf81e",
+      "name": "Send success message",
+      "webhookId": "7a51af94-5d12-4b8d-b7fe-9884a6fe43e9",
+      "credentials": {
+        "telegramApi": {
+          "id": "JXbE4xrOFs0XRQpk",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const telegramId = $('Extract link code').item.json.telegram_id;\nconst baseUrl = 'https://bezpauzy.com'; // Замените на ваш домен\n\n// Генерируем ссылку с telegram_id для автоматического входа\nconst websiteLink = `${baseUrl}?tg_id=${telegramId}`;\n\nreturn [{\n  json: {\n    ...$input.first().json,\n    website_link: websiteLink,\n    telegram_id: telegramId\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2608,
+        624
+      ],
+      "id": "1cc5339e-a2f9-4c05-8deb-7abc148891a6",
+      "name": "Generate website link for success"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "❌ Код привязки не найден или истек  Возможные причины: • Код уже использован • Код истек (действителен 10 минут) • Неверный формат кода  Пожалуйста, сгенерируйте новый код на сайте.",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "🌐 Сгенерировать новый код",
+                    "additionalFields": {
+                      "url": "=https://bezpauzy.com/account"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2224,
+        768
+      ],
+      "id": "55e31452-e1d5-4946-9591-1cf92aaf83b5",
+      "name": "Send error message",
+      "webhookId": "0053b558-4555-4e58-bc9b-1ce039bc0155",
+      "credentials": {
+        "telegramApi": {
+          "id": "JXbE4xrOFs0XRQpk",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const message = $('Telegram Trigger').first().json.message;\nconsole.log('=== Full Message Object ===');\nconsole.log(JSON.stringify(message, null, 2));\nconsole.log('Text:', message.text);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        656
+      ],
+      "id": "3b508644-a680-4cdd-b41e-2f8aadf6224b",
+      "name": "Log message details"
     }
   ],
   "pinData": {
     "Telegram Trigger": [
       {
         "json": {
-          "update_id": 982882291,
-          "callback_query": {
-            "id": "1609253726381524430",
+          "update_id": 982882311,
+          "message": {
+            "message_id": 1431,
             "from": {
               "id": 374683580,
               "is_bot": false,
@@ -3932,76 +4252,26 @@
               "language_code": "en",
               "is_premium": true
             },
-            "message": {
-              "message_id": 1380,
-              "from": {
-                "id": 8381086963,
-                "is_bot": true,
-                "first_name": "Без | паузы",
-                "username": "bezpauzy_bot"
-              },
-              "chat": {
-                "id": 374683580,
-                "first_name": "Olga",
-                "last_name": "Puchkova",
-                "username": "MikadoNuove",
-                "type": "private"
-              },
-              "date": 1763986111,
-              "text": "👋 Добро пожаловать в \"Без |Паузы\"!\n\n📋 СОГЛАСИЕ НА ОБРАБОТКУ ПЕРСОНАЛЬНЫХ ДАННЫХ\n\nДля работы бота необходимо ваше согласие на обработку данных согласно ФЗ-152.\n\nЧто мы обрабатываем:\n- Telegram ID и username\n- Текст ваших запросов и ответов\n- Возрастная группа \n- Данные о подписке (через ЮKassa)\n- История запросов\n\nМы НЕ собираем:\n❌ Email, телефон, имя, фамилию, паспортные данные, ИНН\n\nГде хранятся данные:\n🇷🇺 Россия (Beget) — основное хранение\n\nВаши права:\n✅ Получить копию данных: /export_my_data\n✅ Удалить все данные: /delete_my_data\n✅ Отменить подписку: /cancel_subscription\n\n📖 Полная версия документа:\nhttps://docs.google.com/document/d/1fStbtSHh-prCmIEPR4mdcbk-g-LpahB8k2nyDLdizIc/edit?usp=sharing \n\nНажимая \"Согласен\", вы подтверждаете, что:\n- Прочитали условия обработки данных\n- Понимаете цели и способы обработк\n- Достигли возраста 18 лет\n\nСогласие можно отозвать в любой момент через команду /delete_my_data или написав на my@bez-pauzy.ru",
-              "entities": [
-                {
-                  "offset": 488,
-                  "length": 15,
-                  "type": "bot_command"
-                },
-                {
-                  "offset": 526,
-                  "length": 15,
-                  "type": "bot_command"
-                },
-                {
-                  "offset": 563,
-                  "length": 20,
-                  "type": "bot_command"
-                },
-                {
-                  "offset": 613,
-                  "length": 96,
-                  "type": "url"
-                },
-                {
-                  "offset": 909,
-                  "length": 15,
-                  "type": "bot_command"
-                },
-                {
-                  "offset": 940,
-                  "length": 15,
-                  "type": "email"
-                }
-              ],
-              "link_preview_options": {
-                "is_disabled": true
-              },
-              "reply_markup": {
-                "inline_keyboard": [
-                  [
-                    {
-                      "text": "Согласен",
-                      "callback_data": "consent_agree"
-                    },
-                    {
-                      "text": "Отказаться",
-                      "callback_data": "consent_decline"
-                    }
-                  ]
-                ]
-              }
+            "chat": {
+              "id": 374683580,
+              "first_name": "Olga",
+              "last_name": "Puchkova",
+              "username": "MikadoNuove",
+              "type": "private"
             },
-            "chat_instance": "-3721502597108677556",
-            "data": "consent_agree"
+            "date": 1766340873,
+            "text": "/start link_GYM9TJ",
+            "entities": [
+              {
+                "offset": 0,
+                "length": 6,
+                "type": "bot_command"
+              }
+            ]
           }
+        },
+        "pairedItem": {
+          "item": 0
         }
       }
     ]
@@ -4011,7 +4281,7 @@
       "main": [
         [
           {
-            "node": "Send a text message",
+            "node": "IF Link_?",
             "type": "main",
             "index": 0
           }
@@ -5031,13 +5301,115 @@
           }
         ]
       ]
+    },
+    "IF Link_?": {
+      "main": [
+        [
+          {
+            "node": "Log message details",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract link code": {
+      "main": [
+        [
+          {
+            "node": "Get link code from DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get link code from DB": {
+      "main": [
+        [
+          {
+            "node": "If code found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If code found": {
+      "main": [
+        [
+          {
+            "node": "Update code with telegram_id",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send error message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update code with telegram_id": {
+      "main": [
+        [
+          {
+            "node": "Update user telegram_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update user telegram_id": {
+      "main": [
+        [
+          {
+            "node": "Generate website link for success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate website link for success": {
+      "main": [
+        [
+          {
+            "node": "Send success message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log message details": {
+      "main": [
+        [
+          {
+            "node": "Extract link code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "2b95eca6-26be-45f6-9ebf-ff46ef418a74",
+  "versionId": "fa95140b-3602-4b70-9d1e-858c8ce933cd",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "761e1fd3bf32913741f28039bf2b347bcaaf85889cbc880f5ccd8ce8956f698e"

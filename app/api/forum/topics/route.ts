@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { sanitizeInput, sanitizeText } from '@/lib/utils/sanitize'
 import * as z from 'zod'
 
 const createTopicSchema = z.object({
@@ -54,15 +55,18 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient()
 
+    // Санитизация пользовательского контента перед сохранением
+    const sanitizedData = {
+      category_id: validatedData.category_id,
+      author_email: validatedData.author_email.toLowerCase().trim(),
+      author_name: sanitizeText(validatedData.author_name),
+      title: sanitizeInput(validatedData.title, 200),
+      content: sanitizeInput(validatedData.content, 5000),
+    }
+
     const { data: newTopic, error } = await supabase
       .from('menohub_forum_topics')
-      .insert({
-        category_id: validatedData.category_id,
-        author_email: validatedData.author_email,
-        author_name: validatedData.author_name,
-        title: validatedData.title,
-        content: validatedData.content,
-      })
+      .insert(sanitizedData)
       .select()
       .single()
 
@@ -77,8 +81,12 @@ export async function POST(request: NextRequest) {
     )
   } catch (error) {
     if (error instanceof z.ZodError) {
+      // Детали валидации можно показывать, но только в development для безопасности
       return NextResponse.json(
-        { error: 'Неверные данные', details: error.errors },
+        {
+          error: 'Неверные данные',
+          ...(process.env.NODE_ENV === 'development' && { details: error.errors }),
+        },
         { status: 400 }
       )
     }

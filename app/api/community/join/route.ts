@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-// import { sendWelcomeEmail } from '@/lib/email/send-welcome-email' // Отключено до настройки email-сервиса
+import { sendWelcomeEmail } from '@/lib/email/send-welcome-email'
 import * as z from 'zod'
 
 const communityJoinSchema = z.object({
@@ -57,18 +57,29 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (insertError) {
-      console.error('Supabase insert error:', insertError)
+      const { logger } = await import('@/lib/logger')
+      logger.error('Supabase insert error:', insertError)
       throw new Error('Ошибка при сохранении данных')
     }
 
-    // TODO: Отправка приветственного письма
-    // Раскомментируйте после настройки Resend или другого email-сервиса
-    // sendWelcomeEmail({
-    //   to: validatedData.email,
-    //   name: validatedData.name,
-    // }).catch((error) => {
-    //   console.error('Failed to send welcome email:', error)
-    // })
+    // Отправляем приветственное письмо
+    const { logger } = await import('@/lib/logger')
+    logger.debug('📧 [API] Отправка welcome email при присоединении к сообществу на:', validatedData.email)
+    sendWelcomeEmail({
+      to: validatedData.email,
+      name: validatedData.name,
+    })
+      .then((result) => {
+        if (result.success) {
+          logger.debug('✅ [API] Welcome email успешно отправлен')
+        } else {
+          logger.error('[API] Не удалось отправить welcome email:', result.error)
+        }
+      })
+      .catch((error) => {
+        logger.error('[API] Исключение при отправке welcome email:', error)
+        // Не прерываем процесс, если письмо не отправилось
+      })
 
     return NextResponse.json(
       {
@@ -83,8 +94,12 @@ export async function POST(request: NextRequest) {
     )
   } catch (error) {
     if (error instanceof z.ZodError) {
+      // Детали валидации можно показывать, но только в development для безопасности
       return NextResponse.json(
-        { error: 'Неверные данные формы', details: error.errors },
+        {
+          error: 'Неверные данные формы',
+          ...(process.env.NODE_ENV === 'development' && { details: error.errors }),
+        },
         { status: 400 }
       )
     }

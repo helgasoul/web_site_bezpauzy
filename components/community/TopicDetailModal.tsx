@@ -1,8 +1,8 @@
 'use client'
 
-import { FC, useState, useEffect } from 'react'
+import { FC, useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Loader2, AlertCircle, Send, User, Clock, Eye, MessageCircle, Pin, Lock } from 'lucide-react'
+import { X, Loader2, AlertCircle, Send, User, Clock, Eye, MessageCircle, Pin, Lock, Edit2, Save, XCircle } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -29,6 +29,7 @@ interface Reply {
   author_name: string
   content: string
   created_at: string
+  updated_at?: string
 }
 
 interface TopicDetailModalProps {
@@ -56,6 +57,9 @@ export const TopicDetailModal: FC<TopicDetailModalProps> = ({
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string>('')
+  const [editingReplyId, setEditingReplyId] = useState<string | null>(null)
+  const [editContent, setEditContent] = useState<string>('')
+  const [isUpdating, setIsUpdating] = useState(false)
 
   const {
     register,
@@ -69,13 +73,7 @@ export const TopicDetailModal: FC<TopicDetailModalProps> = ({
     },
   })
 
-  useEffect(() => {
-    if (isOpen) {
-      loadReplies()
-    }
-  }, [isOpen, topic.id])
-
-  const loadReplies = async () => {
+  const loadReplies = useCallback(async () => {
     setIsLoading(true)
     try {
       const response = await fetch(`/api/forum/topics/${topic.id}/replies`)
@@ -88,7 +86,13 @@ export const TopicDetailModal: FC<TopicDetailModalProps> = ({
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [topic.id])
+
+  useEffect(() => {
+    if (isOpen) {
+      loadReplies()
+    }
+  }, [isOpen, topic.id, loadReplies])
 
   const onSubmit = async (data: ReplyFormData) => {
     if (!userEmail) {
@@ -144,6 +148,104 @@ export const TopicDetailModal: FC<TopicDetailModalProps> = ({
       hour: '2-digit',
       minute: '2-digit',
     })
+  }
+
+  const formatDateShort = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diff = now.getTime() - date.getTime()
+    const minutes = Math.floor(diff / (1000 * 60))
+    const hours = Math.floor(diff / (1000 * 60 * 60))
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+
+    if (minutes < 1) return 'только что'
+    if (minutes < 60) return `${minutes} мин назад`
+    if (hours < 24) return `${hours} ч назад`
+    if (days < 7) return `${days} дн назад`
+    
+    return date.toLocaleDateString('ru-RU', {
+      day: 'numeric',
+      month: 'short',
+    })
+  }
+
+  const isReplyEdited = (reply: Reply) => {
+    if (!reply.updated_at) return false
+    return new Date(reply.updated_at).getTime() > new Date(reply.created_at).getTime() + 1000 // +1 секунда для учета округления
+  }
+
+  const handleStartEdit = (reply: Reply) => {
+    if (reply.author_email.toLowerCase() !== userEmail?.toLowerCase()) {
+      setErrorMessage('Вы можете редактировать только свои комментарии')
+      return
+    }
+    setEditingReplyId(reply.id)
+    setEditContent(reply.content)
+    setErrorMessage('')
+  }
+
+  const handleCancelEdit = () => {
+    setEditingReplyId(null)
+    setEditContent('')
+    setErrorMessage('')
+  }
+
+  const handleSaveEdit = async (replyId: string) => {
+    if (!userEmail) {
+      setErrorMessage('Необходимо войти в сообщество')
+      return
+    }
+
+    const trimmedContent = editContent.trim()
+    if (trimmedContent.length < 5) {
+      setErrorMessage('Комментарий должен содержать минимум 5 символов')
+      return
+    }
+
+    if (trimmedContent.length > 3000) {
+      setErrorMessage('Комментарий слишком длинный (максимум 3000 символов)')
+      return
+    }
+
+    setIsUpdating(true)
+    setErrorMessage('')
+
+    try {
+      const response = await fetch(`/api/forum/topics/${topic.id}/replies?replyId=${replyId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: trimmedContent,
+          author_email: userEmail,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        const errorMsg = result.error || 'Произошла ошибка при обновлении комментария'
+        setErrorMessage(errorMsg)
+        return
+      }
+
+      // Обновляем список комментариев
+      setReplies(prevReplies =>
+        prevReplies.map(reply =>
+          reply.id === replyId ? result.reply : reply
+        )
+      )
+
+      setEditingReplyId(null)
+      setEditContent('')
+      setErrorMessage('')
+    } catch (error) {
+      console.error('Error updating reply:', error)
+      setErrorMessage(error instanceof Error ? error.message : 'Произошла ошибка при обновлении комментария')
+    } finally {
+      setIsUpdating(false)
+    }
   }
 
   if (!isOpen) return null
@@ -235,29 +337,108 @@ export const TopicDetailModal: FC<TopicDetailModalProps> = ({
                 </div>
               ) : (
                 <div className="space-y-6">
-                  {replies.map((reply) => (
-                    <div
-                      key={reply.id}
-                      className="bg-lavender-bg rounded-card p-6 border-l-4 border-primary-purple"
-                    >
-                      <div className="flex items-start gap-4 mb-3">
-                        <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary-purple to-ocean-wave-start rounded-full flex items-center justify-center text-white font-semibold">
-                          {reply.author_name.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="font-semibold text-deep-navy">{reply.author_name}</span>
-                            <span className="text-body-small text-deep-navy/60">
-                              {formatDate(reply.created_at)}
-                            </span>
+                  {replies.map((reply) => {
+                    const isEditing = editingReplyId === reply.id
+                    const isAuthor = reply.author_email.toLowerCase() === userEmail?.toLowerCase()
+                    const isEdited = isReplyEdited(reply)
+
+                    return (
+                      <div
+                        key={reply.id}
+                        className="bg-lavender-bg rounded-card p-6 border-l-4 border-primary-purple"
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary-purple to-ocean-wave-start rounded-full flex items-center justify-center text-white font-semibold">
+                            {reply.author_name.charAt(0).toUpperCase()}
                           </div>
-                          <p className="text-body text-deep-navy/80 whitespace-pre-wrap leading-relaxed">
-                            {reply.content}
-                          </p>
+                          <div className="flex-1">
+                            <div className="flex items-start justify-between gap-3 mb-2">
+                              <div className="flex items-center gap-3 flex-wrap">
+                                <span className="font-semibold text-deep-navy">{reply.author_name}</span>
+                                <span className="text-body-small text-deep-navy/60">
+                                  {formatDate(reply.created_at)}
+                                </span>
+                                {isEdited && (
+                                  <span className="text-body-small text-deep-navy/50 italic">
+                                    (отредактировано {formatDateShort(reply.updated_at!)})
+                                  </span>
+                                )}
+                              </div>
+                              {isAuthor && !isEditing && (
+                                <button
+                                  onClick={() => handleStartEdit(reply)}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 text-body-small text-primary-purple hover:bg-primary-purple/10 rounded-lg transition-colors"
+                                  title="Редактировать комментарий"
+                                >
+                                  <Edit2 className="w-4 h-4" />
+                                  <span>Редактировать</span>
+                                </button>
+                              )}
+                            </div>
+
+                            {isEditing ? (
+                              <div className="space-y-3">
+                                <textarea
+                                  value={editContent}
+                                  onChange={(e) => {
+                                    setEditContent(e.target.value)
+                                    // Очищаем ошибку при изменении текста
+                                    if (errorMessage && editingReplyId === reply.id) {
+                                      setErrorMessage('')
+                                    }
+                                  }}
+                                  rows={4}
+                                  className="w-full px-4 py-3 rounded-card border border-primary-purple focus:border-primary-purple focus:ring-2 focus:ring-primary-purple/20 outline-none transition-colors text-body text-deep-navy resize-none"
+                                  placeholder="Редактируйте ваш комментарий..."
+                                  disabled={isUpdating}
+                                />
+                                {errorMessage && editingReplyId === reply.id && (
+                                  <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                    <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
+                                    <p className="text-sm text-red-600">{errorMessage}</p>
+                                  </div>
+                                )}
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => handleSaveEdit(reply.id)}
+                                    disabled={isUpdating || editContent.trim().length < 5 || editContent.trim().length > 3000}
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary-purple text-white rounded-lg text-sm font-medium hover:bg-primary-purple/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {isUpdating ? (
+                                      <>
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        <span>Сохранение...</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Save className="w-4 h-4" />
+                                        <span>Сохранить</span>
+                                      </>
+                                    )}
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      handleCancelEdit()
+                                      setErrorMessage('')
+                                    }}
+                                    disabled={isUpdating}
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-lavender-bg text-deep-navy rounded-lg text-sm font-medium hover:bg-lavender-bg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    <XCircle className="w-4 h-4" />
+                                    <span>Отмена</span>
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-body text-deep-navy/80 whitespace-pre-wrap leading-relaxed">
+                                {reply.content}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </div>

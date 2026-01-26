@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 
+// Явно указываем, что этот route динамический (использует cookies)
+export const dynamic = 'force-dynamic'
+
 /**
  * Получает историю сообщений пользователя
  */

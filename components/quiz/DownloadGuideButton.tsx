@@ -5,20 +5,55 @@ import { motion } from 'framer-motion'
 import { Download, Loader2, FileText } from 'lucide-react'
 
 interface DownloadGuideButtonProps {
-  guideType?: 'anti-inflammatory-nutrition'
+  guideId?: string
+  guideType?: 'anti-inflammatory-nutrition' // Для обратной совместимости
   label?: string
+  filename?: string
+}
+
+// Маппинг ID гайдов на имена файлов и отображаемые имена
+const guideFiles: Record<string, { filename: string, displayName: string }> = {
+  'anti-inflammatory-nutrition': {
+    filename: 'anti-inflammatory-nutrition.pdf',
+    displayName: 'Гайд по противовоспалительному питанию.pdf'
+  },
+  'sleep-improvement': {
+    filename: 'Гайд_по_улучшению_сна_в_менопаузе.pdf',
+    displayName: 'Гайд по улучшению сна в менопаузе.pdf'
+  },
+  'hot-flashes-management': {
+    filename: 'Гайд_по_управлению_приливами.pdf',
+    displayName: 'Гайд по управлению приливами.pdf'
+  },
+  'bone-health': {
+    filename: 'Гайд_по_здоровью_костей_в_менопаузе.pdf',
+    displayName: 'Гайд по здоровью костей в менопаузе.pdf'
+  },
 }
 
 export const DownloadGuideButton: FC<DownloadGuideButtonProps> = ({
-  guideType = 'anti-inflammatory-nutrition',
+  guideId,
+  guideType,
   label = 'Скачать PDF-гайд',
+  filename,
 }) => {
   const [isDownloading, setIsDownloading] = useState(false)
 
   const handleDownload = async () => {
     setIsDownloading(true)
     try {
-      const response = await fetch('/api/guides/anti-inflammatory-nutrition', {
+      // Определяем, какой файл нужно скачать
+      const effectiveGuideId = guideId || guideType || 'anti-inflammatory-nutrition'
+      const guideFile = guideFiles[effectiveGuideId]
+      
+      if (!guideFile) {
+        throw new Error('Гайд не найден')
+      }
+
+      // Используем API endpoint для правильной обработки имени файла
+      const endpoint = `/api/guides/${effectiveGuideId}`
+
+      const response = await fetch(endpoint, {
         method: 'GET',
       })
 
@@ -26,12 +61,23 @@ export const DownloadGuideButton: FC<DownloadGuideButtonProps> = ({
         throw new Error('Ошибка при загрузке гайда')
       }
 
+      // Получаем имя файла из заголовка Content-Disposition или используем переданное
+      const contentDisposition = response.headers.get('Content-Disposition')
+      let downloadFilename = filename || guideFile.displayName
+      
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/)
+        if (filenameMatch) {
+          downloadFilename = filenameMatch[1]
+        }
+      }
+
       // Создаем blob и скачиваем
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = 'Противовоспалительное питание.docx'
+      a.download = downloadFilename
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)

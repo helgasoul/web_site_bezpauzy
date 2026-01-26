@@ -4,6 +4,7 @@ import { FC, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Mail, Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
 import { MRSResults } from './MRSQuiz'
+import { validateEmail } from '@/lib/utils/validation'
 
 interface SaveResultsModalProps {
   isOpen: boolean
@@ -28,8 +29,7 @@ export const SaveResultsModal: FC<SaveResultsModalProps> = ({
     setError(null)
 
     // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
+    if (!validateEmail(email)) {
       setError('Пожалуйста, введите корректный email адрес')
       return
     }

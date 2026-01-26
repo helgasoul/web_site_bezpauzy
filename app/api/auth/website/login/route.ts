@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import bcrypt from 'bcryptjs'
-import { cookies } from 'next/headers'
+import { setSessionCookie } from '@/lib/auth/session'
+import { trackFailedLogin, resetFailedLoginAttempts } from '@/lib/security/monitoring'
+import { logger } from '@/lib/logger'
 
 /**
  * Вход на сайт по логину и паролю
@@ -18,7 +20,7 @@ export async function POST(request: NextRequest) {
     try {
       body = await request.json()
     } catch (parseError) {
-      console.error('Error parsing request body:', parseError)
+      logger.error('Error parsing request body:', parseError)
       return NextResponse.json(
         { error: 'Неверный формат запроса' },
         { status: 400 }
@@ -52,6 +54,17 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (userError || !user) {
+      // Отслеживаем неудачную попытку входа
+      const clientIP = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown'
+      const shouldBlock = trackFailedLogin(clientIP, username)
+      
+      if (shouldBlock) {
+        return NextResponse.json(
+          { error: 'Слишком много неудачных попыток входа. Попробуйте позже.' },
+          { status: 429 }
+        )
+      }
+      
       return NextResponse.json(
         { error: 'Неверный логин или пароль' },
         { status: 401 }
@@ -70,66 +83,52 @@ export async function POST(request: NextRequest) {
     const isPasswordValid = await bcrypt.compare(password, user.password_hash)
 
     if (!isPasswordValid) {
+      // Отслеживаем неудачную попытку входа
+      const clientIP = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown'
+      const shouldBlock = trackFailedLogin(clientIP, username)
+      
+      if (shouldBlock) {
+        return NextResponse.json(
+          { error: 'Слишком много неудачных попыток входа. Попробуйте позже.' },
+          { status: 429 }
+        )
+      }
+      
       return NextResponse.json(
         { error: 'Неверный логин или пароль' },
         { status: 401 }
       )
     }
+    
+    // Успешный вход - сбрасываем счетчик неудачных попыток
+    const clientIP = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown'
+    resetFailedLoginAttempts(clientIP)
 
-    // Создаем сессию
-    const sessionToken = Buffer.from(JSON.stringify({
-      userId: user.id,
-      username: user.username,
-      telegramId: user.telegram_id || null,
-    })).toString('base64')
-
-    // Создаем response
+    // Создаем безопасную JWT сессию
     const response = NextResponse.json({
       success: true,
       user: {
         id: user.id,
         username: user.username,
         telegramId: user.telegram_id,
-        email: user.email,
-        subscriptionStatus: user.subscription_status,
-        subscriptionPlan: user.subscription_plan,
         hasTelegramId: !!user.telegram_id,
       },
     })
 
-    // Устанавливаем cookie в response
-    // Важно: устанавливаем cookie ДО возврата response
-    const cookieOptions: any = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax' as const,
-      maxAge: 60 * 60 * 24 * 30, // 30 дней
-      path: '/',
-    }
-    
-    // Не указываем domain для localhost (браузер сам установит правильный domain)
-    if (process.env.NODE_ENV === 'production') {
-      // В production можно указать domain, если нужно
-      // cookieOptions.domain = '.yourdomain.com'
-    }
-    
-    response.cookies.set('telegram_session', sessionToken, cookieOptions)
-
-    console.log('login: cookie set', { 
-      userId: user.id, 
+    setSessionCookie({
+      userId: user.id,
       username: user.username,
-      cookieLength: sessionToken.length,
-      cookieValue: sessionToken.substring(0, 20) + '...' // Первые 20 символов для отладки
-    })
+      telegramId: user.telegram_id || null,
+    }, response)
     
-    // Логируем заголовки response для отладки
-    console.log('login: response headers', {
-      hasSetCookie: response.headers.get('Set-Cookie') ? true : false
-    })
+    // Дополнительно устанавливаем заголовки для предотвращения кеширования
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
 
     return response
   } catch (error) {
-    console.error('Error in website/login API:', error)
+    logger.error('Error in website/login API:', error)
     return NextResponse.json(
       { error: 'Внутренняя ошибка сервера' },
       { status: 500 }

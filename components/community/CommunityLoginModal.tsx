@@ -118,7 +118,7 @@ export const CommunityLoginModal: FC<CommunityLoginModalProps> = ({
                 <LogIn className="w-8 h-8 text-white" />
               </div>
               <h2 className="text-h2 font-bold text-deep-navy mb-4">
-                Войти в сообщество
+                Войти
               </h2>
               <p className="text-body text-deep-navy/70">
                 Введите email, который вы использовали при регистрации

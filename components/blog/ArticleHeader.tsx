@@ -6,12 +6,15 @@ import Image from 'next/image'
 import { Calendar, Clock, Edit } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
+import { getExpertByCategory, getExpertByName } from '@/lib/experts'
+import type { ExpertCategory } from '@/lib/experts'
+import { AuthorInterviews } from './AuthorInterviews'
 
 interface Article {
-  id: number
+  id: string | number
   title: string
   slug: string
-  category: string
+  category: 'gynecologist' | 'mammologist' | 'nutritionist' | string
   categoryName: string
   author: {
     name: string
@@ -20,7 +23,7 @@ interface Article {
   }
   publishedAt: string
   updatedAt: string
-  readTime: number
+  readTime?: number | null
   image: string
 }
 
@@ -29,6 +32,17 @@ interface ArticleHeaderProps {
 }
 
 export const ArticleHeader: FC<ArticleHeaderProps> = ({ article }) => {
+  // Получаем эксперта по категории или имени для автоматической подстановки фото
+  const expert = getExpertByCategory(article.category as ExpertCategory) || 
+                 getExpertByName(article.author.name)
+  
+  // Используем данные эксперта, если найдены, иначе используем переданные данные
+  const author = expert ? {
+    name: expert.name,
+    role: expert.role,
+    avatar: expert.avatar,
+  } : article.author
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('ru-RU', {
@@ -104,20 +118,22 @@ export const ArticleHeader: FC<ArticleHeaderProps> = ({ article }) => {
         >
           {/* Author */}
           <div className="flex items-center gap-3">
-            <div className="relative w-12 h-12 rounded-full overflow-hidden">
+            <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-white/50 shadow-md">
               <Image
-                src={article.author.avatar}
-                alt={article.author.name}
+                src={author.avatar || '/hero-women.jpg'}
+                alt={author.name}
                 fill
+                sizes="48px"
                 className="object-cover"
+                style={{ objectPosition: 'center top' }}
               />
             </div>
             <div>
               <div className="font-medium text-deep-navy">
-                {article.author.name}
+                {author.name}
               </div>
               <div className="text-body-small">
-                {article.author.role}
+                {author.role}
               </div>
             </div>
           </div>
@@ -128,10 +144,12 @@ export const ArticleHeader: FC<ArticleHeaderProps> = ({ article }) => {
               <Calendar className="w-4 h-4" />
               <span>Опубликовано: {formatDate(article.publishedAt)}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              <span>Время чтения: {article.readTime} мин</span>
-            </div>
+            {article.readTime && (
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                <span>Время чтения: {article.readTime} мин</span>
+              </div>
+            )}
             {article.updatedAt !== article.publishedAt && (
               <div className="flex items-center gap-2">
                 <Edit className="w-4 h-4" />
@@ -139,6 +157,15 @@ export const ArticleHeader: FC<ArticleHeaderProps> = ({ article }) => {
               </div>
             )}
           </div>
+        </motion.div>
+
+        {/* Author Interviews */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+        >
+          <AuthorInterviews authorName={author.name} />
         </motion.div>
       </div>
     </section>

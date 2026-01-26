@@ -7,6 +7,7 @@ interface WelcomeEmailProps {
 export const WelcomeEmail: React.FC<WelcomeEmailProps> = ({ name }) => {
   return (
     <html>
+      {/* eslint-disable-next-line @next/next/no-head-element */}
       <head>
         <meta httpEquiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />

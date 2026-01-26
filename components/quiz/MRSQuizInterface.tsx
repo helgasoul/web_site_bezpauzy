@@ -10,6 +10,8 @@ import type { MRSQuestion, MRSAnswer, MRSResult } from '@/lib/types/mrs-quiz'
 import { QuizQuestionCard } from './QuizQuestionCard'
 import { QuizProgressBar } from './QuizProgressBar'
 import { MRSQuizResults } from './MRSQuizResults'
+import { QuizHistory } from './QuizHistory'
+import { BackButton } from '@/components/ui/BackButton'
 
 type QuizStep = 'intro' | 'questions' | 'results'
 
@@ -66,6 +68,9 @@ export const MRSQuizInterface: FC = () => {
   return (
     <section className="py-12 md:py-16 bg-gradient-to-b from-soft-white to-white min-h-screen">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
+        <div className="mb-6">
+          <BackButton variant="ghost" />
+        </div>
         <div className="max-w-3xl mx-auto">
           {/* Progress Bar */}
           {step !== 'intro' && step !== 'results' && (
@@ -79,26 +84,30 @@ export const MRSQuizInterface: FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="text-center space-y-8"
+                className="space-y-8"
               >
-                <div className="flex items-center justify-center mx-auto">
-                  <Image
-                    src="/logo.png"
-                    alt="Без |Паузы"
-                    width={80}
-                    height={80}
-                    className="object-contain"
-                  />
-                </div>
+                {/* История результатов (если есть) */}
+                <QuizHistory testType="mrs" onStartNew={handleStart} />
 
-                <div>
-                  <h1 className="text-h1 font-bold text-deep-navy mb-4 bg-gradient-to-r from-primary-purple to-ocean-wave-start bg-clip-text text-transparent">
-                    Menopause Rating Scale (MRS)
-                  </h1>
-                  <p className="text-body-large text-deep-navy/70">
-                    Стандартный опросник для оценки симптомов менопаузы. Оцените уровень тяжести ваших симптомов и получите рекомендации.
-                  </p>
-                </div>
+                <div className="text-center space-y-8">
+                  <div className="flex items-center justify-center mx-auto">
+                    <Image
+                      src="/logo.png"
+                      alt="Без |Паузы"
+                      width={80}
+                      height={80}
+                      className="object-contain"
+                    />
+                  </div>
+
+                  <div>
+                    <h1 className="text-h1 font-bold text-deep-navy mb-4 bg-gradient-to-r from-primary-purple to-ocean-wave-start bg-clip-text text-transparent">
+                      Menopause Rating Scale (MRS)
+                    </h1>
+                    <p className="text-body-large text-deep-navy/70">
+                      Стандартный опросник для оценки симптомов менопаузы. Оцените уровень тяжести ваших симптомов и получите рекомендации.
+                    </p>
+                  </div>
 
                 <div className="bg-gradient-to-br from-lavender-bg to-soft-white rounded-3xl p-8 border-2 border-primary-purple/20 shadow-lg space-y-6">
                   <div className="flex items-center gap-3 justify-center mb-4">
@@ -146,6 +155,7 @@ export const MRSQuizInterface: FC = () => {
                 <p className="text-caption text-deep-navy/60">
                   Ваши данные конфиденциальны и не будут переданы третьим лицам
                 </p>
+                </div>
               </motion.div>
             )}
 

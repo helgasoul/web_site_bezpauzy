@@ -46,17 +46,33 @@ export const WebsiteLoginModal: FC<WebsiteLoginModalProps> = ({
       let data
       try {
         const text = await response.text()
+        console.log('[WebsiteLoginModal] Response status:', response.status)
+        console.log('[WebsiteLoginModal] Response text:', text.substring(0, 200))
+        
         if (!text) {
-          throw new Error('Пустой ответ от сервера')
+          console.error('[WebsiteLoginModal] Empty response from server')
+          throw new Error('Пустой ответ от сервера. Попробуйте еще раз.')
         }
-        data = JSON.parse(text)
+        
+        try {
+          data = JSON.parse(text)
+        } catch (jsonError) {
+          console.error('[WebsiteLoginModal] Failed to parse JSON:', jsonError)
+          console.error('[WebsiteLoginModal] Response text was:', text)
+          // Если ответ не JSON, возможно это HTML-страница с ошибкой
+          if (text.includes('<html') || text.includes('<!DOCTYPE')) {
+            throw new Error('Сервер вернул неожиданный формат ответа. Пожалуйста, обновите страницу и попробуйте снова.')
+          }
+          throw new Error('Неверный формат ответа от сервера. Попробуйте еще раз.')
+        }
       } catch (parseError) {
-        console.error('Error parsing response:', parseError)
-        throw new Error('Ошибка при обработке ответа от сервера')
+        console.error('[WebsiteLoginModal] Error parsing response:', parseError)
+        const errorMessage = parseError instanceof Error 
+          ? parseError.message 
+          : 'Ошибка при обработке ответа от сервера'
+        throw new Error(errorMessage)
       }
 
-      // Логируем ответ для отладки
-      console.log('Login response:', { ok: response.ok, status: response.status, data })
 
       if (!response.ok) {
         // Если пользователь не найден, предлагаем зарегистрироваться
@@ -68,43 +84,72 @@ export const WebsiteLoginModal: FC<WebsiteLoginModalProps> = ({
         return
       }
 
-      // Успешный вход - перенаправляем в личный кабинет
-      console.log('Login successful, redirecting to /account', data)
-      
-      // Сбрасываем состояние загрузки
+      // Успешный вход - проверяем сессию и вызываем onSuccess
+      console.log('[WebsiteLoginModal] Login successful, checking session...')
       setLoading(false)
       
-      // Закрываем модальное окно
-      onClose()
+      // Проверяем, что cookie установилась перед вызовом onSuccess (максимум 5 попыток)
+      let retryCount = 0
+      const maxRetries = 5
+      const retryDelay = 800
       
-      // Проверяем, что cookie установилась перед редиректом
-      // Используем более длинную задержку, чтобы cookie точно успела установиться
-      setTimeout(async () => {
-        console.log('Checking session before redirect...')
+      const checkSessionAndProceed = async () => {
         try {
-          // Проверяем сессию перед редиректом
+          console.log(`[WebsiteLoginModal] Session check attempt ${retryCount + 1}/${maxRetries}`)
           const sessionCheck = await fetch('/api/auth/telegram/get-session', {
             credentials: 'include',
-            cache: 'no-store'
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+            },
           })
+          
+          if (!sessionCheck.ok) {
+            throw new Error(`HTTP error! status: ${sessionCheck.status}`)
+          }
+          
           const sessionData = await sessionCheck.json()
-          console.log('Session check before redirect:', sessionData)
+          console.log(`[WebsiteLoginModal] Session check result:`, sessionData)
           
           if (sessionData.authenticated) {
-            console.log('Session confirmed, redirecting to /account')
-            window.location.href = '/account'
+            // Сессия подтверждена, закрываем модалку и вызываем onSuccess
+            console.log('[WebsiteLoginModal] Session authenticated, calling onSuccess')
+            onClose()
+            setTimeout(() => {
+              onSuccess()
+            }, 200)
+          } else if (retryCount < maxRetries - 1) {
+            console.log(`[WebsiteLoginModal] Session not authenticated, retrying in ${retryDelay}ms... Error:`, sessionData.error)
+            retryCount++
+            setTimeout(checkSessionAndProceed, retryDelay)
           } else {
-            console.warn('Session not found, but redirecting anyway (cookie may be delayed)')
-            window.location.href = '/account'
+            // После всех попыток все равно закрываем модалку и вызываем onSuccess
+            console.warn(`[WebsiteLoginModal] All ${maxRetries} attempts failed, but proceeding anyway. Error:`, sessionData.error)
+            onClose()
+            setTimeout(() => {
+              onSuccess()
+            }, 200)
           }
-        } catch (error) {
-          console.error('Error checking session before redirect:', error)
-          // Все равно делаем редирект
-          window.location.href = '/account'
+        } catch (error: any) {
+          console.error(`[WebsiteLoginModal] Error on attempt ${retryCount + 1}:`, error)
+          if (retryCount < maxRetries - 1) {
+            retryCount++
+            setTimeout(checkSessionAndProceed, retryDelay)
+          } else {
+            console.warn(`[WebsiteLoginModal] All ${maxRetries} attempts failed with errors, but proceeding anyway`)
+            onClose()
+            setTimeout(() => {
+              onSuccess()
+            }, 200)
+          }
         }
-      }, 1000) // Увеличиваем задержку до 1 секунды
+      }
       
-      return // Важно: выходим из функции
+      // Начинаем проверку с задержкой, чтобы дать время cookie установиться
+      setTimeout(checkSessionAndProceed, 600)
+      
+      return
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка при входе')
     } finally {
@@ -122,14 +167,14 @@ export const WebsiteLoginModal: FC<WebsiteLoginModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-deep-navy/60 backdrop-blur-sm"
+          className="absolute inset-0 bg-deep-navy/60 backdrop-blur-sm pointer-events-auto"
         />
 
         {/* Modal */}
@@ -137,7 +182,8 @@ export const WebsiteLoginModal: FC<WebsiteLoginModalProps> = ({
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 md:p-10 z-10"
+          onClick={(e) => e.stopPropagation()}
+          className="relative bg-white rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto p-8 md:p-10 z-10 pointer-events-auto"
         >
           {/* Close button */}
           <button

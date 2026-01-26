@@ -1,12 +1,17 @@
 'use client'
 
-import { FC } from 'react'
+import { FC, useEffect } from 'react'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
+import { initFadeInAnimations } from '@/lib/utils/intersection-observer'
 
 interface SocialProofProps {}
 
 export const SocialProof: FC<SocialProofProps> = () => {
+  useEffect(() => {
+    // Инициализируем анимации при монтировании компонента
+    initFadeInAnimations()
+  }, [])
+
   const stats = [
     { 
       value: '12,000+', 
@@ -35,13 +40,9 @@ export const SocialProof: FC<SocialProofProps> = () => {
       <div className="container mx-auto px-4 md:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
           {stats.map((stat, index) => (
-            <motion.div
+            <div
               key={index}
-              className="text-center space-y-4"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.15 }}
+              className={`text-center space-y-4 fade-in ${index === 0 ? 'fade-in-delay-1' : index === 1 ? 'fade-in-delay-2' : 'fade-in-delay-3'}`}
             >
               {/* Photo */}
               <div className="relative w-24 h-24 mx-auto rounded-full overflow-hidden shadow-strong border-4 border-white">
@@ -49,6 +50,7 @@ export const SocialProof: FC<SocialProofProps> = () => {
                   src={stat.image}
                   alt={stat.label}
                   fill
+                  sizes="96px"
                   className="object-cover"
                 />
               </div>
@@ -59,7 +61,7 @@ export const SocialProof: FC<SocialProofProps> = () => {
               <div className="text-body text-deep-navy/70">
                 {stat.label}
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

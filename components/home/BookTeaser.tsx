@@ -15,8 +15,9 @@ export const BookTeaser: FC<BookTeaserProps> = () => {
             <div className="relative w-full max-w-md mx-auto aspect-[2/3] rounded-card shadow-2xl transform hover:scale-105 transition-transform duration-300 overflow-hidden">
               <Image
                 src="/oblozhka.png"
-                alt="Обложка книги Менопауза Без|паузы"
+                alt="Обложка книги Менопауза Без |Паузы"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 448px"
                 className="object-cover"
                 priority
               />
@@ -37,7 +38,7 @@ export const BookTeaser: FC<BookTeaserProps> = () => {
           {/* Right: Content */}
           <div className="space-y-6 lg:order-2 order-1">
             <h2 className="text-h2 font-bold text-soft-white">
-              КНИГА "МЕНОПАУЗА БЕЗ|ПАУЗЫ"
+              КНИГА &quot;МЕНОПАУЗА БЕЗ|ПАУЗЫ&quot;
             </h2>
             <p className="text-body-large text-soft-white/90">
               Новая жизнь - прежняя ты

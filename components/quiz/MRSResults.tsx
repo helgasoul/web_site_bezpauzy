@@ -24,9 +24,37 @@ export const MRSResults: FC<MRSResultsProps> = ({ results }) => {
 
   const handleDownloadPDF = async () => {
     try {
-      // Import and use the PDF generation function
-      const { generateMRSReportPDF } = await import('@/lib/pdf/generateMRSReport')
-      await generateMRSReportPDF(results)
+      const pdfData = {
+        total_score: results.totalScore,
+        severity: results.severity,
+        vasomotor_score: results.vasomotorScore,
+        psychological_score: results.psychologicalScore,
+        urogenital_score: results.urogenitalScore,
+        somatic_score: results.somaticScore,
+        recommendations: results.recommendations || [],
+      }
+
+      const response = await fetch('/api/quiz/mrs/pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(pdfData),
+      })
+
+      if (!response.ok) {
+        throw new Error('Не удалось сгенерировать PDF')
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `mrs-quiz-results-${Date.now()}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
     } catch (error) {
       console.error('Ошибка при генерации PDF:', error)
       alert('Не удалось сгенерировать PDF. Пожалуйста, попробуйте позже.')
@@ -182,7 +210,7 @@ export const MRSResults: FC<MRSResultsProps> = ({ results }) => {
             Сохранить мои результаты
           </button>
           <Link
-            href="/chat"
+            href="/bot"
             className="inline-flex items-center justify-center gap-2 bg-white border-2 border-primary-purple text-primary-purple px-8 py-4 rounded-full text-lg font-semibold hover:bg-primary-purple hover:text-white transition-all duration-300"
           >
             Спросить Еву

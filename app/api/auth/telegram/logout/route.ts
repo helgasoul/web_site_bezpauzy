@@ -1,15 +1,19 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { deleteSessionCookie } from '@/lib/auth/session'
 
 /**
  * Выход из системы (удаляет сессию)
  */
 export async function POST() {
   try {
-    cookies().delete('telegram_session')
-    return NextResponse.json({ success: true })
+    const response = NextResponse.json({ success: true })
+    deleteSessionCookie(response)
+    return response
   } catch (error) {
-    console.error('Error in logout API:', error)
+    // Логируем только в development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error in logout API:', error)
+    }
     return NextResponse.json(
       { error: 'Внутренняя ошибка сервера' },
       { status: 500 }

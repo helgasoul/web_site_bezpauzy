@@ -128,7 +128,7 @@ export const CommunityAccessButtons: FC<CommunityAccessButtonsProps> = ({
           aria-label="Войти в сообщество «Без паузы»"
         >
           <LogIn className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-          <span className={forceVertical ? '' : 'truncate'}>{isChecking ? 'Проверка...' : 'Войти в сообщество'}</span>
+          <span className={forceVertical ? '' : 'truncate'}>{isChecking ? 'Проверка...' : 'Войти'}</span>
         </button>
       </div>
 

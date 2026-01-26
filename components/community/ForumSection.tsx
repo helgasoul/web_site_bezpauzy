@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, useState, useEffect } from 'react'
+import { FC, useState, useEffect, useCallback } from 'react'
 import { MessageCircle, Plus, Eye, Clock, User, Pin, Lock, ExternalLink } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { CreateTopicModal } from './CreateTopicModal'
@@ -50,12 +50,7 @@ export const ForumSection: FC = () => {
     }
   }, [])
 
-  useEffect(() => {
-    loadCategories()
-    loadTopics()
-  }, [selectedCategory])
-
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     try {
       const response = await fetch('/api/forum/categories')
       const result = await response.json()
@@ -65,9 +60,9 @@ export const ForumSection: FC = () => {
     } catch (error) {
       console.error('Error loading categories:', error)
     }
-  }
+  }, [])
 
-  const loadTopics = async () => {
+  const loadTopics = useCallback(async () => {
     setIsLoading(true)
     try {
       const url = selectedCategory
@@ -83,7 +78,12 @@ export const ForumSection: FC = () => {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [selectedCategory])
+
+  useEffect(() => {
+    loadCategories()
+    loadTopics()
+  }, [loadCategories, loadTopics])
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)

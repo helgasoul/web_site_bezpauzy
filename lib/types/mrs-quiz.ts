@@ -30,6 +30,7 @@ export type MRSAnswer = z.infer<typeof MRSAnswerSchema>
 export const MRSResultSchema = z.object({
   total_score: z.number().int().min(0).max(44),
   severity: MRSSeverityEnum,
+  vasomotor_score: z.number().int(), // hot_flashes + heart_discomfort
   somatic_score: z.number().int(), // hot_flashes + heart_discomfort + sleep_problems + joint_muscle_pain
   psychological_score: z.number().int(), // depressive_mood + irritability + anxiety + physical_mental_exhaustion
   urogenital_score: z.number().int() // sexual_problems + bladder_problems + vaginal_dryness

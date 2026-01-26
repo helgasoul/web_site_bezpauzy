@@ -1,135 +1,132 @@
 'use client'
 
-import { FC } from 'react'
+import { FC, useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Calendar, Clock, ArrowRight, Search, Activity, Heart, UtensilsCrossed } from 'lucide-react'
+import { Calendar, Clock, ArrowRight, Search } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/Button'
+import { getCategoryName, getCategoryOverlay } from '@/lib/utils/blog'
+import { getExpertByCategory, getExpertByName } from '@/lib/experts'
+import type { BlogPost } from '@/lib/blog/get-articles'
+import type { ExpertCategory } from '@/lib/experts'
 
-interface BlogListingProps {}
+interface BlogListingProps {
+  articles: BlogPost[]
+  categoryCounts: {
+    all: number
+    gynecologist: number
+    mammologist: number
+    nutritionist: number
+  }
+}
 
-export const BlogListing: FC<BlogListingProps> = () => {
-  // Placeholder data - will be replaced with Supabase data
+export const BlogListing: FC<BlogListingProps> = ({ articles, categoryCounts }) => {
+  const [selectedCategory, setSelectedCategory] = useState<'all' | 'gynecologist' | 'mammologist' | 'nutritionist'>('all')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [visibleCount, setVisibleCount] = useState(9) // Показываем первые 9 статей
+
+  // Категории с подсчетом из пропсов
   const categories = [
-    { id: 'all', name: 'Все статьи', count: 24 },
-    { id: 'gynecologist', name: 'Кабинет гинеколога', count: 10 },
-    { id: 'mammologist', name: 'Разговор с маммологом', count: 8 },
-    { id: 'nutritionist', name: 'Кухня нутрициолога', count: 6 },
+    { id: 'all' as const, name: 'Все статьи', count: categoryCounts.all },
+    { id: 'gynecologist' as const, name: 'Кабинет гинеколога', count: categoryCounts.gynecologist },
+    { id: 'mammologist' as const, name: 'Разговор с маммологом', count: categoryCounts.mammologist },
+    { id: 'nutritionist' as const, name: 'Кухня нутрициолога', count: categoryCounts.nutritionist },
   ]
 
-  const articles = [
-    {
-      id: 1,
-      title: 'Приливы: причины и 10 способов облегчения',
-      excerpt: 'Узнайте, почему возникают приливы и как можно облегчить этот симптом менопаузы. Практические советы от гинеколога.',
-      category: 'gynecologist',
-      categoryName: 'Кабинет гинеколога',
-      slug: 'prilivy-prichiny-i-resheniya',
-      author: {
-        name: 'Др. Анна Иванова',
-        role: 'Гинеколог-эндокринолог',
-        avatar: '/hero-women.jpg', // Placeholder
-      },
-      publishedAt: '2024-12-15',
-      readTime: 8,
-      image: '/article_1.png',
-      gradient: 'from-primary-purple/40 via-ocean-wave-start/30 to-warm-accent/20',
-    },
-    {
-      id: 2,
-      title: 'ЗГТ: показания и противопоказания',
-      excerpt: 'Полное руководство по заместительной гормональной терапии при менопаузе. Когда нужна ЗГТ, а когда нет.',
-      category: 'gynecologist',
-      categoryName: 'Кабинет гинеколога',
-      slug: 'zgt-pokazaniya-i-protivopokazaniya',
-      author: {
-        name: 'Др. Анна Иванова',
-        role: 'Гинеколог-эндокринолог',
-        avatar: '/hero-women.jpg',
-      },
-      publishedAt: '2024-12-10',
-      readTime: 12,
-      image: '/article_2.png',
-      gradient: 'from-warm-accent/40 via-primary-purple/30 to-ocean-wave-end/20',
-    },
-    {
-      id: 3,
-      title: 'Питание в менопаузе: базовые принципы',
-      excerpt: 'Как правильно питаться в период менопаузы для поддержания здоровья и веса. Меню на неделю и рецепты.',
-      category: 'nutritionist',
-      categoryName: 'Кухня нутрициолога',
-      slug: 'pitanie-v-menopauze',
-      author: {
-        name: 'Др. Мария Петрова',
-        role: 'Нутрициолог',
-        avatar: '/hero-women.jpg',
-      },
-      publishedAt: '2024-12-05',
-      readTime: 10,
-      image: '/article_3.png',
-      gradient: 'from-ocean-wave-start/40 via-primary-purple/30 to-warm-accent/20',
-    },
-    {
-      id: 4,
-      title: 'Маммография после 40: что нужно знать',
-      excerpt: 'Когда и как часто делать маммографию в период менопаузы. Разбираемся с плотной тканью и факторами риска.',
-      category: 'mammologist',
-      categoryName: 'Разговор с маммологом',
-      slug: 'mammografiya-posle-40',
-      author: {
-        name: 'Др. Елена Смирнова',
-        role: 'Маммолог',
-        avatar: '/hero-women.jpg',
-      },
-      publishedAt: '2024-11-28',
-      readTime: 7,
-      image: '/article_4.png',
-      gradient: 'from-primary-purple/40 via-warm-accent/30 to-ocean-wave-end/20',
-    },
-    {
-      id: 5,
-      title: 'Бессонница в менопаузе: почему возникает и как наладить сон',
-      excerpt: 'Нарушения сна — частый спутник менопаузы. Узнайте о причинах и эффективных способах улучшить качество сна.',
-      category: 'gynecologist',
-      categoryName: 'Кабинет гинеколога',
-      slug: 'bessonnitsa-v-menopauze',
-      author: {
-        name: 'Др. Анна Иванова',
-        role: 'Гинеколог-эндокринолог',
-        avatar: '/hero-women.jpg',
-      },
-      publishedAt: '2024-11-20',
-      readTime: 9,
-      image: '/article_5.png',
-      gradient: 'from-ocean-wave-start/40 via-warm-accent/30 to-primary-purple/20',
-    },
-    {
-      id: 6,
-      title: 'Вес и метаболизм в менопаузе: почему мы набираем вес',
-      excerpt: 'Почему в менопаузе так сложно контролировать вес? Научное объяснение и практические рекомендации.',
-      category: 'nutritionist',
-      categoryName: 'Кухня нутрициолога',
-      slug: 'ves-i-metabolizm-v-menopauze',
-      author: {
-        name: 'Др. Мария Петрова',
-        role: 'Нутрициолог',
-        avatar: '/hero-women.jpg',
-      },
-      publishedAt: '2024-11-15',
-      readTime: 11,
-      image: '/article_6.png',
-      gradient: 'from-warm-accent/40 via-ocean-wave-start/30 to-primary-purple/20',
-    },
-  ]
+  // Фильтрация статей
+  const filteredArticles = useMemo(() => {
+    let filtered = articles
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('ru-RU', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    })
+    // Фильтр по категории
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(article => article.category === selectedCategory)
+    }
+
+    // Фильтр по поисковому запросу
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim()
+      filtered = filtered.filter(article => 
+        article.title.toLowerCase().includes(query) ||
+        article.excerpt.toLowerCase().includes(query) ||
+        (article.metaKeywords && article.metaKeywords.some(keyword => keyword.toLowerCase().includes(query)))
+      )
+    }
+
+    return filtered
+  }, [articles, selectedCategory, searchQuery])
+
+  // Статьи для отображения (с пагинацией)
+  const displayedArticles = filteredArticles.slice(0, visibleCount)
+  const hasMore = visibleCount < filteredArticles.length
+
+  // Функция для получения градиента на основе категории
+  const getGradient = (category: 'gynecologist' | 'mammologist' | 'nutritionist'): string => {
+    const gradients: Record<'gynecologist' | 'mammologist' | 'nutritionist', string> = {
+      gynecologist: 'from-primary-purple/40 via-ocean-wave-start/30 to-warm-accent/20',
+      mammologist: 'from-primary-purple/40 via-warm-accent/30 to-ocean-wave-end/20',
+      nutritionist: 'from-warm-accent/40 via-primary-purple/30 to-ocean-wave-start/20',
+    }
+    return gradients[category] || gradients.gynecologist
+  }
+
+  // Функция для получения автора (из данных статьи или через систему экспертов)
+  const getAuthor = (article: BlogPost) => {
+    // Пытаемся получить эксперта по категории или имени
+    const expert = getExpertByCategory(article.category as ExpertCategory) || 
+                   (article.authorName ? getExpertByName(article.authorName) : null)
+    
+    // Если эксперт найден, используем его данные (приоритет)
+    if (expert) {
+      return {
+        name: expert.name,
+        role: expert.role,
+        avatar: expert.avatar,
+      }
+    }
+    
+    // Если есть данные автора из статьи, используем их
+    if (article.authorName && article.authorRole) {
+      return {
+        name: article.authorName,
+        role: article.authorRole,
+        avatar: article.authorAvatar || '/hero-women.jpg',
+      }
+    }
+    
+    // Fallback на основе категории (если ничего не найдено)
+    const fallbacks: Record<'gynecologist' | 'mammologist' | 'nutritionist', { name: string; role: string; avatar: string }> = {
+      gynecologist: {
+        name: 'Шамугия Натия',
+        role: 'Гинеколог-эндокринолог, кандидат медицинских наук',
+        avatar: '/shamugia-natiya.jpg',
+      },
+      mammologist: {
+        name: 'Пучкова Ольга',
+        role: 'Маммолог-онколог, врач-рентгенолог, сертифицированный специалист EUSOBI',
+        avatar: '/puchkova-olga.png',
+      },
+      nutritionist: {
+        name: 'Климкова Марина',
+        role: 'Врач превентивной, интегративной и anti-age медицины, Нутрициолог, диетолог',
+        avatar: '/marina-klimkova.jpg',
+      },
+    }
+    return fallbacks[article.category] || fallbacks.gynecologist
+  }
+
+  const formatDate = (dateString: string | null | undefined) => {
+    if (!dateString) return 'Дата не указана'
+    try {
+      const date = new Date(dateString)
+      return date.toLocaleDateString('ru-RU', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
+    } catch {
+      return 'Дата не указана'
+    }
   }
 
   return (
@@ -139,7 +136,7 @@ export const BlogListing: FC<BlogListingProps> = () => {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/ChatGPT Image Dec 17, 2025 at 09_35_22 PM.png"
+            src="/journal page.png"
             alt="Журнал — статьи о менопаузе"
             fill
             className="object-cover"
@@ -170,6 +167,11 @@ export const BlogListing: FC<BlogListingProps> = () => {
               <input
                 type="text"
                 placeholder="Поиск статей..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value)
+                  setVisibleCount(9) // Сбрасываем пагинацию при новом поиске
+                }}
                 className="w-full pl-12 pr-4 py-4 rounded-full border-2 border-white/30 focus:border-primary-purple focus:outline-none bg-white/95 backdrop-blur-sm shadow-card"
               />
             </div>
@@ -184,8 +186,12 @@ export const BlogListing: FC<BlogListingProps> = () => {
             {categories.map((category) => (
               <button
                 key={category.id}
+                onClick={() => {
+                  setSelectedCategory(category.id)
+                  setVisibleCount(9) // Сбрасываем пагинацию при смене категории
+                }}
                 className={`px-6 py-3 rounded-full text-body font-medium transition-all duration-300 ${
-                  category.id === 'all'
+                  selectedCategory === category.id
                     ? 'bg-primary-purple text-white shadow-button'
                     : 'bg-white text-deep-navy hover:bg-lavender-bg border border-lavender-bg'
                 }`}
@@ -199,101 +205,149 @@ export const BlogListing: FC<BlogListingProps> = () => {
           </div>
         </div>
 
+        {/* Results count */}
+        {(selectedCategory !== 'all' || searchQuery.trim()) && (
+          <div className="mb-6 text-center">
+            <p className="text-body text-deep-navy/70">
+              Найдено статей: <span className="font-semibold text-deep-navy">{filteredArticles.length}</span>
+            </p>
+          </div>
+        )}
+
         {/* Articles Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {articles.map((article, index) => (
-            <motion.article
-              key={article.id}
-              className="group"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-            >
-              <Link href={`/blog/${article.slug}`}>
-                <div className="bg-white rounded-3xl overflow-hidden shadow-card hover:shadow-card-hover hover:-translate-y-2 transition-all duration-300 border border-lavender-bg h-full flex flex-col">
-                  {/* Image */}
-                  <div className={`relative w-full h-60 bg-gradient-to-br ${article.gradient} overflow-hidden`}>
-                    <Image
-                      src={article.image}
-                      alt={article.title}
-                      fill
-                      className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
-                    />
-                    {/* Category badge */}
-                    <div className="absolute top-4 left-4">
-                      <span className="px-3 py-1.5 bg-white/90 backdrop-blur-sm text-primary-purple text-body-small font-semibold rounded-full">
-                        {article.categoryName}
-                      </span>
-                    </div>
-                    {/* Wavy bottom edge */}
-                    <div
-                      className="absolute bottom-0 left-0 right-0 h-12 bg-white"
-                      style={{
-                        clipPath:
-                          'polygon(0 0, 100% 0, 100% 85%, 95% 90%, 85% 92%, 75% 90%, 65% 88%, 55% 90%, 45% 92%, 35% 90%, 25% 88%, 15% 90%, 5% 88%, 0 85%)',
-                      }}
-                    />
-                  </div>
+        {displayedArticles.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+              {displayedArticles.map((article, index) => {
+                const author = getAuthor(article)
+                const categoryName = article.categoryName || getCategoryName(article.category)
+                const gradient = getGradient(article.category)
+                const imageUrl = article.image || '/article_1.png'
 
-                  {/* Content */}
-                  <div className="p-6 flex-1 flex flex-col">
-                    <h2 className="text-h5 font-semibold text-deep-navy mb-3 group-hover:text-primary-purple transition-colors line-clamp-2">
-                      {article.title}
-                    </h2>
-                    <p className="text-body-small text-deep-navy/70 mb-4 line-clamp-3 flex-1">
-                      {article.excerpt}
-                    </p>
-
-                    {/* Meta */}
-                    <div className="flex items-center justify-between text-caption text-deep-navy/60 mb-4">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="w-4 h-4" />
-                          <span>{formatDate(article.publishedAt)}</span>
+                return (
+                  <motion.article
+                    key={article.id}
+                    className="group"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                  >
+                    <Link href={`/blog/${article.slug}`}>
+                      <div className="bg-white rounded-3xl overflow-hidden shadow-card hover:shadow-card-hover hover:-translate-y-2 transition-all duration-300 border border-lavender-bg h-full flex flex-col">
+                        {/* Image */}
+                        <div className={`relative w-full h-60 bg-gradient-to-br ${gradient} overflow-hidden`}>
+                          <Image
+                            src={imageUrl}
+                            alt={article.title}
+                            fill
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
+                          />
+                          {/* Category badge */}
+                          <div className="absolute top-4 left-4">
+                            <span className="px-3 py-1.5 bg-white/90 backdrop-blur-sm text-primary-purple text-body-small font-semibold rounded-full">
+                              {categoryName}
+                            </span>
+                          </div>
+                          {/* Wavy bottom edge */}
+                          <div
+                            className="absolute bottom-0 left-0 right-0 h-12 bg-white"
+                            style={{
+                              clipPath:
+                                'polygon(0 0, 100% 0, 100% 85%, 95% 90%, 85% 92%, 75% 90%, 65% 88%, 55% 90%, 45% 92%, 35% 90%, 25% 88%, 15% 90%, 5% 88%, 0 85%)',
+                            }}
+                          />
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <Clock className="w-4 h-4" />
-                          <span>{article.readTime} мин</span>
+
+                        {/* Content */}
+                        <div className="p-6 flex-1 flex flex-col">
+                          <h2 className="text-h5 font-semibold text-deep-navy mb-3 group-hover:text-primary-purple transition-colors line-clamp-2">
+                            {article.title}
+                          </h2>
+                          <p className="text-body-small text-deep-navy/70 mb-4 line-clamp-3 flex-1">
+                            {article.excerpt || ''}
+                          </p>
+
+                          {/* Meta */}
+                          <div className="flex items-center justify-between text-caption text-deep-navy/60 mb-4">
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-1.5">
+                                <Calendar className="w-4 h-4" />
+                                <span>{formatDate(article.publishedAt)}</span>
+                              </div>
+                              {article.readTime && (
+                                <div className="flex items-center gap-1.5">
+                                  <Clock className="w-4 h-4" />
+                                  <span>{article.readTime} мин</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Author */}
+                          <div className="flex items-center gap-3 pt-4 border-t border-lavender-bg">
+                            <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-lavender-bg flex-shrink-0 shadow-sm">
+                              <Image
+                                src={author.avatar}
+                                alt={author.name}
+                                fill
+                                className="object-cover"
+                                style={{ objectPosition: 'center top' }}
+                                sizes="48px"
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-body-small font-medium text-deep-navy truncate">
+                                {author.name}
+                              </div>
+                              <div className="text-caption text-deep-navy/60 line-clamp-1">
+                                {author.role}
+                              </div>
+                            </div>
+                            <ArrowRight className="w-5 h-5 text-primary-purple group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </Link>
+                  </motion.article>
+                )
+              })}
+            </div>
 
-                    {/* Author */}
-                    <div className="flex items-center gap-3 pt-4 border-t border-lavender-bg">
-                      <div className="relative w-10 h-10 rounded-full overflow-hidden">
-                        <Image
-                          src={article.author.avatar}
-                          alt={article.author.name}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-body-small font-medium text-deep-navy truncate">
-                          {article.author.name}
-                        </div>
-                        <div className="text-caption text-deep-navy/60 truncate">
-                          {article.author.role}
-                        </div>
-                      </div>
-                      <ArrowRight className="w-5 h-5 text-primary-purple group-hover:translate-x-1 transition-transform flex-shrink-0" />
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            </motion.article>
-          ))}
-        </div>
-
-        {/* Load More / Pagination */}
-        <div className="text-center">
-          <Button variant="secondary" className="px-8">
-            Загрузить ещё статьи
-          </Button>
-        </div>
+            {/* Load More Button */}
+            {hasMore && (
+              <div className="text-center">
+                <Button 
+                  variant="secondary" 
+                  className="px-8"
+                  onClick={() => setVisibleCount(prev => Math.min(prev + 9, filteredArticles.length))}
+                >
+                  Загрузить ещё статьи ({filteredArticles.length - visibleCount} осталось)
+                </Button>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-16">
+            <p className="text-body-large text-deep-navy/70 mb-4">
+              Статьи не найдены
+            </p>
+            {(selectedCategory !== 'all' || searchQuery.trim()) && (
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setSelectedCategory('all')
+                  setSearchQuery('')
+                  setVisibleCount(9)
+                }}
+              >
+                Сбросить фильтры
+              </Button>
+            )}
+          </div>
+        )}
       </div>
     </section>
   )
 }
-

@@ -51,14 +51,24 @@ const severityLabels: Record<string, string> = {
 }
 
 export async function generateInflammationQuizPDF(data: InflammationQuizPDFData): Promise<jsPDF> {
+  console.log('🚀 Начинаю генерацию PDF для квиза на воспаление...')
+  
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
     format: 'a4',
   })
 
+  console.log('📄 Документ создан, инициализирую кириллические шрифты...')
   // Инициализируем кириллические шрифты (работает на клиенте и сервере)
-  await initCyrillicFonts(doc)
+  try {
+    await initCyrillicFonts(doc)
+    console.log('✅ Инициализация шрифтов завершена')
+  } catch (error) {
+    console.error('❌ Ошибка инициализации шрифтов:', error)
+    console.warn('⚠️ Продолжаю без кириллических шрифтов (текст может отображаться некорректно)')
+    // Продолжаем генерацию, но кириллица может не работать
+  }
 
   const pageWidth = doc.internal.pageSize.getWidth()
   const pageHeight = doc.internal.pageSize.getHeight()
@@ -236,14 +246,24 @@ export async function generateInflammationQuizPDF(data: InflammationQuizPDFData)
 }
 
 export async function generateMRSQuizPDF(data: MRSQuizPDFData): Promise<jsPDF> {
+  console.log('🚀 Начинаю генерацию PDF для MRS квиза...')
+  
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
     format: 'a4',
   })
 
+  console.log('📄 Документ создан, инициализирую кириллические шрифты...')
   // Инициализируем кириллические шрифты (работает на клиенте и сервере)
-  await initCyrillicFonts(doc)
+  try {
+    await initCyrillicFonts(doc)
+    console.log('✅ Инициализация шрифтов завершена')
+  } catch (error) {
+    console.error('❌ Ошибка инициализации шрифтов:', error)
+    console.warn('⚠️ Продолжаю без кириллических шрифтов (текст может отображаться некорректно)')
+    // Продолжаем генерацию, но кириллица может не работать
+  }
 
   const pageWidth = doc.internal.pageSize.getWidth()
   const pageHeight = doc.internal.pageSize.getHeight()

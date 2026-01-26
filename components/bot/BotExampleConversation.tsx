@@ -35,33 +35,19 @@ export const BotExampleConversation: FC<BotExampleConversationProps> = () => {
             Посмотрите, как Ева отвечает на реальные вопросы
           </p>
 
-          {/* Grid: Photo + Chat */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Photo */}
-            <motion.div
-              className="relative rounded-3xl overflow-hidden shadow-strong order-2 lg:order-1"
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              <Image
-                src="/hero-women.jpg"
-                alt="Женщины используют ассистента Еву"
-                width={600}
-                height={800}
-                className="w-full h-auto object-cover"
-              />
-              {/* Subtle overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-lavender-bg/30 to-transparent" />
-            </motion.div>
-
-            {/* Chat container */}
-            <div className="bg-white rounded-3xl shadow-strong p-6 md:p-8 border border-lavender-bg order-1 lg:order-2">
+          {/* Chat container - centered */}
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-white rounded-3xl shadow-strong p-6 md:p-8 border border-lavender-bg">
             {/* Chat header */}
             <div className="flex items-center gap-3 pb-4 border-b border-lavender-bg mb-6">
-              <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center">
-                <span className="text-2xl">🤖</span>
+              <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center overflow-hidden">
+                <Image
+                  src="/ChatGPT Image Dec 19, 2025 at 10_44_36 PM.png"
+                  alt="Ева"
+                  width={48}
+                  height={48}
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div>
                 <div className="font-semibold text-deep-navy">Ева</div>
@@ -109,7 +95,7 @@ export const BotExampleConversation: FC<BotExampleConversationProps> = () => {
                 <div className="w-2 h-2 bg-primary-purple/40 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
               </div>
             </motion.div>
-          </div>
+            </div>
           </div>
         </motion.div>
       </div>

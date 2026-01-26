@@ -142,7 +142,7 @@ export const TelegramAuthModal: FC<TelegramAuthModalProps> = ({
               <div className="bg-lavender-bg rounded-xl p-4 mb-6 text-left">
                 <p className="text-sm font-semibold text-deep-navy mb-2">📱 Инструкция:</p>
                 <ol className="text-sm text-deep-navy/70 space-y-2 list-decimal list-inside">
-                  <li>Нажмите "Создать код" ниже</li>
+                  <li>Нажмите &quot;Создать код&quot; ниже</li>
                   <li>Откройте Telegram бота <span className="font-semibold">@bezpauzy_bot</span></li>
                   <li>Отправьте команду <span className="font-mono bg-white px-2 py-1 rounded">/code</span></li>
                   <li>Бот отправит вам код</li>

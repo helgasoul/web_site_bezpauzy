@@ -10,10 +10,17 @@ export const metadata: Metadata = {
   title: 'Сообщество «Без паузы» — Бесплатная поддержка | Без |Паузы',
   description: 'Присоединяйтесь к бесплатному сообществу женщин 40+ в период менопаузы. Поддержка, экспертные ответы, вебинары и безопасное пространство для общения.',
   keywords: ['сообщество', 'менопауза', 'поддержка', 'бесплатно', 'женское здоровье', 'эксперты'],
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://bezpauzy.com'}/community`,
+  },
   openGraph: {
     title: 'Сообщество «Без паузы» — Бесплатная поддержка',
     description: 'Присоединяйтесь к бесплатному сообществу женщин в период менопаузы',
     type: 'website',
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://bezpauzy.com'}/community`,
+  },
+  other: {
+    'telegram:channel': '@bezpauzi',
   },
 }
 

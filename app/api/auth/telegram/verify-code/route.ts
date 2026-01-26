@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
+import { setSessionCookie } from '@/lib/auth/session'
 
 /**
  * Проверяет код аутентификации и создает сессию пользователя
@@ -77,25 +77,8 @@ export async function POST(request: NextRequest) {
       .update({ used: true })
       .eq('id', authCode.id)
 
-    // Создаем сессию (используем простой подход с cookie)
-    // В production можно использовать JWT или Supabase Auth
-    const sessionToken = Buffer.from(JSON.stringify({
-      userId: user.id,
-      telegramId: user.telegram_id,
-      email: user.email || null,
-      ageRange: user.age_range || null,
-    })).toString('base64')
-
-    // Устанавливаем cookie (действителен 30 дней)
-    cookies().set('telegram_session', sessionToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 30, // 30 дней
-      path: '/',
-    })
-
-    return NextResponse.json({
+    // Создаем безопасную JWT сессию
+    const response = NextResponse.json({
       success: true,
       user: {
         id: user.id,
@@ -107,6 +90,15 @@ export async function POST(request: NextRequest) {
         subscriptionPlan: user.subscription_plan,
       },
     })
+
+    setSessionCookie({
+      userId: user.id,
+      telegramId: user.telegram_id,
+      email: user.email || null,
+      ageRange: user.age_range || null,
+    }, response)
+
+    return response
   } catch (error) {
     console.error('Error in verify-code API:', error)
     return NextResponse.json(

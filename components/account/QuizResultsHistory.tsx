@@ -1,12 +1,13 @@
 'use client'
 
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { Activity, Flame, Calendar, TrendingUp, TrendingDown, Minus } from 'lucide-react'
+import { Activity, Flame, Calendar, TrendingUp, TrendingDown, Minus, Trash2, Download, RefreshCcw, Scale, ArrowLeft } from 'lucide-react'
 import { getUserEmail } from '@/lib/quiz/save-results'
 import { getMRSSeverityLabel, getMRSSeverityEmoji, getMRSSeverityColor } from '@/lib/mrs-quiz/scoring'
 import { getInflammationLevelLabel, getInflammationLevelEmoji, getInflammationLevelColor } from '@/lib/inflammation-quiz/scoring'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface MRSResult {
   id: string
@@ -16,6 +17,18 @@ interface MRSResult {
   somatic_score: number
   psychological_score: number
   urogenital_score: number
+  recommendations?: string[]
+  answers?: {
+    explanations?: {
+      severityLabel?: string
+      severityDescription?: string
+      categoryBreakdown?: {
+        somatic?: { score: number; description: string }
+        psychological?: { score: number; description: string }
+        urogenital?: { score: number; description: string }
+      }
+    }
+  }
   created_at: string
 }
 
@@ -31,20 +44,37 @@ interface InflammationResult {
   bmi: number | null
   demographics?: any
   high_risk_categories?: string[]
+  recommendations?: string[]
+  answers?: {
+    explanations?: {
+      levelLabel?: string
+      levelDescription?: string
+      scoreBreakdown?: {
+        diet?: { score: number; description: string }
+        lifestyle?: { score: number; description: string }
+        bmi?: { score: number; value: number; description: string }
+        waist?: { score: number; description: string }
+      }
+      highRiskCategories?: string[]
+    }
+  }
+  explanations?: {
+    levelLabel?: string
+    levelDescription?: string
+    scoreBreakdown?: any
+  }
   created_at: string
 }
 
 export const QuizResultsHistory: FC = () => {
+  const router = useRouter()
   const [mrsResults, setMrsResults] = useState<MRSResult[]>([])
   const [inflammationResults, setInflammationResults] = useState<InflammationResult[]>([])
   const [loading, setLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
 
-  useEffect(() => {
-    loadResults()
-  }, [])
-
-  const loadResults = async () => {
+  const loadResults = useCallback(async () => {
     try {
       // Сначала проверяем сессию
       const sessionResponse = await fetch('/api/auth/telegram/get-session')
@@ -90,7 +120,11 @@ export const QuizResultsHistory: FC = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    loadResults()
+  }, [loadResults])
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -109,22 +143,29 @@ export const QuizResultsHistory: FC = () => {
     const inflammationResults: InflammationResult[] = []
     
     results.forEach((r: any) => {
-      if (r.test_type === 'inflammation') {
+      const testType = r.test_type?.toLowerCase() || ''
+      
+      if (testType === 'inflammation') {
         inflammationResults.push({
           id: r.id,
           test_type: r.test_type,
           total_score: r.total_score || 0,
           inflammation_level: r.inflammation_level || r.severity || 'moderate',
-          diet_score: r.diet_score || r.vasomotor_score || 0,
-          lifestyle_score: r.lifestyle_score || r.psychological_score || 0,
-          bmi_score: r.bmi_score || r.urogenital_score || 0,
-          waist_score: r.waist_score || r.somatic_score || 0,
+          diet_score: r.diet_score || 0,
+          lifestyle_score: r.lifestyle_score || 0,
+          bmi_score: r.bmi_score || 0,
+          waist_score: r.waist_score || 0,
           bmi: r.bmi,
           demographics: r.demographics,
           high_risk_categories: r.high_risk_categories || [],
+          recommendations: r.recommendations || [],
           created_at: r.created_at
         })
-      } else {
+      } else if (testType === 'mrs' || (!testType && r.somatic_score !== undefined && r.psychological_score !== undefined && r.urogenital_score !== undefined && testType !== 'frax' && testType !== 'phenoage' && testType !== 'whr')) {
+        // MRS квиз определяется ТОЛЬКО если:
+        // 1. Явно указан test_type === 'mrs'
+        // 2. ИЛИ если test_type не указан, но есть ВСЕ специфичные поля MRS И это не другой тип квиза
+        // Это предотвращает попадание результатов других квизов (FRAX, PhenoAge, WHR) в секцию MRS
         mrsResults.push({
           id: r.id,
           total_score: r.total_score || 0,
@@ -133,9 +174,12 @@ export const QuizResultsHistory: FC = () => {
           somatic_score: r.somatic_score || 0,
           psychological_score: r.psychological_score || 0,
           urogenital_score: r.urogenital_score || 0,
+          recommendations: r.recommendations || [],
           created_at: r.created_at
         })
       }
+      // Игнорируем другие типы квизов (frax, phenoage, whr) - они должны отображаться в отдельных секциях
+      // TODO: Добавить отдельные секции для FRAX, PhenoAge, WHR квизов
     })
     
     setMrsResults(mrsResults)
@@ -147,6 +191,145 @@ export const QuizResultsHistory: FC = () => {
     if (current < previous) return <TrendingDown className="w-4 h-4 text-success" />
     if (current > previous) return <TrendingUp className="w-4 h-4 text-error" />
     return <Minus className="w-4 h-4 text-deep-navy/40" />
+  }
+
+  const handleDeleteResult = async (resultId: string, testType: 'mrs' | 'inflammation') => {
+    if (!confirm('Вы уверены, что хотите удалить этот результат? Это действие нельзя отменить.')) {
+      return
+    }
+
+    setDeletingIds(prev => new Set(prev).add(resultId))
+
+    try {
+      const response = await fetch('/api/quiz/delete-result', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ resultId }),
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        alert(data.error || 'Не удалось удалить результат')
+        return
+      }
+
+      // Удаляем результат из состояния
+      if (testType === 'mrs') {
+        setMrsResults(prev => prev.filter(r => r.id !== resultId))
+      } else {
+        setInflammationResults(prev => prev.filter(r => r.id !== resultId))
+      }
+    } catch (error) {
+      console.error('Error deleting result:', error)
+      alert('Произошла ошибка при удалении результата')
+    } finally {
+      setDeletingIds(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(resultId)
+        return newSet
+      })
+    }
+  }
+
+  const handleDownloadPDF = async (result: MRSResult | InflammationResult, testType: 'mrs' | 'inflammation') => {
+    try {
+      console.log('[QuizResultsHistory] Starting PDF download for:', testType, result)
+      
+      // Подготавливаем данные для генерации PDF
+      let pdfData: any
+      let endpoint: string
+
+      if (testType === 'mrs') {
+        const mrsResult = result as MRSResult
+        pdfData = {
+          total_score: mrsResult.total_score ?? 0,
+          severity: mrsResult.severity || 'mild',
+          vasomotor_score: mrsResult.vasomotor_score ?? 0,
+          psychological_score: mrsResult.psychological_score ?? 0,
+          urogenital_score: mrsResult.urogenital_score ?? 0,
+          somatic_score: mrsResult.somatic_score ?? 0,
+          recommendations: mrsResult.recommendations || [],
+        }
+        endpoint = '/api/quiz/mrs/pdf'
+        console.log('[QuizResultsHistory] MRS PDF data:', pdfData)
+      } else {
+        const inflammationResult = result as InflammationResult
+        pdfData = {
+          total_inflammation_score: inflammationResult.total_score ?? 0,
+          inflammation_level: inflammationResult.inflammation_level || 'moderate',
+          diet_score: inflammationResult.diet_score ?? 0,
+          lifestyle_score: inflammationResult.lifestyle_score ?? 0,
+          bmi_score: inflammationResult.bmi_score ?? 0,
+          waist_score: inflammationResult.waist_score ?? 0,
+          bmi: inflammationResult.bmi ?? 0,
+          high_risk_categories: inflammationResult.high_risk_categories || [],
+          demographics: inflammationResult.demographics || {
+            age_range: '',
+            height_cm: 0,
+            weight_kg: 0,
+          },
+          recommendations: inflammationResult.recommendations || [],
+        }
+        endpoint = '/api/quiz/inflammation/pdf'
+        console.log('[QuizResultsHistory] Inflammation PDF data:', pdfData)
+      }
+
+      console.log('[QuizResultsHistory] Sending request to:', endpoint)
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(pdfData),
+      })
+
+      console.log('[QuizResultsHistory] Response status:', response.status, response.statusText)
+
+      if (!response.ok) {
+        // Пытаемся получить детали ошибки
+        let errorMessage = 'Не удалось сгенерировать PDF'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorData.message || errorMessage
+          console.error('[QuizResultsHistory] API error details:', errorData)
+        } catch (e) {
+          console.error('[QuizResultsHistory] Could not parse error response:', e)
+        }
+        throw new Error(errorMessage)
+      }
+
+      const blob = await response.blob()
+      console.log('[QuizResultsHistory] PDF blob received, size:', blob.size, 'bytes')
+
+      if (blob.size === 0) {
+        throw new Error('Получен пустой PDF файл')
+      }
+
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      
+      if (testType === 'mrs') {
+        const mrsResult = result as MRSResult
+        a.download = `mrs-quiz-results-${new Date(mrsResult.created_at).toISOString().split('T')[0]}.pdf`
+      } else {
+        const inflammationResult = result as InflammationResult
+        a.download = `inflammation-quiz-results-${new Date(inflammationResult.created_at).toISOString().split('T')[0]}.pdf`
+      }
+      
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+      
+      console.log('[QuizResultsHistory] PDF downloaded successfully')
+    } catch (error) {
+      console.error('[QuizResultsHistory] Error downloading PDF:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка'
+      alert(`Не удалось скачать PDF: ${errorMessage}. Попробуйте позже или обратитесь в поддержку.`)
+    }
   }
 
   if (loading) {
@@ -174,7 +357,7 @@ export const QuizResultsHistory: FC = () => {
                 Чтобы просматривать сохраненные результаты квизов, необходимо войти в аккаунт.
               </p>
               <Link
-                href="/login"
+                href="/"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-primary text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 Войти в аккаунт
@@ -190,6 +373,13 @@ export const QuizResultsHistory: FC = () => {
     <section className="py-16 md:py-24">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-body text-deep-navy/70 hover:text-primary-purple transition-colors mb-6"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Назад</span>
+          </button>
           <h1 className="text-h1 font-bold text-deep-navy mb-2">
             Мои результаты квизов
           </h1>
@@ -253,7 +443,16 @@ export const QuizResultsHistory: FC = () => {
                           {previousResult && getTrendIcon(result.total_score, previousResult.total_score)}
                         </div>
                       </div>
-                      <div className={`grid gap-4 text-center ${result.vasomotor_score !== undefined ? 'grid-cols-2 md:grid-cols-4' : 'grid-cols-3'}`}>
+                      {/* Описание уровня тяжести (если сохранено) */}
+                      {result.answers?.explanations?.severityDescription && (
+                        <div className="mb-4 p-4 bg-white/50 rounded-xl">
+                          <p className="text-body text-deep-navy/80 leading-relaxed">
+                            {result.answers.explanations.severityDescription}
+                          </p>
+                        </div>
+                      )}
+                      
+                      <div className={`grid gap-4 text-center ${result.vasomotor_score !== undefined ? 'grid-cols-2 md:grid-cols-4' : 'grid-cols-3'} mb-4`}>
                         {result.vasomotor_score !== undefined && (
                           <div>
                             <div className="text-body-small text-deep-navy/60 mb-1">Вазомоторные</div>
@@ -273,6 +472,66 @@ export const QuizResultsHistory: FC = () => {
                           <div className="text-body font-semibold text-deep-navy">{result.urogenital_score}</div>
                         </div>
                       </div>
+                      
+                      {/* Рекомендации (если сохранены) */}
+                      {result.recommendations && result.recommendations.length > 0 && (
+                        <div className="mb-4 p-4 bg-gradient-to-br from-primary-purple/5 to-ocean-wave-start/5 rounded-xl border border-primary-purple/20">
+                          <h4 className="text-body font-semibold text-deep-navy mb-2">Рекомендации:</h4>
+                          <ul className="space-y-2">
+                            {result.recommendations.map((rec, idx) => (
+                              <li key={idx} className="flex items-start gap-2 text-body-small text-deep-navy/80">
+                                <span className="text-primary-purple mt-1">•</span>
+                                <span>{rec}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {/* Кнопки действий */}
+                      <div className="flex flex-wrap gap-3 pt-4 border-t border-deep-navy/10">
+                        <Link
+                          href="/quiz/mrs"
+                          className="flex items-center gap-2 px-4 py-2 bg-primary-purple/10 text-primary-purple border-2 border-primary-purple/20 rounded-full text-sm font-medium hover:bg-primary-purple/20 hover:border-primary-purple/40 transition-colors"
+                        >
+                          <RefreshCcw className="w-4 h-4" />
+                          Пройти повторно
+                        </Link>
+                        {previousResult && (
+                          <Link
+                            href={`/community/quiz-results?testType=mrs&compare=${result.id},${previousResult.id}`}
+                            className="flex items-center gap-2 px-4 py-2 bg-ocean-wave-start/10 text-ocean-wave-start border-2 border-ocean-wave-start/20 rounded-full text-sm font-medium hover:bg-ocean-wave-start/20 hover:border-ocean-wave-start/40 transition-colors"
+                          >
+                            <Scale className="w-4 h-4" />
+                            Сравнить результаты
+                          </Link>
+                        )}
+                        <button
+                          onClick={() => handleDownloadPDF(result, 'mrs')}
+                          disabled={deletingIds.has(result.id)}
+                          className="flex items-center gap-2 px-4 py-2 bg-primary-purple text-soft-white rounded-full text-sm font-medium hover:bg-primary-purple/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Download className="w-4 h-4" />
+                          Скачать PDF
+                        </button>
+                        <button
+                          onClick={() => handleDeleteResult(result.id, 'mrs')}
+                          disabled={deletingIds.has(result.id)}
+                          className="flex items-center gap-2 px-4 py-2 bg-transparent text-error border-2 border-error rounded-full text-sm font-medium hover:bg-error/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {deletingIds.has(result.id) ? (
+                            <>
+                              <div className="w-4 h-4 border-2 border-error border-t-transparent rounded-full animate-spin"></div>
+                              Удаление...
+                            </>
+                          ) : (
+                            <>
+                              <Trash2 className="w-4 h-4" />
+                              Удалить результаты
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </motion.div>
                   )
                 })}
@@ -290,7 +549,7 @@ export const QuizResultsHistory: FC = () => {
             {inflammationResults.length === 0 ? (
               <div className="bg-gradient-to-br from-lavender-bg to-soft-white rounded-2xl p-8 border-2 border-primary-purple/20 text-center">
                 <p className="text-body text-deep-navy/70 mb-4">
-                  У вас пока нет сохраненных результатов квиза "Индекс воспаления"
+                  У вас пока нет сохраненных результатов квиза &quot;Индекс воспаления&quot;
                 </p>
                 <Link
                   href="/quiz/inflammation"
@@ -336,7 +595,16 @@ export const QuizResultsHistory: FC = () => {
                           {previousResult && getTrendIcon(result.total_score, previousResult.total_score)}
                         </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-4 text-center">
+                      {/* Описание уровня воспаления (если сохранено) */}
+                      {(result.explanations?.levelDescription || result.answers?.explanations?.levelDescription) && (
+                        <div className="mb-4 p-4 bg-white/50 rounded-xl">
+                          <p className="text-body text-deep-navy/80 leading-relaxed">
+                            {result.explanations?.levelDescription || result.answers?.explanations?.levelDescription}
+                          </p>
+                        </div>
+                      )}
+                      
+                      <div className="grid grid-cols-3 gap-4 text-center mb-4">
                         <div>
                           <div className="text-body-small text-deep-navy/60 mb-1">Питание</div>
                           <div className="text-body font-semibold text-deep-navy">
@@ -355,6 +623,66 @@ export const QuizResultsHistory: FC = () => {
                             {result.bmi ? result.bmi.toFixed(1) : '—'}
                           </div>
                         </div>
+                      </div>
+                      
+                      {/* Рекомендации (если сохранены) */}
+                      {result.recommendations && result.recommendations.length > 0 && (
+                        <div className="mb-4 p-4 bg-gradient-to-br from-primary-purple/5 to-ocean-wave-start/5 rounded-xl border border-primary-purple/20">
+                          <h4 className="text-body font-semibold text-deep-navy mb-2">Рекомендации:</h4>
+                          <ul className="space-y-2">
+                            {result.recommendations.map((rec, idx) => (
+                              <li key={idx} className="flex items-start gap-2 text-body-small text-deep-navy/80">
+                                <span className="text-primary-purple mt-1">•</span>
+                                <span>{rec}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {/* Кнопки действий */}
+                      <div className="flex flex-wrap gap-3 pt-4 border-t border-deep-navy/10">
+                        <Link
+                          href="/quiz/inflammation"
+                          className="flex items-center gap-2 px-4 py-2 bg-primary-purple/10 text-primary-purple border-2 border-primary-purple/20 rounded-full text-sm font-medium hover:bg-primary-purple/20 hover:border-primary-purple/40 transition-colors"
+                        >
+                          <RefreshCcw className="w-4 h-4" />
+                          Пройти повторно
+                        </Link>
+                        {previousResult && (
+                          <Link
+                            href={`/community/quiz-results?testType=inflammation&compare=${result.id},${previousResult.id}`}
+                            className="flex items-center gap-2 px-4 py-2 bg-ocean-wave-start/10 text-ocean-wave-start border-2 border-ocean-wave-start/20 rounded-full text-sm font-medium hover:bg-ocean-wave-start/20 hover:border-ocean-wave-start/40 transition-colors"
+                          >
+                            <Scale className="w-4 h-4" />
+                            Сравнить результаты
+                          </Link>
+                        )}
+                        <button
+                          onClick={() => handleDownloadPDF(result, 'inflammation')}
+                          disabled={deletingIds.has(result.id)}
+                          className="flex items-center gap-2 px-4 py-2 bg-primary-purple text-soft-white rounded-full text-sm font-medium hover:bg-primary-purple/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Download className="w-4 h-4" />
+                          Скачать PDF
+                        </button>
+                        <button
+                          onClick={() => handleDeleteResult(result.id, 'inflammation')}
+                          disabled={deletingIds.has(result.id)}
+                          className="flex items-center gap-2 px-4 py-2 bg-transparent text-error border-2 border-error rounded-full text-sm font-medium hover:bg-error/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {deletingIds.has(result.id) ? (
+                            <>
+                              <div className="w-4 h-4 border-2 border-error border-t-transparent rounded-full animate-spin"></div>
+                              Удаление...
+                            </>
+                          ) : (
+                            <>
+                              <Trash2 className="w-4 h-4" />
+                              Удалить результаты
+                            </>
+                          )}
+                        </button>
                       </div>
                     </motion.div>
                   )

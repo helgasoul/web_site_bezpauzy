@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, useEffect, useState, Suspense } from 'react'
+import { FC, useEffect, useState, Suspense, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 
 /**
@@ -12,18 +12,7 @@ const DeepLinkHandlerContent: FC = () => {
   const router = useRouter()
   const [processed, setProcessed] = useState(false)
 
-  useEffect(() => {
-    const telegramId = searchParams.get('tg_id')
-    const token = searchParams.get('token')
-
-    // Если есть параметры из бота, обрабатываем их
-    if (telegramId && !processed) {
-      setProcessed(true)
-      handleDeepLink(telegramId, token)
-    }
-  }, [searchParams, processed])
-
-  const handleDeepLink = async (telegramId: string, token: string | null) => {
+  const handleDeepLink = useCallback(async (telegramId: string, token: string | null) => {
     try {
       const params = new URLSearchParams({ tg_id: telegramId })
       if (token) {
@@ -50,7 +39,18 @@ const DeepLinkHandlerContent: FC = () => {
     } catch (error) {
       console.error('Error handling deep link:', error)
     }
-  }
+  }, [router])
+
+  useEffect(() => {
+    const telegramId = searchParams.get('tg_id')
+    const token = searchParams.get('token')
+
+    // Если есть параметры из бота, обрабатываем их
+    if (telegramId && !processed) {
+      setProcessed(true)
+      handleDeepLink(telegramId, token)
+    }
+  }, [searchParams, processed, handleDeepLink])
 
   return null // Компонент не рендерит ничего
 }

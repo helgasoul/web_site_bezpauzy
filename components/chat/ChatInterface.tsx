@@ -2,7 +2,9 @@
 
 import { FC, useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, Loader2, Bot, User, MessageCircle } from 'lucide-react'
+import { Send, Loader2, Bot, User, MessageCircle, History } from 'lucide-react'
+import Image from 'next/image'
+import { ChatHistorySidebar } from './ChatHistorySidebar'
 
 interface Message {
   id: string
@@ -28,6 +30,7 @@ export const ChatInterface: FC<ChatInterfaceProps> = ({ userId, telegramId, quiz
   const [inputText, setInputText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingHistory, setIsLoadingHistory] = useState(true)
+  const [isHistorySidebarOpen, setIsHistorySidebarOpen] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -61,30 +64,49 @@ export const ChatInterface: FC<ChatInterfaceProps> = ({ userId, telegramId, quiz
         const response = await fetch('/api/chat/history')
         const data = await response.json()
 
-        if (data.success && data.messages) {
+        if (data.success && data.messages && data.messages.length > 0) {
           const formattedMessages: Message[] = data.messages.map((msg: any) => ({
             id: msg.id,
-            text: msg.response_text || msg.query_text,
-            sender: msg.query_text ? 'user' : 'bot',
+            text: msg.response_text || msg.query_text || '',
+            sender: msg.type === 'user' || msg.query_text ? 'user' : 'bot',
             timestamp: new Date(msg.created_at),
           }))
           setMessages(formattedMessages)
         } else {
           // Приветственное сообщение, если истории нет
+          let welcomeText = 'Привет! Я Ева, ваш персональный помощник по женскому здоровью. Чем могу помочь?'
+          
+          if (quizContext) {
+            const quizName = quizContext.quizType === 'inflammation' ? 'Индекс воспаления' : 'Шкала MRS'
+            welcomeText = `Привет! Я вижу, что вы только что прошли квиз "${quizName}". ${quizContext.level ? `Ваш результат: ${quizContext.level}.` : ''} Чем могу помочь? Могу ответить на вопросы о результатах, дать рекомендации или объяснить, что означают ваши баллы.`
+          } else if (articleSlug) {
+            welcomeText = 'Привет! Я вижу, что вы читали статью. Есть вопросы по этой теме? Я могу помочь разобраться и дать персональные рекомендации.'
+          }
+          
           setMessages([
             {
               id: 'welcome',
-              text: 'Привет! Я Ева, ваш персональный помощник по женскому здоровью. Чем могу помочь?',
+              text: welcomeText,
               sender: 'bot',
               timestamp: new Date(),
             },
           ])
         }
       } catch (error) {
+        // Приветственное сообщение при ошибке
+        let welcomeText = 'Привет! Я Ева, ваш персональный помощник по женскому здоровью. Чем могу помочь?'
+        
+        if (quizContext) {
+          const quizName = quizContext.quizType === 'inflammation' ? 'Индекс воспаления' : 'Шкала MRS'
+          welcomeText = `Привет! Я вижу, что вы только что прошли квиз "${quizName}". ${quizContext.level ? `Ваш результат: ${quizContext.level}.` : ''} Чем могу помочь?`
+        } else if (articleSlug) {
+          welcomeText = 'Привет! Я вижу, что вы читали статью. Есть вопросы по этой теме?'
+        }
+        
         setMessages([
           {
             id: 'welcome',
-            text: 'Привет! Я Ева, ваш персональный помощник по женскому здоровью. Чем могу помочь?',
+            text: welcomeText,
             sender: 'bot',
             timestamp: new Date(),
           },
@@ -95,7 +117,7 @@ export const ChatInterface: FC<ChatInterfaceProps> = ({ userId, telegramId, quiz
     }
 
     loadHistory()
-  }, [userId, telegramId])
+  }, [userId, telegramId, quizContext, articleSlug])
 
   // Автопрокрутка к последнему сообщению
   useEffect(() => {
@@ -255,19 +277,39 @@ export const ChatInterface: FC<ChatInterfaceProps> = ({ userId, telegramId, quiz
   }
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-soft-white to-white">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-primary-purple to-ocean-wave-start p-6 text-white">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-            <Bot className="w-6 h-6" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold">Ева</h2>
-            <p className="text-sm text-white/80">Ваш помощник по женскому здоровью</p>
+    <div className="flex h-full bg-gradient-to-b from-soft-white to-white relative">
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-primary-purple to-ocean-wave-start p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center overflow-hidden">
+                <Image
+                  src="/ChatGPT Image Dec 19, 2025 at 10_44_36 PM.png"
+                  alt="Ева"
+                  width={48}
+                  height={48}
+                  className="w-full h-full object-cover rounded-full"
+                />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">Ева</h2>
+                <p className="text-sm text-white/80">Ваш помощник по женскому здоровью</p>
+              </div>
+            </div>
+            {(userId || telegramId) && (
+              <button
+                onClick={() => setIsHistorySidebarOpen(true)}
+                className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                aria-label="Открыть историю"
+                title="История диалогов"
+              >
+                <History className="w-5 h-5" />
+              </button>
+            )}
           </div>
         </div>
-      </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
@@ -287,8 +329,14 @@ export const ChatInterface: FC<ChatInterfaceProps> = ({ userId, telegramId, quiz
                 className={`flex gap-3 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {message.sender === 'bot' && (
-                  <div className="w-10 h-10 bg-gradient-to-br from-primary-purple to-ocean-wave-start rounded-full flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-5 h-5 text-white" />
+                  <div className="w-10 h-10 bg-gradient-to-br from-primary-purple to-ocean-wave-start rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    <Image
+                      src="/ChatGPT Image Dec 19, 2025 at 10_44_36 PM.png"
+                      alt="Ева"
+                      width={40}
+                      height={40}
+                      className="w-full h-full object-cover rounded-full"
+                    />
                   </div>
                 )}
                 <div
@@ -333,7 +381,7 @@ export const ChatInterface: FC<ChatInterfaceProps> = ({ userId, telegramId, quiz
               onKeyPress={handleKeyPress}
               placeholder="Напишите ваш вопрос..."
               rows={1}
-              className="w-full px-4 py-3 pr-12 rounded-2xl border-2 border-lavender-bg focus:ring-2 focus:ring-primary-purple focus:border-primary-purple outline-none resize-none text-body text-deep-navy placeholder:text-deep-navy/40"
+              className="w-full px-4 py-3 pr-12 rounded-2xl border-2 border-lavender-bg focus:ring-2 focus:ring-primary-purple focus:border-primary-purple outline-none resize-none text-body bg-white text-deep-navy placeholder:text-deep-navy/40"
               style={{
                 minHeight: '52px',
                 maxHeight: '120px',
@@ -357,6 +405,15 @@ export const ChatInterface: FC<ChatInterfaceProps> = ({ userId, telegramId, quiz
           Нажмите Enter для отправки, Shift+Enter для новой строки
         </p>
       </div>
+      </div>
+
+      {/* History Sidebar */}
+      <ChatHistorySidebar
+        userId={userId}
+        telegramId={telegramId}
+        isOpen={isHistorySidebarOpen}
+        onClose={() => setIsHistorySidebarOpen(false)}
+      />
     </div>
   )
 }

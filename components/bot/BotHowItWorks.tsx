@@ -11,7 +11,7 @@ export const BotHowItWorks: FC<BotHowItWorksProps> = () => {
     {
       icon: MessageSquare,
       title: 'Задаете вопрос',
-      description: 'Голосом или текстом в Telegram',
+      description: 'Текстом в Telegram',
       color: 'from-primary-purple/20 to-primary-purple/10',
     },
     {
@@ -29,7 +29,7 @@ export const BotHowItWorks: FC<BotHowItWorksProps> = () => {
     {
       icon: ArrowRight,
       title: 'Действуете',
-      description: 'Врачи, видео, чек-листы',
+      description: 'Врачи, видео',
       color: 'from-primary-purple/20 to-ocean-wave-start/10',
     },
   ]

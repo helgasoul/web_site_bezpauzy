@@ -80,18 +80,27 @@ export const BotTrust: FC<BotTrustProps> = () => {
         </div>
 
         <motion.div
-          className="mt-12 text-center"
+          className="mt-12 text-center space-y-3"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.5 }}
         >
-          <a
-            href="/privacy"
-            className="text-body text-primary-purple hover:underline"
-          >
-            Политика конфиденциальности →
-          </a>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <a
+              href="/bot/privacy"
+              className="text-body text-primary-purple hover:underline"
+            >
+              Политика конфиденциальности бота →
+            </a>
+            <span className="text-body text-deep-navy/40 hidden sm:inline">•</span>
+            <a
+              href="/bot/terms"
+              className="text-body text-primary-purple hover:underline"
+            >
+              Пользовательское соглашение бота →
+            </a>
+          </div>
         </motion.div>
       </div>
     </section>

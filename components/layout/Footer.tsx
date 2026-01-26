@@ -1,20 +1,25 @@
 import { FC } from 'react'
 import Link from 'next/link'
+import { Mail, Send, BookOpen, Book, Stethoscope, Info, Database, CreditCard, HelpCircle, FileText, BookMarked, Headphones, PlayCircle } from 'lucide-react'
 
 interface FooterProps {}
 
 export const Footer: FC<FooterProps> = () => {
   const navigation = {
     main: [
-      { name: 'Журнал', href: '/blog' },
-      { name: 'Книга', href: '/book' },
-      { name: 'Врачи', href: '/doctors' },
-      { name: 'О нас', href: '/about' },
+      { name: 'Журнал', href: '/blog', icon: BookOpen },
+      { name: 'noPause Подкаст', href: '/podcasts/nopause', icon: Headphones },
+      { name: 'Ева объясняет', href: '/videos/eva-explains', icon: PlayCircle },
+      { name: 'Книга', href: '/book', icon: Book },
+      { name: 'Эксперты проекта', href: '/doctors', icon: Stethoscope },
+      { name: 'О проекте Без |Паузы', href: '/about', icon: Info },
     ],
     resources: [
-      { name: 'База знаний', href: '/knowledge-base' },
-      { name: 'Тарифы', href: '/bot#pricing' },
-      { name: 'FAQ', href: '/faq' },
+      { name: 'База знаний', href: '/knowledge-base', icon: Database },
+      { name: 'Гайды', href: '/resources/guides', icon: BookMarked },
+      { name: 'Чек-листы', href: '/resources/checklists', icon: FileText },
+      { name: 'Тарифы', href: '/bot#pricing', icon: CreditCard },
+      { name: 'FAQ', href: '/faq', icon: HelpCircle },
     ],
   }
 
@@ -36,16 +41,20 @@ export const Footer: FC<FooterProps> = () => {
           <div>
             <h3 className="text-body font-semibold mb-4">Навигация</h3>
             <ul className="space-y-2">
-              {navigation.main.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="text-body-small text-soft-white/70 hover:text-ocean-wave-start transition-colors"
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
+              {navigation.main.map((item) => {
+                const Icon = item.icon
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      className="flex items-center gap-2 text-body-small text-soft-white/70 hover:text-ocean-wave-start transition-colors"
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span>{item.name}</span>
+                    </Link>
+                  </li>
+                )
+              })}
             </ul>
           </div>
 
@@ -53,52 +62,84 @@ export const Footer: FC<FooterProps> = () => {
           <div>
             <h3 className="text-body font-semibold mb-4">Ресурсы</h3>
             <ul className="space-y-2">
-              {navigation.resources.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="text-body-small text-soft-white/70 hover:text-ocean-wave-start transition-colors"
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
+              {navigation.resources.map((item) => {
+                const Icon = item.icon
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      className="flex items-center gap-2 text-body-small text-soft-white/70 hover:text-ocean-wave-start transition-colors"
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span>{item.name}</span>
+                    </Link>
+                  </li>
+                )
+              })}
             </ul>
           </div>
 
           {/* Contacts */}
           <div>
             <h3 className="text-body font-semibold mb-4">Контакты</h3>
-            <ul className="space-y-2 text-body-small text-soft-white/70">
+            <ul className="space-y-3 text-body-small text-soft-white/70">
               <li>
                 <a
-                  href="mailto:info@bezpauzy.com"
-                  className="hover:text-ocean-wave-start transition-colors"
+                  href="mailto:bez-pauzy@yandex.com"
+                  className="flex items-center gap-2 hover:text-ocean-wave-start transition-colors"
                 >
-                  Email
+                  <Mail className="w-4 h-4" />
+                  <span>bez-pauzy@yandex.com</span>
                 </a>
               </li>
               <li>
                 <a
-                  href="https://t.me/bezpauzy_bot?start=website_footer"
+                  href="https://t.me/bezpauzi"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-ocean-wave-start transition-colors"
+                  className="flex items-center gap-2 hover:text-ocean-wave-start transition-colors"
                 >
-                  Telegram
+                  <Send className="w-4 h-4" />
+                  <span>Telegram канал</span>
                 </a>
               </li>
             </ul>
+            
+            {/* Telegram Channel Link */}
+            <div className="mt-6">
+              <a
+                href="https://t.me/bezpauzi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-ocean-wave-start/20 hover:bg-ocean-wave-start/30 border border-ocean-wave-start/30 rounded-lg text-soft-white hover:text-ocean-wave-start transition-all duration-300"
+              >
+                <Send className="w-5 h-5" />
+                <span className="font-medium">Подписаться на канал</span>
+              </a>
+            </div>
           </div>
         </div>
 
-        {/* Bottom Bar */}
+        {/* Medical Disclaimer */}
         <div className="mt-12 pt-8 border-t border-soft-white/10">
+          <p className="text-caption text-soft-white/60 text-center max-w-3xl mx-auto">
+            Информация на сайте носит информационный характер и не является медицинской консультацией, диагностикой или планом лечения. Проконсультируйтесь с врачом перед принятием решений о здоровье.
+          </p>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="mt-8 pt-8 border-t border-soft-white/10">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-caption text-soft-white/60">
-              © 2024 Без |Паузы. Все права защищены.
+              © 2025 Без |Паузы. Все права защищены.
             </p>
-            <div className="flex space-x-6 text-caption text-soft-white/60">
+            <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-caption text-soft-white/60">
+              <Link
+                href="/legal"
+                className="hover:text-ocean-wave-start transition-colors"
+              >
+                Правовые документы
+              </Link>
               <Link
                 href="/privacy"
                 className="hover:text-ocean-wave-start transition-colors"
@@ -106,10 +147,16 @@ export const Footer: FC<FooterProps> = () => {
                 Политика конфиденциальности
               </Link>
               <Link
-                href="/terms"
+                href="/legal/cookies"
                 className="hover:text-ocean-wave-start transition-colors"
               >
-                Пользовательское соглашение
+                Политика cookie
+              </Link>
+              <Link
+                href="/cookies"
+                className="hover:text-ocean-wave-start transition-colors"
+              >
+                Управление cookie
               </Link>
             </div>
           </div>

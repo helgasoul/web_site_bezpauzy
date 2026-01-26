@@ -45,7 +45,7 @@ const config: Config = {
         'body': ['16px', { lineHeight: '24px', fontWeight: '400' }],
         'body-small': ['14px', { lineHeight: '20px', fontWeight: '400' }],
         'caption': ['12px', { lineHeight: '16px', fontWeight: '400' }],
-        'quote': ['24px', { lineHeight: '36px', fontWeight: '400', fontStyle: 'italic' }],
+        'quote': ['24px', { lineHeight: '36px', fontWeight: '400' }],
       },
       spacing: {
         'xs': '4px',
@@ -100,7 +100,9 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 }
 export default config
 

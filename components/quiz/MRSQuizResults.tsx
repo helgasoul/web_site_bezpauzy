@@ -10,6 +10,8 @@ import { StatHighlight } from '@/components/blog/StatHighlight'
 import { SaveResultsButton } from './SaveResultsButton'
 import { AskEvaQuizButton } from './AskEvaQuizButton'
 import { DownloadQuizPDFButton } from './DownloadQuizPDFButton'
+import { DownloadLabChecklistButton } from './DownloadLabChecklistButton'
+import { SaveToCollectionButton } from '@/components/ui/SaveToCollectionButton'
 import type { MRSAnswer } from '@/lib/types/mrs-quiz'
 
 interface MRSQuizResultsProps {
@@ -167,6 +169,43 @@ export const MRSQuizResults: FC<MRSQuizResultsProps> = ({ result, answers }) => 
             urogenital_score: result.urogenital_score,
             somatic_score: result.somatic_score,
             recommendations: getRecommendations(),
+          }}
+        />
+      </motion.div>
+
+      {/* Download Lab Checklist */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7 }}
+        className="bg-gradient-to-br from-lavender-bg to-soft-white rounded-3xl p-8 border-2 border-primary-purple/20 text-center"
+      >
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <CheckCircle2 className="w-6 h-6 text-primary-purple" />
+          <h3 className="text-h4 font-bold text-deep-navy">Чек-лист лабораторных анализов</h3>
+        </div>
+        <p className="text-body text-deep-navy/70 mb-6">
+          Скачайте подробный чек-лист анализов, которые рекомендуется сдавать в период менопаузы. Возьмите его с собой на приём к врачу.
+        </p>
+        <DownloadLabChecklistButton label="Скачать чек-лист анализов" />
+      </motion.div>
+
+      {/* Save to Collection Button */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
+        className="flex justify-center"
+      >
+        <SaveToCollectionButton
+          contentType="quiz"
+          contentId="mrs"
+          title="Menopause Rating Scale (MRS)"
+          description={`Уровень тяжести симптомов: ${severityLabel}. Общий балл: ${result.total_score}.`}
+          url="/quiz/mrs"
+          metadata={{
+            severity: result.severity,
+            total_score: result.total_score,
           }}
         />
       </motion.div>

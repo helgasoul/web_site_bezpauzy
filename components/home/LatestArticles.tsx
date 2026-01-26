@@ -1,44 +1,43 @@
-import { FC } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
+import { getPublishedArticles } from '@/lib/blog/get-articles'
+import { getCategoryName, getCategoryOverlay } from '@/lib/utils/blog'
+import type { BlogPost } from '@/lib/blog/get-articles'
 
 interface LatestArticlesProps {}
 
-export const LatestArticles: FC<LatestArticlesProps> = () => {
-  // Placeholder data - will be replaced with real data from Supabase
-  const articles = [
-    {
-      id: 1,
-      title: 'Приливы: причины и 10 способов облегчения',
-      excerpt: 'Узнайте, почему возникают приливы и как можно облегчить этот симптом менопаузы.',
-      category: 'Гинеколог',
-      slug: 'prilivy-prichiny-i-resheniya',
-      // Photo: Mature confident woman, professional setting
-      image: '/article_1.png',
-      overlay: 'from-primary-purple/50 to-transparent',
-    },
-    {
-      id: 2,
-      title: 'ЗГТ: показания и противопоказания',
-      excerpt: 'Полное руководство по заместительной гормональной терапии при менопаузе.',
-      category: 'Гинеколог',
-      slug: 'zgt-pokazaniya-i-protivopokazaniya',
-      // Photo: Professional woman in medical/healthcare context
-      image: '/article_2.png',
-      overlay: 'from-warm-accent/50 to-transparent',
-    },
-    {
-      id: 3,
-      title: 'Питание в менопаузе: базовые принципы',
-      excerpt: 'Как правильно питаться в период менопаузы для поддержания здоровья и веса.',
-      category: 'Нутрициолог',
-      slug: 'pitanie-v-menopauze',
-      // Photo: Mature woman with healthy food, nutrition context
-      image: '/article_3.png',
-      overlay: 'from-ocean-wave-start/50 to-transparent',
-    },
-  ]
+export async function LatestArticles() {
+  // Получаем последние 3 опубликованные статьи из Supabase
+  const articles = await getPublishedArticles(3)
+
+  // Если статей нет, показываем пустой блок или placeholder
+  if (!articles || articles.length === 0) {
+    return (
+      <section className="py-16 md:py-24 bg-lavender-bg">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8">
+          <h2 className="text-h2 font-bold text-deep-navy mb-12">
+            Последние статьи из журнала
+          </h2>
+          <p className="text-body text-deep-navy/70">
+            Статьи скоро появятся
+          </p>
+        </div>
+      </section>
+    )
+  }
+
+  // Маппим данные из БД в формат компонента
+  const mappedArticles = articles.map((article: BlogPost, index: number) => ({
+    id: article.id,
+    title: article.title,
+    excerpt: article.excerpt || '',
+    category: getCategoryName(article.category),
+    slug: article.slug,
+    image: article.image || '/article_1.png', // Fallback изображение
+    overlay: getCategoryOverlay(article.category),
+    isFirst: index === 0, // Для priority загрузки изображения
+  }))
 
   return (
     <section className="py-16 md:py-24 bg-lavender-bg">
@@ -55,7 +54,7 @@ export const LatestArticles: FC<LatestArticlesProps> = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {articles.map((article) => (
+          {mappedArticles.map((article) => (
             <Link
               key={article.id}
               href={`/blog/${article.slug}`}
@@ -70,7 +69,7 @@ export const LatestArticles: FC<LatestArticlesProps> = () => {
                     fill
                     className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    priority={article.id === 1}
+                    priority={article.isFirst}
                   />
                   {/* Gradient overlay - только внизу для лучшей видимости фото */}
                   <div className={`absolute bottom-0 right-0 h-32 bg-gradient-to-t ${article.overlay}`} />

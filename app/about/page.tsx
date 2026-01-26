@@ -2,15 +2,23 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { BackButton } from '@/components/ui/BackButton'
 import { AskEvaWidget } from '@/components/ui/AskEvaWidget'
+import { PenTool, GraduationCap, Microscope, Video } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'О нас — Кто мы | Без |Паузы',
   description: 'Узнайте больше о создателе платформы Без |Паузы и нашей миссии помочь женщинам 40+ в период менопаузы.',
   keywords: ['о нас', 'создатель', 'менопауза', 'женское здоровье', 'команда'],
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://bezpauzy.com'}/about`,
+  },
   openGraph: {
     title: 'О нас — Кто мы',
     description: 'Узнайте больше о создателе платформы Без |Паузы',
     type: 'website',
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://bezpauzy.com'}/about`,
+  },
+  other: {
+    'telegram:channel': '@bezpauzi',
   },
 }
 
@@ -81,6 +89,121 @@ export default function AboutPage() {
           </div>
         </section>
 
+        {/* Interviews & Media Section */}
+        <section className="py-16 md:py-24 bg-white">
+          <div className="container mx-auto px-4 md:px-6 lg:px-8">
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-h2 font-bold text-deep-navy text-center mb-12">
+                Интервью и публикации
+              </h2>
+              <p className="text-body-large text-deep-navy/70 text-center max-w-2xl mx-auto mb-12">
+                Ольга Пучкова регулярно выступает в СМИ и участвует в экспертных обсуждениях о женском здоровье, маммологии и менопаузе
+              </p>
+
+              {/* Interviews Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                <a
+                  href="https://snob.ru/profile/32128/blog/1007545/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group bg-white rounded-card p-6 border-2 border-lavender-bg hover:border-primary-purple hover:shadow-card-hover transition-all duration-300"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-primary-purple/10 to-ocean-wave-start/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <PenTool className="w-6 h-6 text-primary-purple" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-h6 font-semibold text-deep-navy mb-2 group-hover:text-primary-purple transition-colors line-clamp-2">
+                        Блог на Snob.ru
+                      </h3>
+                      <p className="text-body-small text-deep-navy/60 mb-3">
+                        Snob.ru
+                      </p>
+                      <span className="text-body-small text-primary-purple font-medium group-hover:underline">
+                        Читать →
+                      </span>
+                    </div>
+                  </div>
+                </a>
+
+                <a
+                  href="https://news.itmo.ru/ru/news/13518/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group bg-white rounded-card p-6 border-2 border-lavender-bg hover:border-primary-purple hover:shadow-card-hover transition-all duration-300"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-primary-purple/10 to-ocean-wave-start/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <GraduationCap className="w-6 h-6 text-primary-purple" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-h6 font-semibold text-deep-navy mb-2 group-hover:text-primary-purple transition-colors line-clamp-2">
+                        Интервью для ИТМО
+                      </h3>
+                      <p className="text-body-small text-deep-navy/60 mb-3">
+                        Новости ИТМО
+                      </p>
+                      <span className="text-body-small text-primary-purple font-medium group-hover:underline">
+                        Читать →
+                      </span>
+                    </div>
+                  </div>
+                </a>
+
+                <a
+                  href="https://t-j.ru/list/mammography/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group bg-white rounded-card p-6 border-2 border-lavender-bg hover:border-primary-purple hover:shadow-card-hover transition-all duration-300"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-primary-purple/10 to-ocean-wave-start/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Microscope className="w-6 h-6 text-primary-purple" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-h6 font-semibold text-deep-navy mb-2 group-hover:text-primary-purple transition-colors line-clamp-2">
+                        Маммография: важность обследования
+                      </h3>
+                      <p className="text-body-small text-deep-navy/60 mb-3">
+                        T-J.ru
+                      </p>
+                      <span className="text-body-small text-primary-purple font-medium group-hover:underline">
+                        Читать →
+                      </span>
+                    </div>
+                  </div>
+                </a>
+              </div>
+
+              {/* Video Section */}
+              <div className="bg-gradient-to-br from-primary-purple/5 via-ocean-wave-start/5 to-warm-accent/5 rounded-card p-8 border-2 border-primary-purple/10">
+                <div className="flex items-start gap-6">
+                  <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-primary-purple to-ocean-wave-start rounded-lg flex items-center justify-center shadow-medium">
+                    <Video className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-h4 font-semibold text-deep-navy mb-3">
+                      Подкаст FemTech Force
+                    </h3>
+                    <p className="text-body text-deep-navy/70 mb-4">
+                      Интервью с Ольгой Пучковой о женском здоровье, маммологии и важности регулярных обследований
+                    </p>
+                    <a
+                      href="https://femtechforce.mave.digital/ep-51"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-primary-purple text-white rounded-full font-semibold hover:shadow-strong hover:scale-105 transition-all duration-300"
+                    >
+                      <span>Смотреть видео</span>
+                      <span>→</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Mission Section */}
         <section className="py-16 md:py-24 bg-lavender-bg">
           <div className="container mx-auto px-4 md:px-6 lg:px-8">
@@ -139,7 +262,7 @@ export default function AboutPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
-                  href="mailto:info@bezpauzy.com"
+                  href="mailto:bez-pauzy@yandex.com"
                   className="inline-flex items-center justify-center px-8 py-4 bg-white text-primary-purple rounded-full font-semibold hover:shadow-strong hover:scale-105 transition-all duration-300"
                 >
                   Написать нам

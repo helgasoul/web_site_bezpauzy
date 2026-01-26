@@ -38,12 +38,18 @@ export function calculateMRSScore(answers: MRSAnswer): MRSResult {
     answers.bladder_problems +
     answers.vaginal_dryness
 
+  // Vasomotor score (hot_flashes + heart_discomfort)
+  const vasomotor_score = 
+    answers.hot_flashes +
+    answers.heart_discomfort
+
   // Determine severity
   const severity = determineSeverity(total_score)
 
   return {
     total_score,
     severity,
+    vasomotor_score,
     somatic_score,
     psychological_score,
     urogenital_score

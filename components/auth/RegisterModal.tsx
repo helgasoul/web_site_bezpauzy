@@ -9,9 +9,11 @@ interface RegisterModalProps {
   isOpen: boolean
   onClose: () => void
   onSuccess?: () => void
+  skipTelegramLink?: boolean // Если true, пропускает шаг привязки Telegram
+  onSwitchToLogin?: () => void // Переключение на форму входа
 }
 
-export const RegisterModal: FC<RegisterModalProps> = ({ isOpen, onClose, onSuccess }) => {
+export const RegisterModal: FC<RegisterModalProps> = ({ isOpen, onClose, onSuccess, skipTelegramLink = false, onSwitchToLogin }) => {
   const router = useRouter()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -65,14 +67,68 @@ export const RegisterModal: FC<RegisterModalProps> = ({ isOpen, onClose, onSucce
       }
 
       // Регистрация успешна
-      // Если пользователь хочет общаться с Евой, показываем шаг привязки
-      // Иначе сразу переходим к успеху
-      setStep('link-telegram')
-      generateLinkCode()
+      // Проверяем, что сессия установилась
+      await checkSessionAndProceed()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка при регистрации')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const checkSessionAndProceed = async () => {
+    // Проверяем сессию (максимум 3 попытки)
+    let retryCount = 0
+    const maxRetries = 3
+    const retryDelay = 500
+
+    const checkSession = async (): Promise<boolean> => {
+      try {
+        const sessionCheck = await fetch('/api/auth/telegram/get-session', {
+          credentials: 'include',
+          cache: 'no-store',
+        })
+        const sessionData = await sessionCheck.json()
+        return sessionData.authenticated === true
+      } catch (error) {
+        return false
+      }
+    }
+
+    while (retryCount < maxRetries) {
+      const isAuthenticated = await checkSession()
+      if (isAuthenticated) {
+        // Сессия подтверждена, продолжаем
+        if (skipTelegramLink) {
+          setStep('success')
+          setTimeout(() => {
+            onSuccess?.()
+            onClose()
+          }, 1500)
+        } else {
+          // Если пользователь хочет общаться с Евой, показываем шаг привязки
+          setStep('link-telegram')
+          generateLinkCode()
+        }
+        return
+      }
+      retryCount++
+      if (retryCount < maxRetries) {
+        await new Promise((resolve) => setTimeout(resolve, retryDelay))
+      }
+    }
+
+    // Если сессия не подтверждена после всех попыток, все равно продолжаем
+    // (cookie может быть установлена, но еще не прочитана)
+    if (skipTelegramLink) {
+      setStep('success')
+      setTimeout(() => {
+        onSuccess?.()
+        onClose()
+      }, 1500)
+    } else {
+      setStep('link-telegram')
+      generateLinkCode()
     }
   }
 
@@ -93,7 +149,9 @@ export const RegisterModal: FC<RegisterModalProps> = ({ isOpen, onClose, onSucce
         setStep('success')
         setTimeout(() => {
           onSuccess?.()
-          router.push('/account')
+          if (!onSuccess) {
+          router.push('/community/dashboard')
+          }
           onClose()
         }, 1500)
         return
@@ -112,11 +170,13 @@ export const RegisterModal: FC<RegisterModalProps> = ({ isOpen, onClose, onSucce
     setTimeout(() => setCodeCopied(false), 2000)
   }
 
-  const skipTelegramLink = () => {
+  const handleSkipTelegramLink = () => {
     setStep('success')
     setTimeout(() => {
       onSuccess?.()
-      router.push('/account')
+      if (!onSuccess) {
+      router.push('/community/dashboard')
+      }
       onClose()
     }, 1500)
   }
@@ -137,14 +197,14 @@ export const RegisterModal: FC<RegisterModalProps> = ({ isOpen, onClose, onSucce
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 flex items-end md:items-end justify-center p-4 pb-8 md:pb-16 pointer-events-none">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={handleClose}
-          className="absolute inset-0 bg-deep-navy/60 backdrop-blur-sm"
+          className="absolute inset-0 bg-deep-navy/60 backdrop-blur-sm pointer-events-auto"
         />
 
         {/* Modal */}
@@ -152,7 +212,8 @@ export const RegisterModal: FC<RegisterModalProps> = ({ isOpen, onClose, onSucce
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 md:p-10 z-10"
+          onClick={(e) => e.stopPropagation()}
+          className="relative bg-white rounded-t-3xl md:rounded-3xl shadow-2xl max-w-md w-full max-h-[85vh] overflow-y-auto p-8 md:p-10 z-10 pointer-events-auto"
         >
           {/* Close button */}
           <button
@@ -259,6 +320,33 @@ export const RegisterModal: FC<RegisterModalProps> = ({ isOpen, onClose, onSucce
                     </>
                   )}
                 </button>
+
+                <p className="text-xs text-deep-navy/60 text-center mt-4">
+                  Нажимая кнопку &quot;Зарегистрироваться&quot;, вы соглашаетесь с{' '}
+                  <a
+                    href="/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary-purple hover:underline"
+                  >
+                    политикой конфиденциальности
+                  </a>
+                </p>
+                
+                {onSwitchToLogin && (
+                  <div className="mt-4 pt-4 border-t border-lavender-bg">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleClose()
+                        onSwitchToLogin()
+                      }}
+                      className="w-full text-sm text-deep-navy/60 hover:text-deep-navy transition-colors"
+                    >
+                      Уже зарегистрированы? Войти
+                    </button>
+                  </div>
+                )}
               </form>
             </div>
           )}
@@ -316,7 +404,7 @@ export const RegisterModal: FC<RegisterModalProps> = ({ isOpen, onClose, onSucce
 
               <div className="flex gap-3">
                 <button
-                  onClick={skipTelegramLink}
+                  onClick={handleSkipTelegramLink}
                   className="flex-1 text-sm text-deep-navy/60 hover:text-deep-navy transition-colors"
                 >
                   Пропустить (можно привязать позже)

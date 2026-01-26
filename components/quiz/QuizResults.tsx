@@ -11,6 +11,8 @@ import { SaveResultsButton } from './SaveResultsButton'
 import { AskEvaQuizButton } from './AskEvaQuizButton'
 import { DownloadQuizPDFButton } from './DownloadQuizPDFButton'
 import { DownloadGuideButton } from './DownloadGuideButton'
+import { DownloadLabChecklistButton } from './DownloadLabChecklistButton'
+import { SaveToCollectionButton } from '@/components/ui/SaveToCollectionButton'
 import type { InflammationAnswers } from '@/lib/types/inflammation-quiz'
 
 interface QuizResultsProps {
@@ -230,6 +232,43 @@ export const QuizResults: FC<QuizResultsProps> = ({ result, demographics, answer
           Скачайте PDF-гайд &quot;Противовоспалительное питание&quot; с детальными рекомендациями, рецептами и планом на 21 день
         </p>
         <DownloadGuideButton label="Скачать PDF-гайд" />
+      </motion.div>
+
+      {/* Download Lab Checklist */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
+        className="bg-gradient-to-br from-lavender-bg to-soft-white rounded-3xl p-8 border-2 border-primary-purple/20 text-center"
+      >
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <CheckCircle2 className="w-6 h-6 text-primary-purple" />
+          <h3 className="text-h4 font-bold text-deep-navy">Чек-лист лабораторных анализов</h3>
+        </div>
+        <p className="text-body text-deep-navy/70 mb-6">
+          Скачайте подробный чек-лист анализов, которые рекомендуется сдавать в период менопаузы. Возьмите его с собой на приём к врачу.
+        </p>
+        <DownloadLabChecklistButton label="Скачать чек-лист анализов" />
+      </motion.div>
+
+      {/* Save to Collection Button */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.9 }}
+        className="flex justify-center"
+      >
+        <SaveToCollectionButton
+          contentType="quiz"
+          contentId="inflammation"
+          title="Индекс воспаления"
+          description={`Уровень воспаления: ${levelLabel}. Общий балл: ${result.total_inflammation_score}.`}
+          url="/quiz/inflammation"
+          metadata={{
+            inflammation_level: result.inflammation_level,
+            total_score: result.total_inflammation_score,
+          }}
+        />
       </motion.div>
     </div>
   )

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
+import { setSessionCookie } from '@/lib/auth/session'
+
+// Явно указываем, что этот route динамический (использует request.url)
+export const dynamic = 'force-dynamic'
 
 /**
  * Обработка deep link из бота для автоматического входа
@@ -47,14 +50,7 @@ export async function GET(request: NextRequest) {
     const hasWebsiteAuth = !!(user.username && user.password_hash)
 
     if (hasWebsiteAuth) {
-      // Автоматически входим
-      const sessionToken = Buffer.from(JSON.stringify({
-        userId: user.id,
-        username: user.username,
-        telegramId: user.telegram_id,
-      })).toString('base64')
-
-      // Устанавливаем cookie
+      // Автоматически входим с безопасной JWT сессией
       const response = NextResponse.json({
         success: true,
         found: true,
@@ -70,13 +66,11 @@ export async function GET(request: NextRequest) {
         message: 'Автоматический вход выполнен',
       })
 
-      response.cookies.set('telegram_session', sessionToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 30, // 30 дней
-        path: '/',
-      })
+      setSessionCookie({
+        userId: user.id,
+        username: user.username,
+        telegramId: user.telegram_id,
+      }, response)
 
       return response
     } else {

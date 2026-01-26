@@ -2,6 +2,7 @@
 
 import { FC, useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { MessageCircle, X, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -25,24 +26,36 @@ export const AskEvaWidget: FC<AskEvaWidgetProps> = ({ articleTitle, articleSlug 
   const [showWebsiteLogin, setShowWebsiteLogin] = useState(false)
   const [showTelegramLink, setShowTelegramLink] = useState(false)
   const [userTelegramId, setUserTelegramId] = useState<number | null>(null)
+  const [hasEvaPhoto, setHasEvaPhoto] = useState(true) // Will be set to false if image fails to load
 
   // Check authentication status
   useEffect(() => {
     checkAuth()
   }, [])
 
-  // Show widget after user scrolls down a bit
+  // Always show sidebar on desktop, hide on mobile until scroll
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 400) {
-        setIsVisible(true)
+      if (window.innerWidth < 1024) {
+        // Mobile: show after scroll
+        if (window.scrollY > 400) {
+          setIsVisible(true)
+        } else {
+          setIsVisible(false)
+        }
       } else {
-        setIsVisible(false)
+        // Desktop: always visible
+        setIsVisible(true)
       }
     }
 
+    handleScroll() // Check on mount
     window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    window.addEventListener('resize', handleScroll)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleScroll)
+    }
   }, [])
 
   const checkAuth = async () => {
@@ -86,54 +99,125 @@ export const AskEvaWidget: FC<AskEvaWidgetProps> = ({ articleTitle, articleSlug 
 
   return (
     <>
-      {/* Floating Button - triggers the widget */}
+      {/* Sticky Sidebar Widget - Desktop */}
       <AnimatePresence>
-        {isVisible && !isOpen && (
-          <motion.div
-            className="fixed right-6 bottom-6 z-50"
-            initial={{ opacity: 0, scale: 0.8, x: 100 }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            exit={{ opacity: 0, scale: 0.8, x: 100 }}
-            transition={{ duration: 0.3 }}
-          >
-            <button
-              onClick={handleAskEvaClick}
-              className="group relative w-16 h-16 bg-gradient-primary rounded-full shadow-strong flex items-center justify-center hover:scale-110 transition-transform duration-300"
-              aria-label="Спросить Еву"
+        {isVisible && (
+          <>
+            {/* Desktop: Round sticky sidebar widget with photo */}
+            <motion.div
+              className="hidden lg:block fixed right-6 top-24 z-40"
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 100 }}
+              transition={{ duration: 0.3 }}
             >
-              <MessageCircle className="w-8 h-8 text-white" />
-              
-              {/* Pulse animation */}
-              <div className="absolute inset-0 rounded-full bg-primary-purple animate-ping opacity-20" />
-              
-              {/* Tooltip on hover */}
-              <div className="absolute right-full mr-4 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                <div className="bg-deep-navy text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap shadow-lg">
-                  Спросить Еву
-                  <div className="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-deep-navy" />
+              <div className="w-52 h-52 bg-gradient-to-br from-primary-purple via-primary-purple/90 to-ocean-wave-start rounded-full shadow-2xl border-4 border-white overflow-hidden hover:shadow-3xl transition-all duration-300 hover:-translate-y-1 hover:scale-105 relative">
+                  {/* Background Pattern */}
+                  <div className="absolute inset-0 opacity-10">
+                    <div className="absolute inset-0" style={{
+                      backgroundImage: `radial-gradient(circle at 30% 40%, rgba(255,255,255,0.3) 0%, transparent 50%),
+                                       radial-gradient(circle at 70% 60%, rgba(255,255,255,0.2) 0%, transparent 50%)`
+                    }} />
+                  </div>
+                  
+                {/* Eva Photo - только лицо, обрезано сверху */}
+                <div className="absolute inset-0 flex items-start justify-center pt-5">
+                  {hasEvaPhoto ? (
+                    <div className="relative w-28 h-28 rounded-full overflow-hidden ring-2 ring-white/40 shadow-2xl">
+                      <Image
+                        src="/eva-avatar.png"
+                        alt="Ева - AI-консультант"
+                        fill
+                        className="object-cover rounded-full"
+                        sizes="112px"
+                        priority
+                        style={{ objectPosition: 'center 20%' }}
+                        onError={() => {
+                          setHasEvaPhoto(false)
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative w-28 h-28 rounded-full bg-gradient-to-br from-white/30 to-white/10 backdrop-blur-sm flex items-center justify-center ring-4 ring-white/40 shadow-xl">
+                      <MessageCircle className="w-14 h-14 text-white" strokeWidth={1.5} />
+                    </div>
+                  )}
                 </div>
+                
+                {/* Name and Title - внизу */}
+                <div className="absolute bottom-7 left-0 right-0 flex flex-col items-center justify-center px-3 z-10">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    {/* Online Indicator - слева от имени */}
+                    <div className="relative w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-lg" style={{ 
+                      boxShadow: '0 0 0 1px rgba(255, 255, 255, 0.8), 0 2px 8px rgba(34, 197, 94, 0.8), 0 0 12px rgba(34, 197, 94, 0.6)'
+                    }} />
+                    <h3 className="text-base font-bold text-white leading-tight drop-shadow-lg">Ева</h3>
+                  </div>
+                  <p className="text-[10px] text-white/95 leading-tight text-center drop-shadow-md">
+                    AI-помощник
+                  </p>
+                </div>
+                
+                {/* Loading Indicator */}
+                {isCheckingAuth && (
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center justify-center z-20">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
+                
+                {/* Clickable Overlay - не должен блокировать бейджи */}
+                {!isCheckingAuth && (
+                  <button
+                    onClick={handleAskEvaClick}
+                    className="absolute inset-0 w-full h-full rounded-full cursor-pointer z-[5]"
+                    aria-label="Спросить Еву"
+                    style={{ pointerEvents: 'auto' }}
+                  />
+                )}
               </div>
-            </button>
-          </motion.div>
+            </motion.div>
+
+            {/* Mobile: Floating Button */}
+            <AnimatePresence>
+              {isVisible && !isOpen && (
+                <motion.div
+                  className="lg:hidden fixed right-6 bottom-6 z-50"
+                  initial={{ opacity: 0, scale: 0.8, x: 100 }}
+                  animate={{ opacity: 1, scale: 1, x: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, x: 100 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <button
+                    onClick={handleAskEvaClick}
+                    className="group relative w-16 h-16 bg-gradient-primary rounded-full shadow-strong flex items-center justify-center hover:scale-110 transition-transform duration-300"
+                    aria-label="Спросить Еву"
+                  >
+                    <MessageCircle className="w-8 h-8 text-white" />
+                    <div className="absolute inset-0 rounded-full bg-primary-purple animate-ping opacity-20" />
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </>
         )}
       </AnimatePresence>
 
-      {/* Sidebar Widget */}
+      {/* Mobile Sidebar Modal */}
       <AnimatePresence>
         {isOpen && (
           <>
             {/* Backdrop */}
             <motion.div
-              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50"
+              className="lg:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-50"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Sidebar Panel */}
+            {/* Sidebar Panel - Mobile */}
             <motion.div
-              className="fixed right-0 top-0 h-full w-full sm:w-96 bg-white shadow-2xl z-50 overflow-y-auto"
+              className="lg:hidden fixed right-0 top-0 h-full w-full sm:w-96 bg-white shadow-2xl z-50 overflow-y-auto"
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
@@ -204,7 +288,7 @@ export const AskEvaWidget: FC<AskEvaWidgetProps> = ({ articleTitle, articleSlug 
                       {userTelegramId && userTelegramId !== 0 ? (
                         <>
                           <Link
-                            href="/chat"
+                            href="/bot"
                             className="block w-full"
                             onClick={() => setIsOpen(false)}
                           >

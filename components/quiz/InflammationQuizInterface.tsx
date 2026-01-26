@@ -6,10 +6,12 @@ import { Activity, CheckCircle2, ArrowRight, ArrowLeft, Sparkles, TrendingDown, 
 import Image from 'next/image'
 import { ALL_QUESTIONS, DEMOGRAPHICS_QUESTIONS, DIET_QUESTIONS, LIFESTYLE_QUESTIONS } from '@/lib/inflammation-quiz/questions'
 import { calculateInflammationScore, getInflammationLevelLabel, getInflammationLevelDescription, getInflammationLevelColor, getInflammationLevelEmoji } from '@/lib/inflammation-quiz/scoring'
-import type { InflammationQuestion, Demographics, InflammationAnswers, InflammationResult } from '@/lib/types/inflammation-quiz'
+import type { InflammationQuestion, Demographics, InflammationAnswers, InflammationResult, AgeRange } from '@/lib/types/inflammation-quiz'
 import { QuizQuestionCard } from './QuizQuestionCard'
 import { QuizProgressBar } from './QuizProgressBar'
 import { QuizResults } from './QuizResults'
+import { QuizHistory } from './QuizHistory'
+import { BackButton } from '@/components/ui/BackButton'
 
 type QuizStep = 'intro' | 'demographics' | 'diet' | 'lifestyle' | 'results'
 
@@ -154,7 +156,16 @@ export const InflammationQuizInterface: FC = () => {
         }
       } else {
         // Для нечисловых полей (age_range) сохраняем как есть
-        setDemographics(prev => ({ ...prev, [key]: value }))
+        // Проверяем, что value соответствует типу AgeRange
+        if (key === 'age_range' && typeof value === 'string') {
+          const validAgeRanges: AgeRange[] = ['35-39', '40-44', '45-49', '50-54', '55-59', '60+']
+          if (validAgeRanges.includes(value as AgeRange)) {
+            setDemographics(prev => ({ ...prev, [key]: value as AgeRange }))
+          }
+        } else {
+          // Для других нечисловых полей (если они появятся)
+          setDemographics(prev => ({ ...prev, [key]: value as any }))
+        }
       }
     } else {
       const key = currentQuestion.id as keyof InflammationAnswers
@@ -205,6 +216,9 @@ export const InflammationQuizInterface: FC = () => {
   return (
     <section className="py-12 md:py-16 bg-gradient-to-b from-soft-white to-white min-h-screen">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
+        <div className="mb-6">
+          <BackButton variant="ghost" />
+        </div>
         <div className="max-w-3xl mx-auto">
           {/* Progress Bar */}
           {step !== 'intro' && step !== 'results' && (
@@ -218,26 +232,30 @@ export const InflammationQuizInterface: FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="text-center space-y-8"
+                className="space-y-8"
               >
-                <div className="flex items-center justify-center mx-auto">
-                  <Image
-                    src="/logo.png"
-                    alt="Без |Паузы"
-                    width={80}
-                    height={80}
-                    className="object-contain"
-                  />
-                </div>
+                {/* История результатов (если есть) */}
+                <QuizHistory testType="inflammation" onStartNew={handleStart} />
 
-                <div>
-                  <h1 className="text-h1 font-bold text-deep-navy mb-4 bg-gradient-to-r from-primary-purple to-ocean-wave-start bg-clip-text text-transparent">
-                    Индекс воспаления
-                  </h1>
-                  <p className="text-body-large text-deep-navy/70">
-                    Узнайте уровень хронического воспаления в вашем организме и получите персонализированные рекомендации
-                  </p>
-                </div>
+                <div className="text-center space-y-8">
+                  <div className="flex items-center justify-center mx-auto">
+                    <Image
+                      src="/logo.png"
+                      alt="Без |Паузы"
+                      width={80}
+                      height={80}
+                      className="object-contain"
+                    />
+                  </div>
+
+                  <div>
+                    <h1 className="text-h1 font-bold text-deep-navy mb-4 bg-gradient-to-r from-primary-purple to-ocean-wave-start bg-clip-text text-transparent">
+                      Индекс воспаления
+                    </h1>
+                    <p className="text-body-large text-deep-navy/70">
+                      Узнайте уровень хронического воспаления в вашем организме и получите персонализированные рекомендации
+                    </p>
+                  </div>
 
                 <div className="bg-gradient-to-br from-lavender-bg to-soft-white rounded-3xl p-8 border-2 border-primary-purple/20 shadow-lg space-y-6">
                   <div className="flex items-center gap-3 justify-center mb-4">
@@ -285,6 +303,7 @@ export const InflammationQuizInterface: FC = () => {
                 <p className="text-caption text-deep-navy/60">
                   Ваши данные конфиденциальны и не будут переданы третьим лицам
                 </p>
+                </div>
               </motion.div>
             )}
 

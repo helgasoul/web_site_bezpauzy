@@ -17,29 +17,9 @@ export const BotCTA: FC<BotCTAProps> = () => {
     e.preventDefault()
     setIsChecking(true)
 
-    try {
-      // Проверяем авторизацию
-      const response = await fetch('/api/auth/telegram/get-session')
-      const data = await response.json()
-      const authenticated = data.authenticated || false
-      const subscription = data.user?.subscriptionStatus === 'active' || false
-
-      if (authenticated && subscription) {
-        // Пользователь авторизован и имеет подписку - открываем чат
-        router.push('/chat')
-      } else if (authenticated && !subscription) {
-        // Пользователь авторизован, но нет подписки - открываем чат (там покажется сообщение о подписке)
-        router.push('/chat')
-      } else {
-        // Пользователь не авторизован - открываем чат (там покажется форма регистрации/входа)
-        router.push('/chat')
-      }
-    } catch (error) {
-      // В случае ошибки просто переходим в чат
-      router.push('/chat')
-    } finally {
-      setIsChecking(false)
-    }
+    // Всегда ведем в чат - там ChatAuthGate проверит авторизацию и покажет нужный экран
+    router.push('/chat')
+    setIsChecking(false)
   }
   return (
     <section className="py-16 md:py-24 bg-deep-navy text-white relative overflow-hidden">
@@ -54,23 +34,26 @@ export const BotCTA: FC<BotCTAProps> = () => {
 
       <div className="container mx-auto px-4 md:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center max-w-6xl mx-auto">
-          {/* Photo */}
+          {/* Photo - Circular Eva */}
           <motion.div
-            className="relative rounded-3xl overflow-hidden shadow-strong order-2 lg:order-1"
+            className="relative w-full max-w-md mx-auto lg:mx-0 order-2 lg:order-1"
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <Image
-              src="/hero-women.jpg"
-              alt="Присоединяйтесь к тысячам женщин, которые доверяют Еве"
-              width={600}
-              height={800}
-              className="w-full h-auto object-cover"
-            />
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-deep-navy/60 via-deep-navy/20 to-transparent" />
+            <div className="relative w-full aspect-square rounded-full overflow-hidden shadow-strong">
+              <Image
+                src="/ChatGPT Image Dec 19, 2025 at 10_44_36 PM.png"
+                alt="Ева — ваш AI-консультант по менопаузе"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 384px"
+                priority
+              />
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-deep-navy/60 via-deep-navy/20 to-transparent" />
+            </div>
           </motion.div>
 
           {/* Text Content */}
@@ -111,6 +94,18 @@ export const BotCTA: FC<BotCTAProps> = () => {
                 подпишитесь на рассылку
               </Link>
               {' '}для получения научных новостей
+            </p>
+
+            <p className="text-body-small text-white/70 max-w-xl mx-auto lg:mx-0 pt-4 border-t border-white/20">
+              Начиная общение с Евой, вы соглашаетесь с{' '}
+              <Link href="/bot/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-ocean-wave-start transition-colors">
+                пользовательским соглашением
+              </Link>
+              {' '}и{' '}
+              <Link href="/bot/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-ocean-wave-start transition-colors">
+                политикой конфиденциальности
+              </Link>
+              {' '}Telegram-бота.
             </p>
           </motion.div>
         </div>
