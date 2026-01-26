@@ -9,6 +9,7 @@ import {
   Area,
   BarChart,
   Bar,
+  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -158,9 +159,7 @@ export const QuizStatistics: FC<QuizStatisticsProps> = ({ results }) => {
               Динамика общего балла
             </h3>
           </div>
-          {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
           <ResponsiveContainer width="100%" height={300}>
-            {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
             <AreaChart data={chartData}>
               <defs>
                 <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
@@ -169,14 +168,12 @@ export const QuizStatistics: FC<QuizStatisticsProps> = ({ results }) => {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#E8E5F2" />
-              {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
               <XAxis
                 dataKey="name"
                 stroke="#3D4461"
                 fontSize={12}
                 tick={{ fill: '#3D4461' }}
               />
-              {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
               <YAxis
                 stroke="#3D4461"
                 fontSize={12}
@@ -191,7 +188,6 @@ export const QuizStatistics: FC<QuizStatisticsProps> = ({ results }) => {
                 }}
                 labelStyle={{ color: '#3D4461', fontWeight: 'bold' }}
               />
-              {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
               <Area
                 type="monotone"
                 dataKey="Общий балл"
@@ -216,19 +212,15 @@ export const QuizStatistics: FC<QuizStatisticsProps> = ({ results }) => {
           <h3 className="text-h4 font-bold text-deep-navy mb-6">
             Динамика по категориям
           </h3>
-          {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
           <ResponsiveContainer width="100%" height={350}>
-            {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E8E5F2" />
-              {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
               <XAxis
                 dataKey="name"
                 stroke="#3D4461"
                 fontSize={12}
                 tick={{ fill: '#3D4461' }}
               />
-              {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
               <YAxis
                 stroke="#3D4461"
                 fontSize={12}
@@ -242,12 +234,10 @@ export const QuizStatistics: FC<QuizStatisticsProps> = ({ results }) => {
                 }}
                 labelStyle={{ color: '#3D4461', fontWeight: 'bold' }}
               />
-              {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
               <Legend
                 wrapperStyle={{ paddingTop: '20px' }}
                 iconType="line"
               />
-              {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
               <Line
                 type="monotone"
                 dataKey="Вазомоторные"
@@ -255,7 +245,6 @@ export const QuizStatistics: FC<QuizStatisticsProps> = ({ results }) => {
                 strokeWidth={2}
                 dot={{ fill: '#8B7FD6', r: 4 }}
               />
-              {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
               <Line
                 type="monotone"
                 dataKey="Психоэмоциональные"
@@ -263,7 +252,6 @@ export const QuizStatistics: FC<QuizStatisticsProps> = ({ results }) => {
                 strokeWidth={2}
                 dot={{ fill: '#7DD3E0', r: 4 }}
               />
-              {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
               <Line
                 type="monotone"
                 dataKey="Урогенитальные"
@@ -271,7 +259,6 @@ export const QuizStatistics: FC<QuizStatisticsProps> = ({ results }) => {
                 strokeWidth={2}
                 dot={{ fill: '#F5A623', r: 4 }}
               />
-              {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
               <Line
                 type="monotone"
                 dataKey="Соматические"
@@ -294,14 +281,10 @@ export const QuizStatistics: FC<QuizStatisticsProps> = ({ results }) => {
         <h3 className="text-h4 font-bold text-deep-navy mb-6">
           Последний результат по категориям
         </h3>
-        {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
         <ResponsiveContainer width="100%" height={300}>
-          {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
           <BarChart data={categoryData} layout="vertical">
             <CartesianGrid strokeDasharray="3 3" stroke="#E8E5F2" />
-            {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
             <XAxis type="number" domain={[0, 'dataMax']} stroke="#3D4461" fontSize={12} />
-            {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
             <YAxis
               dataKey="name"
               type="category"
@@ -317,11 +300,9 @@ export const QuizStatistics: FC<QuizStatisticsProps> = ({ results }) => {
               }}
               labelStyle={{ color: '#3D4461', fontWeight: 'bold' }}
             />
-            {/* @ts-expect-error - recharts has React 18 type compatibility issues */}
             <Bar dataKey="value" radius={[0, 8, 8, 0]}>
               {categoryData.map((entry, index) => (
-                // @ts-expect-error - recharts has React 18 type compatibility issues
-                <Bar key={index} fill={entry.color} />
+                <Cell key={index} fill={entry.color} />
               ))}
             </Bar>
           </BarChart>
