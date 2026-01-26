@@ -1,6 +1,7 @@
 'use client'
 
-import { FC, useState } from 'react'
+import { FC, useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, User, Lock, Loader2, AlertCircle, CheckCircle2, Copy, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -193,12 +194,14 @@ export const RegisterModal: FC<RegisterModalProps> = ({ isOpen, onClose, onSucce
     onClose()
   }
 
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
   if (!isOpen) return null
 
-  return (
+  const modalContent = (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-end md:items-end justify-center p-4 pb-8 md:pb-16 pointer-events-none">
-        {/* Backdrop */}
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -206,14 +209,12 @@ export const RegisterModal: FC<RegisterModalProps> = ({ isOpen, onClose, onSucce
           onClick={handleClose}
           className="absolute inset-0 bg-deep-navy/60 backdrop-blur-sm pointer-events-auto"
         />
-
-        {/* Modal */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
           onClick={(e) => e.stopPropagation()}
-          className="relative bg-white rounded-t-3xl md:rounded-3xl shadow-2xl max-w-md w-full max-h-[85vh] overflow-y-auto p-8 md:p-10 z-10 pointer-events-auto"
+          className="relative bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto p-8 md:p-10 z-10 pointer-events-auto"
         >
           {/* Close button */}
           <button
@@ -431,5 +432,7 @@ export const RegisterModal: FC<RegisterModalProps> = ({ isOpen, onClose, onSucce
       </div>
     </AnimatePresence>
   )
+
+  return mounted && typeof document !== 'undefined' ? createPortal(modalContent, document.body) : null
 }
 

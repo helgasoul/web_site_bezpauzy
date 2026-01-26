@@ -1,6 +1,7 @@
 'use client'
 
-import { FC, useState } from 'react'
+import { FC, useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, User, Lock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -16,6 +17,8 @@ export const AuthModal: FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const router = useRouter()
   const [showRegisterModal, setShowRegisterModal] = useState(false)
   const [showWebsiteLogin, setShowWebsiteLogin] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   const handleClose = () => {
     setShowRegisterModal(false)
@@ -23,14 +26,9 @@ export const AuthModal: FC<AuthModalProps> = ({ isOpen, onClose }) => {
     onClose()
   }
 
-  if (!isOpen) return null
-
-  return (
-    <>
+  const modalContent = isOpen && (
     <AnimatePresence>
-        {isOpen && (
-          <div key="auth-modal" className="fixed inset-0 z-50 flex items-end md:items-end justify-center p-4 pb-8 md:pb-16 pointer-events-none">
-        {/* Backdrop */}
+      <div key="auth-modal" className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -38,14 +36,12 @@ export const AuthModal: FC<AuthModalProps> = ({ isOpen, onClose }) => {
           onClick={handleClose}
           className="absolute inset-0 bg-deep-navy/60 backdrop-blur-sm pointer-events-auto"
         />
-
-        {/* Modal */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
           onClick={(e) => e.stopPropagation()}
-          className="relative bg-soft-white rounded-t-3xl md:rounded-3xl shadow-2xl max-w-md w-full p-8 md:p-10 z-10 pointer-events-auto"
+          className="relative bg-soft-white rounded-2xl md:rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto p-8 md:p-10 z-10 pointer-events-auto"
         >
           {/* Close button */}
           <button
@@ -86,10 +82,14 @@ export const AuthModal: FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 </button>
               </div>
             </div>
-            </motion.div>
-            </div>
-          )}
-      </AnimatePresence>
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  )
+
+  return (
+    <>
+      {mounted && typeof document !== 'undefined' && modalContent && createPortal(modalContent, document.body)}
       <RegisterModal
         isOpen={showRegisterModal}
         onClose={() => setShowRegisterModal(false)}
