@@ -40,7 +40,10 @@ yarn-error.log*
 next-env.d.ts
 
 # Large PDF files (too big for GitHub)
-litrature/**/*.pdf
+litrature/
 *.pdf
 !public/**/*.pdf
+
+# Large video/assets (GitHub limit 100 MB)
+public/welcome-video.mp4
 
