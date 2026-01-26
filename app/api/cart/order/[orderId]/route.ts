@@ -97,7 +97,7 @@ export async function GET(
             allOrders.push({
               type: 'resource',
               id: order.id,
-              title: order.menohub_resources?.title || 'Гайд',
+              title: (order.menohub_resources as { title?: string }[] | null)?.[0]?.title ?? 'Гайд',
               amount_kopecks: order.amount_kopecks,
               order_number: order.order_number || undefined,
             })
@@ -148,7 +148,7 @@ export async function GET(
         {
           type: 'resource',
           id: resourceOrder.id,
-          title: resourceOrder.menohub_resources?.title || 'Гайд',
+          title: (resourceOrder.menohub_resources as { title?: string }[] | null)?.[0]?.title ?? 'Гайд',
           amount_kopecks: resourceOrder.amount_kopecks,
           order_number: resourceOrder.order_number || undefined,
         },
@@ -196,7 +196,7 @@ export async function GET(
             allOrders.push({
               type: 'resource',
               id: order.id,
-              title: order.menohub_resources?.title || 'Гайд',
+              title: (order.menohub_resources as { title?: string }[] | null)?.[0]?.title ?? 'Гайд',
               amount_kopecks: order.amount_kopecks,
               order_number: order.order_number || undefined,
             })
