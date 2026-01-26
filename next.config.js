@@ -42,9 +42,9 @@ const nextConfig = {
     return []
   },
   
-  // Experimental features for better performance
+  // Experimental: optimizeCss requires 'critters' — off to keep Vercel build reliable
   experimental: {
-    optimizeCss: true, // Requires 'critters' package (now installed)
+    optimizeCss: false,
   },
   
   transpilePackages: ['@supabase/supabase-js'],
