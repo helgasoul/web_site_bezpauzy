@@ -124,8 +124,13 @@ export async function middleware(request: NextRequest) {
     const pathname = request.nextUrl.pathname
     const method = request.method
 
-    // Skip rate limiting for GET requests (except sensitive endpoints)
-    if (method === 'GET' && !pathname.includes('/auth/') && !pathname.includes('/quiz/get-results')) {
+    // Skip rate limiting for safe GET requests
+    // get-session вызывается очень часто и безопасен, поэтому исключаем его
+    if (
+      method === 'GET' &&
+      (pathname.includes('/auth/telegram/get-session') ||
+        (!pathname.includes('/auth/') && !pathname.includes('/quiz/get-results')))
+    ) {
       return response
     }
 

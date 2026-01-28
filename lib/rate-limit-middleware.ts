@@ -92,10 +92,10 @@ export function checkRateLimit(
  * Predefined rate limit configurations
  */
 export const RateLimitConfigs = {
-  // Strict limits for authentication endpoints
+  // Limits for authentication endpoints (исключая get-session)
   auth: {
     interval: 15 * 60 * 1000, // 15 minutes
-    limit: 5, // 5 requests per 15 minutes
+    limit: 20, // 20 requests per 15 minutes (увеличено с 5)
   },
   // Moderate limits for newsletter/community
   subscription: {
