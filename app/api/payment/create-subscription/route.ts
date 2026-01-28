@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from '@/lib/auth/session'
-import { createServiceRoleClient } from '@/lib/supabase/service-role-client'
+import { createServiceRoleClient } from '@/lib/supabase/server'
 
 const YOOKASSA_SHOP_ID = process.env.YOOKASSA_SHOP_ID
 const YOOKASSA_SECRET_KEY = process.env.YOOKASSA_SECRET_KEY
