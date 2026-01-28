@@ -67,6 +67,7 @@ export async function POST(req: NextRequest) {
         subscription_plan: plan_id,
         payment_status: 'paid',
         subscription_end_date: subscriptionEnd.toISOString(),
+        last_payment_date: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
       .eq('id', parseInt(user_id))
