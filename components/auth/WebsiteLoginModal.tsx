@@ -172,9 +172,8 @@ export const WebsiteLoginModal: FC<WebsiteLoginModalProps> = ({
   const modalContent = (
     <AnimatePresence>
       {/* Оверлей с overflow-y-auto: на мобильных форма остаётся в зоне видимости при клавиатуре */}
-      <div className="fixed inset-0 z-[110] overflow-y-auto overflow-x-hidden p-4 pointer-events-none">
-        <div className="min-h-full flex items-center justify-center py-6 pointer-events-none">
-          <div className="w-full max-w-md flex items-center justify-center pointer-events-none">
+      <div className="fixed inset-0 z-[110] flex items-start justify-center p-4 py-8 overflow-y-auto pointer-events-none">
+        <div className="w-full max-w-md my-auto pointer-events-none">
             {/* Backdrop — на всю область оверлея */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -309,7 +308,6 @@ export const WebsiteLoginModal: FC<WebsiteLoginModalProps> = ({
             </div>
           </div>
         </motion.div>
-          </div>
         </div>
       </div>
     </AnimatePresence>

@@ -108,7 +108,7 @@ export const TelegramLinkModal: FC<TelegramLinkModalProps> = ({ isOpen, onClose,
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 flex items-start justify-center p-4 py-8 overflow-y-auto">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -123,7 +123,7 @@ export const TelegramLinkModal: FC<TelegramLinkModalProps> = ({ isOpen, onClose,
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 md:p-10 z-10 max-h-[90vh] overflow-y-auto"
+          className="relative bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 md:p-10 z-10 my-auto"
         >
           {/* Close button */}
           <button

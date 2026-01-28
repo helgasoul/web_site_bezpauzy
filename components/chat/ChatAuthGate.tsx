@@ -95,12 +95,12 @@ export const ChatAuthGate: FC<ChatAuthGateProps> = ({ user, quizContext, article
   if (effectiveUser && (effectiveUser.telegramId === null || effectiveUser.telegramId === undefined || effectiveUser.telegramId === 0)) {
     return (
       <>
-        <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+        <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center overflow-y-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="max-w-md w-full space-y-6"
+            className="max-w-md w-full space-y-6 my-auto"
           >
             <div className="w-20 h-20 bg-gradient-to-br from-primary-purple to-ocean-wave-start rounded-full flex items-center justify-center mx-auto">
               <Bot className="w-10 h-10 text-white" />
@@ -167,12 +167,12 @@ export const ChatAuthGate: FC<ChatAuthGateProps> = ({ user, quizContext, article
   // Если пользователь авторизован, но нет подписки
   if (effectiveUser && effectiveUser.subscriptionStatus !== 'active') {
     return (
-      <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+      <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center overflow-y-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="max-w-md w-full space-y-6"
+          className="max-w-md w-full space-y-6 my-auto"
         >
           <div className="w-20 h-20 bg-gradient-to-br from-primary-purple to-ocean-wave-start rounded-full flex items-center justify-center mx-auto">
             <Lock className="w-10 h-10 text-white" />
@@ -228,7 +228,7 @@ export const ChatAuthGate: FC<ChatAuthGateProps> = ({ user, quizContext, article
   // Если пользователь не авторизован
   // Ева доступна только в личном кабинете, поэтому нужна регистрация на сайте
   return (
-    <div className="flex flex-col items-center justify-center min-h-full p-6 sm:p-8 text-center overflow-y-auto">
+    <div className="flex flex-col items-center justify-center min-h-screen p-6 sm:p-8 text-center overflow-y-auto">
       {isChecking ? (
         <div className="flex items-center justify-center">
           <div className="w-12 h-12 border-4 border-primary-purple border-t-transparent rounded-full animate-spin" />
@@ -238,7 +238,7 @@ export const ChatAuthGate: FC<ChatAuthGateProps> = ({ user, quizContext, article
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="max-w-md w-full space-y-6 py-6 sm:py-8 pb-10"
+          className="max-w-md w-full space-y-6 py-6 sm:py-8 pb-16 my-auto"
         >
           <div className="w-20 h-20 bg-gradient-to-br from-primary-purple to-ocean-wave-start rounded-full flex items-center justify-center mx-auto">
             <MessageCircle className="w-10 h-10 text-white" />
