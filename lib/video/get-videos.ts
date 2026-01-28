@@ -33,6 +33,13 @@ export interface VideoContent {
   // Eva explains fields
   topic?: string | null
   
+  // Doctors explain fields
+  doctorId?: number | null
+  doctorName?: string | null
+  doctorSpecialty?: string | null
+  doctorCredentials?: string | null
+  doctorAvatar?: string | null
+  
   // Video metadata
   videoUrl: string
   videoType: 'youtube' | 'vimeo' | 'direct' | 'telegram'
