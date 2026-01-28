@@ -157,6 +157,7 @@ export const Header: FC<HeaderProps> = () => {
         { label: 'Журнал', href: '/blog' },
         { label: 'noPause Подкаст', href: '/podcasts/nopause' },
         { label: 'Ева объясняет', href: '/videos/eva-explains' },
+        { label: 'Врачи объясняют', href: '/doctors-explain' },
         { label: 'Квизы', href: '/quiz' },
         { label: 'FAQ', href: '/faq' },
         { label: '---', href: '#', isDivider: true },
