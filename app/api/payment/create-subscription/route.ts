@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from '@/lib/auth/session'
+import { getSession } from '@/lib/auth/session'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 
 const YOOKASSA_SHOP_ID = process.env.YOOKASSA_SHOP_ID
@@ -14,7 +14,7 @@ interface CreateSubscriptionBody {
 export async function POST(req: NextRequest) {
   try {
     // Проверяем аутентификацию
-    const session = await getServerSession()
+    const session = await getSession()
     if (!session?.userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
