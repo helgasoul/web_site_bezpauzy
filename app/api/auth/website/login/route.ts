@@ -48,14 +48,6 @@ export async function POST(request: NextRequest) {
     const supabase = createServiceRoleClient()
     const loginOrEmail = username.toLowerCase().trim()
 
-    console.log('[Login] Attempting login:', { username: loginOrEmail })
-
-    // Сначала проверим, сколько вообще пользователей в таблице
-    const { count } = await supabase
-      .from('menohub_users')
-      .select('*', { count: 'exact', head: true })
-    console.log('[Login] Total users in table:', count)
-
     // Если введён адрес с @ — ищем по email, иначе по username (чтобы находить и по email, и по логину)
     const isEmail = loginOrEmail.includes('@')
 
@@ -63,32 +55,62 @@ export async function POST(request: NextRequest) {
     let userError = null
 
     if (isEmail) {
-      console.log('[Login] Searching by email:', loginOrEmail)
-      // Поиск по email (с учетом возможных различий в регистре)
+      // Поиск по email - используем точное совпадение, так как email уже в нижнем регистре
       const { data, error } = await supabase
         .from('menohub_users')
         .select('*')
-        .ilike('email', loginOrEmail) // ilike для case-insensitive поиска
+        .eq('email', loginOrEmail) // Точное совпадение, так как loginOrEmail уже в нижнем регистре
+        .not('email', 'is', null) // Исключаем записи с NULL email
         .maybeSingle()
-      user = data
-      userError = error
-      console.log('[Login] Email search result:', { found: !!data, error: error?.message })
+      
+      // Если не нашли, пробуем поиск без учета регистра через ilike (на случай, если в БД другой регистр)
+      if (!data && !error) {
+        const { data: dataIlike, error: errorIlike } = await supabase
+          .from('menohub_users')
+          .select('*')
+          .ilike('email', loginOrEmail)
+          .not('email', 'is', null)
+          .maybeSingle()
+        user = dataIlike
+        userError = errorIlike
+      } else {
+        user = data
+        userError = error
+      }
+      
+      // Если не нашли по email, пробуем поиск по username (на случай, если пользователь ввел email, но в БД только username)
+      if (!user && !userError) {
+        const { data: dataByUsername, error: errorByUsername } = await supabase
+          .from('menohub_users')
+          .select('*')
+          .eq('username', loginOrEmail)
+          .maybeSingle()
+        if (dataByUsername) {
+          user = dataByUsername
+          userError = errorByUsername
+        }
+      }
     } else {
-      console.log('[Login] Searching by username:', loginOrEmail)
-      // Поиск по username
+      // Поиск по username - используем точное совпадение, так как username уже в нижнем регистре
       const { data, error } = await supabase
         .from('menohub_users')
         .select('*')
-        .ilike('username', loginOrEmail) // ilike для case-insensitive поиска
+        .eq('username', loginOrEmail) // Точное совпадение, так как loginOrEmail уже в нижнем регистре
         .maybeSingle()
-      user = data
-      userError = error
-      console.log('[Login] Username search result:', {
-        found: !!data,
-        error: error?.message,
-        userId: data?.id,
-        hasPassword: !!data?.password_hash
-      })
+      
+      // Если не нашли, пробуем поиск без учета регистра через ilike (на случай, если в БД другой регистр)
+      if (!data && !error) {
+        const { data: dataIlike, error: errorIlike } = await supabase
+          .from('menohub_users')
+          .select('*')
+          .ilike('username', loginOrEmail)
+          .maybeSingle()
+        user = dataIlike
+        userError = errorIlike
+      } else {
+        user = data
+        userError = error
+      }
     }
 
     // Логируем для отладки (только в development)
