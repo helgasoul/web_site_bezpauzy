@@ -106,16 +106,24 @@ export function SubscribersTable({ subscribers, pagination, onPageChange, loadin
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     {subscriber.confirmed_at ? (
-                      <CheckCircle className="h-5 w-5 text-green-500 mx-auto" title={formatDate(subscriber.confirmed_at)} />
+                      <div title={formatDate(subscriber.confirmed_at)}>
+                        <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
+                      </div>
                     ) : (
-                      <XCircle className="h-5 w-5 text-gray-300 mx-auto" title="Не подтвержден" />
+                      <div title="Не подтвержден">
+                        <XCircle className="h-5 w-5 text-gray-300 mx-auto" />
+                      </div>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     {subscriber.welcome_email_sent ? (
-                      <CheckCircle className="h-5 w-5 text-green-500 mx-auto" title="Отправлено" />
+                      <div title="Отправлено">
+                        <CheckCircle className="h-5 w-5 text-green-500 mx-auto" />
+                      </div>
                     ) : (
-                      <XCircle className="h-5 w-5 text-gray-300 mx-auto" title="Не отправлено" />
+                      <div title="Не отправлено">
+                        <XCircle className="h-5 w-5 text-gray-300 mx-auto" />
+                      </div>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
