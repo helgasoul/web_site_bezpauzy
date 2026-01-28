@@ -7,3 +7,5 @@ export async function POST() {
 
   return NextResponse.json({ success: true })
 }
+
+export const dynamic = 'force-dynamic'
