@@ -41,15 +41,35 @@ export async function POST(req: NextRequest) {
 
     // Получаем данные пользователя
     const supabase = createServiceRoleClient()
+    
+    // Добавляем детальное логирование
+    console.log('[Payment] Looking for user with userId:', session.userId)
+    console.log('[Payment] Session data:', JSON.stringify(session))
+    
     const { data: user, error: userError } = await supabase
       .from('menohub_users')
-      .select('id, email, telegram_id')
+      .select('id, email, telegram_id, username')
       .eq('id', session.userId)
       .single()
 
+    console.log('[Payment] User query result:', { user, error: userError })
+
     if (userError || !user) {
-      console.error('❌ [Payment] User not found:', userError)
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+      console.error('❌ [Payment] User not found:', {
+        userId: session.userId,
+        error: userError,
+        errorMessage: userError?.message,
+        errorDetails: userError?.details
+      })
+      return NextResponse.json({ 
+        error: 'User not found', 
+        details: process.env.NODE_ENV === 'development' ? {
+          userId: session.userId,
+          errorMessage: userError?.message
+        } : undefined
+      }, { status: 404 })
+    }
+
     }
 
     // Создаём уникальный идемпотентный ключ для предотвращения дублирующих платежей
