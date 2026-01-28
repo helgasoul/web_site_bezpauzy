@@ -331,6 +331,15 @@ export const RegisterModal: FC<RegisterModalProps> = ({ isOpen, onClose, onSucce
                 <p className="text-xs text-deep-navy/60 text-center mt-4">
                   Нажимая кнопку &quot;Зарегистрироваться&quot;, вы соглашаетесь с{' '}
                   <a
+                    href="/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary-purple hover:underline"
+                  >
+                    условиями использования
+                  </a>
+                  {' '}и{' '}
+                  <a
                     href="/privacy"
                     target="_blank"
                     rel="noopener noreferrer"

@@ -70,8 +70,6 @@ export async function POST(req: NextRequest) {
       }, { status: 404 })
     }
 
-    }
-
     // Создаём уникальный идемпотентный ключ для предотвращения дублирующих платежей
     const idempotenceKey = crypto.randomUUID()
 

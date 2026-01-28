@@ -53,6 +53,16 @@ const plans: SubscriptionPlan[] = [
     ],
   },
 ]
+
+export default function SubscribePage() {
+  const router = useRouter()
+  const [selectedPlan, setSelectedPlan] = useState<string>('annual')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [checkingAuth, setCheckingAuth] = useState(true)
+
+  useEffect(() => {
     checkAuth()
   }, [])
 

@@ -170,6 +170,16 @@ export const TelegramLinkModal: FC<TelegramLinkModalProps> = ({ isOpen, onClose,
                     </Link>
                     {' '}и согласен с{' '}
                     <Link
+                      href="/terms"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary-purple hover:text-ocean-wave-start underline font-medium"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      условиями использования
+                    </Link>
+                    {' '}и{' '}
+                    <Link
                       href="/privacy"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -181,15 +191,26 @@ export const TelegramLinkModal: FC<TelegramLinkModalProps> = ({ isOpen, onClose,
                   </label>
                 </div>
                 
-                <Link
-                  href="/privacy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm text-primary-purple hover:text-ocean-wave-start transition-colors"
-                >
-                  <FileText className="w-4 h-4" />
-                  <span>Ознакомиться с политикой конфиденциальности</span>
-                </Link>
+                <div className="flex flex-col gap-2">
+                  <Link
+                    href="/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm text-primary-purple hover:text-ocean-wave-start transition-colors"
+                  >
+                    <FileText className="w-4 h-4" />
+                    <span>Ознакомиться с условиями использования</span>
+                  </Link>
+                  <Link
+                    href="/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm text-primary-purple hover:text-ocean-wave-start transition-colors"
+                  >
+                    <FileText className="w-4 h-4" />
+                    <span>Ознакомиться с политикой конфиденциальности</span>
+                  </Link>
+                </div>
               </div>
 
               {error && (
