@@ -41,31 +41,46 @@ export async function POST(req: NextRequest) {
 
     // Получаем данные пользователя
     const supabase = createServiceRoleClient()
-    
+
     // Добавляем детальное логирование
     console.log('[Payment] Looking for user with userId:', session.userId)
+    console.log('[Payment] userId type:', typeof session.userId)
     console.log('[Payment] Session data:', JSON.stringify(session))
-    
+
+    // Преобразуем userId в число явно на случай, если он пришел как строка
+    const userIdNumber = typeof session.userId === 'string' ? parseInt(session.userId, 10) : session.userId
+    console.log('[Payment] userId after conversion:', userIdNumber, 'type:', typeof userIdNumber)
+
+    // Сначала проверим, есть ли вообще записи в таблице
+    const { count } = await supabase
+      .from('menohub_users')
+      .select('*', { count: 'exact', head: true })
+    console.log('[Payment] Total users in table:', count)
+
     const { data: user, error: userError } = await supabase
       .from('menohub_users')
       .select('id, email, telegram_id, username')
-      .eq('id', session.userId)
+      .eq('id', userIdNumber)
       .single()
 
     console.log('[Payment] User query result:', { user, error: userError })
 
     if (userError || !user) {
       console.error('❌ [Payment] User not found:', {
-        userId: session.userId,
+        originalUserId: session.userId,
+        userIdNumber: userIdNumber,
         error: userError,
         errorMessage: userError?.message,
-        errorDetails: userError?.details
+        errorDetails: userError?.details,
+        errorCode: userError?.code
       })
-      return NextResponse.json({ 
-        error: 'User not found', 
+      return NextResponse.json({
+        error: 'User not found',
         details: process.env.NODE_ENV === 'development' ? {
           userId: session.userId,
-          errorMessage: userError?.message
+          userIdNumber: userIdNumber,
+          errorMessage: userError?.message,
+          errorCode: userError?.code
         } : undefined
       }, { status: 404 })
     }
