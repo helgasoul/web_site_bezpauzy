@@ -5,9 +5,9 @@ import { createServiceRoleClient } from '@/lib/supabase/server'
 // GET /api/admin/subscribers - List subscribers with pagination and filters
 export async function GET(request: NextRequest) {
   try {
-    const { admin, error } = await requireAdmin(request)
-    if (!admin || error) {
-      return NextResponse.json({ error: error || 'Unauthorized' }, { status: 401 })
+    const { admin, error: authError } = await requireAdmin(request)
+    if (!admin || authError) {
+      return NextResponse.json({ error: authError || 'Unauthorized' }, { status: 401 })
     }
 
     if (admin.role !== 'super_admin' && admin.role !== 'support_manager' && admin.role !== 'content_manager') {
@@ -53,10 +53,10 @@ export async function GET(request: NextRequest) {
     // Пагинация
     query = query.range(offset, offset + limit - 1)
 
-    const { data, error, count } = await query
+    const { data, error: queryError, count } = await query
 
-    if (error) {
-      console.error('❌ [Admin Subscribers] Query error:', error)
+    if (queryError) {
+      console.error('❌ [Admin Subscribers] Query error:', queryError)
       return NextResponse.json(
         { error: 'Failed to fetch subscribers' },
         { status: 500 }

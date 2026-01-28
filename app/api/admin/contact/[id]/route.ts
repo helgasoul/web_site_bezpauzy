@@ -8,9 +8,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { admin, error } = await requireAdmin(request)
-    if (!admin || error) {
-      return NextResponse.json({ error: error || 'Unauthorized' }, { status: 401 })
+    const { admin, error: authError } = await requireAdmin(request)
+    if (!admin || authError) {
+      return NextResponse.json({ error: authError || 'Unauthorized' }, { status: 401 })
     }
 
     if (admin.role !== 'super_admin' && admin.role !== 'support_manager') {
@@ -19,14 +19,14 @@ export async function GET(
 
     const supabase = createServiceRoleClient()
 
-    const { data: submission, error } = await supabase
+    const { data: submission, error: queryError } = await supabase
       .from('menohub_support_requests')
       .select('*')
       .eq('id', params.id)
       .single()
 
-    if (error) {
-      console.error('❌ [Admin Contact] Query error:', error)
+    if (queryError) {
+      console.error('❌ [Admin Contact] Query error:', queryError)
       return NextResponse.json(
         { error: 'Support request not found' },
         { status: 404 }
@@ -49,9 +49,9 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { admin, error } = await requireAdmin(request)
-    if (!admin || error) {
-      return NextResponse.json({ error: error || 'Unauthorized' }, { status: 401 })
+    const { admin, error: authError } = await requireAdmin(request)
+    if (!admin || authError) {
+      return NextResponse.json({ error: authError || 'Unauthorized' }, { status: 401 })
     }
 
     if (admin.role !== 'super_admin' && admin.role !== 'support_manager') {
@@ -127,9 +127,9 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { admin, error } = await requireAdmin(request)
-    if (!admin || error) {
-      return NextResponse.json({ error: error || 'Unauthorized' }, { status: 401 })
+    const { admin, error: authError } = await requireAdmin(request)
+    if (!admin || authError) {
+      return NextResponse.json({ error: authError || 'Unauthorized' }, { status: 401 })
     }
 
     if (admin.role !== 'super_admin') {
@@ -138,13 +138,13 @@ export async function DELETE(
 
     const supabase = createServiceRoleClient()
 
-    const { error } = await supabase
+    const { error: deleteError } = await supabase
       .from('menohub_support_requests')
       .delete()
       .eq('id', params.id)
 
-    if (error) {
-      console.error('❌ [Admin Contact] Delete error:', error)
+    if (deleteError) {
+      console.error('❌ [Admin Contact] Delete error:', deleteError)
       return NextResponse.json(
         { error: 'Failed to delete support request' },
         { status: 500 }
