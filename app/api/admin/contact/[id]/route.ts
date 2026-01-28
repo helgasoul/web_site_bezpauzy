@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/admin/auth'
-import { createServiceRoleClient } from '@/lib/supabase/service-role-client'
+import { requireAdmin } from '@/lib/admin/middleware'
+import { createServiceRoleClient } from '@/lib/supabase/server'
 
 // GET /api/admin/contact/[id] - Get support request details
 export async function GET(
@@ -8,7 +8,14 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    await requireAdmin(request, ['super_admin', 'support_manager'])
+    const { admin, error } = await requireAdmin(request)
+    if (!admin || error) {
+      return NextResponse.json({ error: error || 'Unauthorized' }, { status: 401 })
+    }
+
+    if (admin.role !== 'super_admin' && admin.role !== 'support_manager') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
 
     const supabase = createServiceRoleClient()
 
@@ -27,17 +34,8 @@ export async function GET(
     }
 
     return NextResponse.json({ submission })
-  } catch (error: any) {
+  } catch (error) {
     console.error('❌ [Admin Contact] Error:', error)
-
-    if (error.message === 'Unauthorized') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    if (error.message === 'Forbidden') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
-
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -51,7 +49,14 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    await requireAdmin(request, ['super_admin', 'support_manager'])
+    const { admin, error } = await requireAdmin(request)
+    if (!admin || error) {
+      return NextResponse.json({ error: error || 'Unauthorized' }, { status: 401 })
+    }
+
+    if (admin.role !== 'super_admin' && admin.role !== 'support_manager') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
 
     const body = await request.json()
     const { status } = body
@@ -107,17 +112,8 @@ export async function PATCH(
       success: true,
       submission: updatedSubmission,
     })
-  } catch (error: any) {
+  } catch (error) {
     console.error('❌ [Admin Contact] Error:', error)
-
-    if (error.message === 'Unauthorized') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    if (error.message === 'Forbidden') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
-
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -131,7 +127,14 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    await requireAdmin(request, ['super_admin'])
+    const { admin, error } = await requireAdmin(request)
+    if (!admin || error) {
+      return NextResponse.json({ error: error || 'Unauthorized' }, { status: 401 })
+    }
+
+    if (admin.role !== 'super_admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
 
     const supabase = createServiceRoleClient()
 
@@ -149,17 +152,8 @@ export async function DELETE(
     }
 
     return NextResponse.json({ success: true })
-  } catch (error: any) {
+  } catch (error) {
     console.error('❌ [Admin Contact] Error:', error)
-
-    if (error.message === 'Unauthorized') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    if (error.message === 'Forbidden') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
-
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

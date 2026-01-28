@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/admin/auth'
-import { createServiceRoleClient } from '@/lib/supabase/service-role-client'
+import { requireAdmin } from '@/lib/admin/middleware'
+import { createServiceRoleClient } from '@/lib/supabase/server'
 
 // GET /api/admin/subscribers - List subscribers with pagination and filters
 export async function GET(request: NextRequest) {
   try {
-    // Требуем авторизацию: super_admin, support_manager
-    await requireAdmin(request, ['super_admin', 'support_manager'])
+    const { admin, error } = await requireAdmin(request)
+    if (!admin || error) {
+      return NextResponse.json({ error: error || 'Unauthorized' }, { status: 401 })
+    }
+
+    if (admin.role !== 'super_admin' && admin.role !== 'support_manager' && admin.role !== 'content_manager') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
 
     const searchParams = request.nextUrl.searchParams
     const page = parseInt(searchParams.get('page') || '1')
@@ -66,17 +72,8 @@ export async function GET(request: NextRequest) {
         totalPages: Math.ceil((count || 0) / limit),
       },
     })
-  } catch (error: any) {
+  } catch (error) {
     console.error('❌ [Admin Subscribers] Error:', error)
-
-    if (error.message === 'Unauthorized') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    if (error.message === 'Forbidden') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
-
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
