@@ -59,6 +59,71 @@ export const AskEvaWidget: FC<AskEvaWidgetProps> = ({ articleTitle, articleSlug 
     }
   }, [])
 
+  // Защита от смещения виджета наверх - проверяем и фиксируем позицию
+  useEffect(() => {
+    if (typeof window === 'undefined' || !isVisible) return
+
+    const MIN_TOP = 96 // Минимальная позиция от верха (top-24 = 96px)
+    
+    const fixWidgetPosition = () => {
+      const widget = document.querySelector('[data-eva-widget]') as HTMLElement
+      if (!widget) return
+
+      // Принудительно устанавливаем правильную позицию с !important через setProperty
+      widget.style.setProperty('position', 'fixed', 'important')
+      widget.style.setProperty('top', `${MIN_TOP}px`, 'important')
+      widget.style.setProperty('right', '24px', 'important') // right-6 = 24px
+      widget.style.setProperty('z-index', '40', 'important')
+      widget.style.setProperty('transform', 'none', 'important')
+      
+      // Дополнительная проверка через getBoundingClientRect
+      const rect = widget.getBoundingClientRect()
+      if (rect.top < MIN_TOP) {
+        widget.style.setProperty('top', `${MIN_TOP}px`, 'important')
+      }
+    }
+
+    // Проверяем позицию сразу при монтировании
+    fixWidgetPosition()
+    
+    // Проверяем позицию периодически (каждые 500ms) для дополнительной защиты
+    const intervalId = setInterval(fixWidgetPosition, 500)
+    
+    // Проверяем позицию при скролле и ресайзе
+    window.addEventListener('scroll', fixWidgetPosition, { passive: true })
+    window.addEventListener('resize', fixWidgetPosition)
+    
+    // Проверяем позицию при открытии/закрытии модалок
+    const observer = new MutationObserver(() => {
+      // Небольшая задержка, чтобы дать время DOM обновиться
+      setTimeout(fixWidgetPosition, 10)
+    })
+    observer.observe(document.body, { 
+      attributes: true, 
+      attributeFilter: ['style', 'class'],
+      childList: true,
+      subtree: true
+    })
+
+    // Проверяем позицию при изменении состояния модалок
+    const checkOnModalChange = () => {
+      setTimeout(fixWidgetPosition, 50)
+    }
+    
+    // Слушаем события открытия/закрытия модалок
+    window.addEventListener('focus', checkOnModalChange)
+    window.addEventListener('blur', checkOnModalChange)
+
+    return () => {
+      clearInterval(intervalId)
+      window.removeEventListener('scroll', fixWidgetPosition)
+      window.removeEventListener('resize', fixWidgetPosition)
+      window.removeEventListener('focus', checkOnModalChange)
+      window.removeEventListener('blur', checkOnModalChange)
+      observer.disconnect()
+    }
+  }, [isVisible, showRegisterModal, showWebsiteLogin, showTelegramLink])
+
   const checkAuth = async () => {
     try {
       const response = await fetch('/api/auth/telegram/get-session')
@@ -105,7 +170,15 @@ export const AskEvaWidget: FC<AskEvaWidgetProps> = ({ articleTitle, articleSlug 
           <>
             {/* Desktop: Round sticky sidebar widget with photo */}
             <motion.div
-              className="hidden lg:block fixed right-6 top-24 z-40"
+              data-eva-widget
+              className="hidden lg:block fixed right-6 z-40"
+              style={{ 
+                top: '96px',
+                position: 'fixed',
+                right: '24px',
+                willChange: 'transform',
+                maxHeight: 'calc(100vh - 96px)'
+              }}
               initial={{ opacity: 0, x: 100 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 100 }}
