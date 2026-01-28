@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, CheckCircle2, MessageCircle, BookOpen, Video, Users, ExternalLink, Sparkles, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 
+const TELEGRAM_COMMUNITY_LINK = process.env.NEXT_PUBLIC_TELEGRAM_COMMUNITY_LINK || 'https://t.me/bezpauzy_community'
+
 interface CommunityMemberModalProps {
   isOpen: boolean
   onClose: () => void
@@ -75,7 +77,7 @@ export const CommunityMemberModal: FC<CommunityMemberModalProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Telegram Group */}
                 <Link
-                  href="https://t.me/bezpauzy_community"
+                  href={TELEGRAM_COMMUNITY_LINK}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group p-6 bg-gradient-to-br from-primary-purple/5 to-ocean-wave-start/5 rounded-card border border-primary-purple/10 hover:border-primary-purple/30 hover:shadow-md transition-all"

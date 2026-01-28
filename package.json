@@ -21,10 +21,16 @@
     "perf:check": "node scripts/check-bundle-size.js",
     "perf:quick": "node scripts/quick-bundle-check.js",
     "perf:bundle": "ANALYZE=true npm run build",
-    "perf:lighthouse": "echo 'Запустите Lighthouse в Chrome DevTools или используйте: lighthouse https://bezpauzy.com --view'"
+    "perf:lighthouse": "echo 'Запустите Lighthouse в Chrome DevTools или используйте: lighthouse https://bezpauzy.com --view'",
+    "vector:check": "node scripts/check-vector-store.js",
+    "vector:generate": "node scripts/generate-embeddings.js",
+    "admin:create": "node scripts/create-super-admin.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.0",
+    "@langchain/community": "^0.3.59",
+    "@langchain/core": "^0.3.80",
+    "@langchain/openai": "^0.3.17",
     "@react-email/render": "^2.0.0",
     "@react-pdf/renderer": "^4.3.1",
     "@supabase/supabase-js": "^2.39.0",
@@ -33,6 +39,7 @@
     "adm-zip": "^0.5.16",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.0.0",
+    "dotenv": "^16.3.1",
     "fast-xml-parser": "^4.3.2",
     "framer-motion": "^10.16.0",
     "isomorphic-dompurify": "^2.9.0",
@@ -42,12 +49,13 @@
     "lucide-react": "^0.294.0",
     "mammoth": "^1.11.0",
     "next": "^14.0.0",
+    "openai": "^4.104.0",
     "pdf-parse": "^1.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.48.0",
     "react-markdown": "^9.0.1",
-    "recharts": "^2.10.0",
+    "recharts": "^2.15.4",
     "resend": "^6.6.0",
     "tailwind-merge": "^2.0.0",
     "zod": "^3.22.0",
@@ -67,5 +75,10 @@
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.5",
     "typescript": "^5.2.2"
+  },
+  "overrides": {
+    "@next/eslint-plugin-next": {
+      "glob": "^10.4.5"
+    }
   }
 }

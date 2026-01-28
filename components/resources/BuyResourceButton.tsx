@@ -5,6 +5,7 @@ import { Check, ShoppingCart } from 'lucide-react'
 import { AddToCartButton } from '@/components/cart/AddToCartButton'
 import { CartConfirmationModal } from '@/components/cart/CartConfirmationModal'
 import { useCartStore } from '@/lib/stores/cart-store'
+import { formatPrice } from '@/lib/utils/format'
 import type { Resource } from '@/lib/supabase/resources'
 
 interface BuyResourceButtonProps {
@@ -68,7 +69,7 @@ export const BuyResourceButton: FC<BuyResourceButtonProps> = ({
           ) : (
             <>
               <ShoppingCart className="w-4 h-4" />
-              Добавить в корзину
+              Добавить в корзину — {formatPrice(price)}
             </>
           )}
         </button>

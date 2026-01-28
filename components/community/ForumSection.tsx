@@ -34,6 +34,9 @@ interface Topic {
 
 const COMMUNITY_EMAIL_KEY = 'bezpauzy_community_email'
 
+/** Ссылка на Telegram-группу. Для приватной группы задайте NEXT_PUBLIC_TELEGRAM_COMMUNITY_LINK с инвайт-ссылкой (Edit group → Invite links). */
+const TELEGRAM_COMMUNITY_LINK = process.env.NEXT_PUBLIC_TELEGRAM_COMMUNITY_LINK || 'https://t.me/bezpauzy_community'
+
 export const ForumSection: FC = () => {
   const [categories, setCategories] = useState<Category[]>([])
   const [topics, setTopics] = useState<Topic[]>([])
@@ -270,7 +273,7 @@ export const ForumSection: FC = () => {
                 Вы можете общаться как здесь на сайте, так и в нашей Telegram-группе. Выбирайте удобный для вас формат!
               </p>
               <a
-                href="https://t.me/bezpauzy_community"
+                href={TELEGRAM_COMMUNITY_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-primary-purple text-white rounded-full font-semibold hover:shadow-md hover:scale-105 transition-all duration-300"

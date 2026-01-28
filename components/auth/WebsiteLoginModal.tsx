@@ -78,7 +78,7 @@ export const WebsiteLoginModal: FC<WebsiteLoginModalProps> = ({
       if (!response.ok) {
         // Если пользователь не найден, предлагаем зарегистрироваться
         if (data.error?.includes('Неверный логин') || data.error?.includes('не найден')) {
-          setError('Пользователь с таким логином не найден. Хотите зарегистрироваться?')
+          setError('Пользователь с таким логином или email не найден. Хотите зарегистрироваться?')
         } else {
           throw new Error(data.error || 'Ошибка при входе')
         }
@@ -212,14 +212,14 @@ export const WebsiteLoginModal: FC<WebsiteLoginModalProps> = ({
             Вход на сайт
           </h2>
           <p className="text-body text-deep-navy/70 mb-6 text-center">
-            Введите ваш логин и пароль
+            Введите логин или email и пароль
           </p>
 
           {/* Form */}
           <div className="space-y-4">
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-deep-navy mb-2">
-                Логин
+                Логин или email
               </label>
               <input
                 id="username"
@@ -230,7 +230,7 @@ export const WebsiteLoginModal: FC<WebsiteLoginModalProps> = ({
                   setError(null)
                 }}
                 onKeyPress={handleKeyPress}
-                placeholder="Ваш логин"
+                placeholder="Логин или email"
                 className="w-full px-4 py-3 bg-white border-2 border-lavender-bg rounded-xl focus:outline-none focus:border-primary-purple transition-colors text-deep-navy placeholder:text-deep-navy/50"
                 autoFocus
                 disabled={loading}

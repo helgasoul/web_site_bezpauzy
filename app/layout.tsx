@@ -1,12 +1,9 @@
 import type { Metadata } from 'next'
 import { Inter, Montserrat } from 'next/font/google'
 import './globals.css'
-import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
 import { WebVitalsReporter } from '@/components/performance/WebVitalsReporter'
-import { CookieConsent } from '@/components/cookies/CookieConsent'
-import { SupportButton } from '@/components/support/SupportButton'
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
+import { ConditionalLayout } from '@/components/layout/ConditionalLayout'
 
 const inter = Inter({ 
   subsets: ['latin', 'cyrillic'],
@@ -64,13 +61,7 @@ export default function RootLayout({
       <body className="font-inter antialiased">
         <ErrorBoundary>
           <WebVitalsReporter />
-          <Header />
-          <main className="min-h-screen bg-gradient-to-b from-soft-white to-white">
-            {children}
-          </main>
-          <Footer />
-          <CookieConsent />
-          <SupportButton />
+          <ConditionalLayout>{children}</ConditionalLayout>
         </ErrorBoundary>
       </body>
     </html>

@@ -1,4 +1,4 @@
-export type VideoContentType = 'podcast' | 'eva_explains'
+export type VideoContentType = 'podcast' | 'eva_explains' | 'doctors_explain'
 export type VideoType = 'youtube' | 'mave' | 'supabase' | 'vimeo' | 'direct' | 'telegram'
 export type VideoAccessLevel = 'free' | 'paid1' | 'paid2'
 
@@ -61,6 +61,13 @@ export interface VideoContent {
 
   // Eva explains specific fields
   topic?: string | null
+
+  // Doctors explain specific fields
+  doctor_id?: number | null
+  doctor_name?: string | null
+  doctor_specialty?: string | null
+  doctor_credentials?: string | null
+  doctor_avatar?: string | null
 }
 
 export interface PodcastEpisode extends VideoContent {
@@ -73,6 +80,13 @@ export interface EvaExplainsVideo extends VideoContent {
   video_type: 'supabase'
   storage_bucket: string
   storage_path: string
+}
+
+export interface DoctorsExplainVideo extends VideoContent {
+  content_type: 'doctors_explain'
+  video_type: 'youtube' | 'mave' | 'vimeo'
+  doctor_name: string
+  doctor_specialty: string
 }
 
 export interface VideoContentFilters {

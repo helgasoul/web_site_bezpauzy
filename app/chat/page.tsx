@@ -122,21 +122,23 @@ export default async function ChatPage({ searchParams }: ChatPageProps) {
                 articleSlug={searchParams.article}
               />
             ) : (
-              <ChatAuthGate 
-                user={user ? {
-                  id: user.id,
-                  telegramId: user.telegramId,
-                  email: user.email,
-                  subscriptionStatus: user.subscriptionStatus,
-                  subscriptionPlan: user.subscriptionPlan,
-                } : null}
-                quizContext={searchParams.quiz ? {
-                  quizType: searchParams.quiz as 'inflammation' | 'mrs',
-                  level: searchParams.level,
-                  score: searchParams.score ? parseInt(searchParams.score) : undefined
-                } : undefined}
-                articleSlug={searchParams.article}
-              />
+              <div className="h-full overflow-y-auto">
+                <ChatAuthGate 
+                  user={user ? {
+                    id: user.id,
+                    telegramId: user.telegramId,
+                    email: user.email,
+                    subscriptionStatus: user.subscriptionStatus,
+                    subscriptionPlan: user.subscriptionPlan,
+                  } : null}
+                  quizContext={searchParams.quiz ? {
+                    quizType: searchParams.quiz as 'inflammation' | 'mrs',
+                    level: searchParams.level,
+                    score: searchParams.score ? parseInt(searchParams.score) : undefined
+                  } : undefined}
+                  articleSlug={searchParams.article}
+                />
+              </div>
             )}
           </div>
         </div>

@@ -8,6 +8,11 @@ import { assetUrl } from '@/lib/assets'
 
 interface BotIntroVideoProps {}
 
+const VIDEO_SRC =
+  typeof process.env.NEXT_PUBLIC_WELCOME_VIDEO_URL === 'string' && process.env.NEXT_PUBLIC_WELCOME_VIDEO_URL.startsWith('http')
+    ? process.env.NEXT_PUBLIC_WELCOME_VIDEO_URL
+    : '/api/video/welcome-video'
+
 export const BotIntroVideo: FC<BotIntroVideoProps> = () => {
   const [isMuted, setIsMuted] = useState(false)
   const [volume, setVolume] = useState(1) // 0 to 1
@@ -211,7 +216,7 @@ export const BotIntroVideo: FC<BotIntroVideoProps> = () => {
             <div className="relative w-80 h-80 md:w-96 md:h-96 lg:w-[500px] lg:h-[500px] rounded-full overflow-hidden shadow-strong bg-gradient-to-br from-primary-purple/20 to-ocean-wave-start/20 border-4 border-white">
               <video
                 ref={videoRef}
-                src="/api/video/welcome-video"
+                src={VIDEO_SRC}
                 preload="metadata"
                 className={`w-full h-full object-cover transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
                 loop
@@ -236,7 +241,11 @@ export const BotIntroVideo: FC<BotIntroVideoProps> = () => {
                     
                     // Устанавливаем сообщение об ошибке
                     if (video.error.code === 4) {
-                      setVideoError('Файл видео не найден. Добавьте welcome-video.mp4 в public/ или укажите WELCOME_VIDEO_URL в настройках (URL из Supabase Storage).')
+                      setVideoError(
+                        VIDEO_SRC.startsWith('http')
+                          ? `Видео по ссылке недоступно. Проверьте NEXT_PUBLIC_WELCOME_VIDEO_URL и что файл открывается в браузере.`
+                          : 'Файл видео не найден. Задайте NEXT_PUBLIC_WELCOME_VIDEO_URL (или WELCOME_VIDEO_URL) в настройках — URL файла в Supabase Storage. На проде (Vercel) добавьте переменную в Environment Variables.'
+                      )
                     } else {
                       setVideoError(`Ошибка загрузки видео: код ${video.error.code}`)
                     }
@@ -251,7 +260,7 @@ export const BotIntroVideo: FC<BotIntroVideoProps> = () => {
                     <p className="font-semibold mb-2">Ошибка загрузки видео</p>
                     <p className="text-xs">{videoError}</p>
                     <p className="text-xs mt-2 text-red-500">
-                      Либо загрузите welcome-video.mp4 в public/, либо задайте WELCOME_VIDEO_URL (URL в Supabase Storage).
+                      Задайте NEXT_PUBLIC_WELCOME_VIDEO_URL в .env.local и на Vercel — полный URL файла в Storage (тот же, что открывается в браузере).
                     </p>
                   </div>
                 </div>

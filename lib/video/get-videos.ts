@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 
-export type VideoContentType = 'podcast' | 'eva_explains'
+export type VideoContentType = 'podcast' | 'eva_explains' | 'doctors_explain'
 export type VideoAccessLevel = 'free' | 'paid1' | 'paid2'
 export type VideoCategory = 
   | 'menopause' 
@@ -124,15 +124,15 @@ export async function getPublishedVideos(
  */
 export async function getVideoBySlug(slug: string): Promise<VideoContent | null> {
   const supabase = await createClient()
-  
+
   const { data, error } = await supabase
-    .from('video_content')
+    .from('menohub_video_content')
     .select('*')
     .eq('slug', slug)
     .eq('published', true)
     .lte('published_at', new Date().toISOString())
     .single()
-  
+
   if (error) {
     if (error.code === 'PGRST116') {
       return null
@@ -140,7 +140,7 @@ export async function getVideoBySlug(slug: string): Promise<VideoContent | null>
     console.error('Error fetching video by slug:', error)
     return null
   }
-  
+
   return transformVideoData(data) as VideoContent
 }
 
@@ -163,9 +163,9 @@ export async function getRelatedVideos(
   limit: number = 3
 ): Promise<VideoContent[]> {
   const supabase = await createClient()
-  
+
   const { data, error } = await supabase
-    .from('video_content')
+    .from('menohub_video_content')
     .select('*')
     .eq('published', true)
     .eq('category', category)
@@ -173,12 +173,12 @@ export async function getRelatedVideos(
     .lte('published_at', new Date().toISOString())
     .order('published_at', { ascending: false })
     .limit(limit)
-  
+
   if (error) {
     console.error('Error fetching related videos:', error)
     return []
   }
-  
+
   return (data || []).map(transformVideoData) as VideoContent[]
 }
 
@@ -199,11 +199,16 @@ function transformVideoData(row: any): Partial<VideoContent> {
     guestExpertAvatar: row.guest_expert_avatar,
     hostName: row.host_name,
     topic: row.topic,
+    doctorId: row.doctor_id,
+    doctorName: row.doctor_name,
+    doctorSpecialty: row.doctor_specialty,
+    doctorCredentials: row.doctor_credentials,
+    doctorAvatar: row.doctor_avatar,
     videoUrl: row.video_url,
     videoType: row.video_type,
     videoId: row.video_id,
     thumbnailUrl: row.thumbnail_url,
-    duration: row.duration,
+    duration: row.duration || 0,
     category: row.category,
     categoryName: row.category_name,
     metaTitle: row.meta_title,
@@ -214,7 +219,7 @@ function transformVideoData(row: any): Partial<VideoContent> {
     publishedAt: row.published_at,
     viewsCount: row.views_count || 0,
     likesCount: row.likes_count || 0,
-    tags: row.tags,
+    tags: row.tags || [],
     transcript: row.transcript,
     timestamps: row.timestamps,
     relatedArticles: row.related_articles,

@@ -15,10 +15,14 @@ const sendMessageSchema = z.object({
  * 
  * Flow:
  * 1. Получаем сообщение от пользователя
- * 2. Сохраняем запрос в menohub_queries
- * 3. Отправляем запрос в n8n webhook или напрямую в Telegram Bot API
- * 4. Получаем ответ и сохраняем в menohub_queries
- * 5. Возвращаем ответ пользователю
+ * 2. Сохраняем запрос в menohub_queries с source='website'
+ * 3. Обрабатываем через единый обработчик (processMessage)
+ * 4. Генерируем ответ через Claude API с RAG контекстом
+ * 5. Сохраняем ответ в menohub_queries
+ * 6. Возвращаем ответ пользователю
+ * 
+ * Синхронизация: Все сообщения сохраняются в единую таблицу menohub_queries,
+ * что позволяет видеть историю и в Telegram, и на сайте.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -99,6 +103,7 @@ export async function POST(request: NextRequest) {
         query_text: sanitizedMessage,
         query_status: 'processing',
         response_text: 'processing',
+        source: 'website', // Указываем источник для синхронизации
       })
       .select()
       .single()
@@ -111,70 +116,50 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Отправляем запрос в n8n webhook или Telegram Bot API
-    // Вариант 1: Через n8n webhook (если настроен и есть telegram_id)
-    const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL
-
-    if (n8nWebhookUrl && user.telegram_id) {
-      try {
-        const webhookResponse = await fetch(n8nWebhookUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            message: sanitizedMessage,
-            telegram_id: user.telegram_id,
-            user_id: user.id,
-            query_id: queryRecord.id,
-            source: 'website',
-          }),
-        })
-
-        if (webhookResponse.ok) {
-          const webhookData = await webhookResponse.json()
-          
-          // Обновляем запрос с ответом
-          await supabase
-            .from('menohub_queries')
-            .update({
-              query_status: 'completed',
-              response_text: webhookData.response || webhookData.message || 'Ответ получен',
-            })
-            .eq('id', queryRecord.id)
-
-          return NextResponse.json({
-            success: true,
-            response: webhookData.response || webhookData.message || 'Ответ получен',
-            messageId: queryRecord.id,
-          })
-        }
-      } catch (webhookError) {
-        console.error('Webhook error:', webhookError)
-        // Продолжаем к альтернативному методу
-      }
-    }
-
-    // Вариант 2: Прямой запрос к Telegram Bot API (если бот может обрабатывать через polling)
-    // Или просто сохраняем и возвращаем сообщение о том, что запрос обрабатывается
-    // В реальности, лучше использовать n8n webhook или polling из БД
-
-    // Временное решение: возвращаем сообщение о том, что запрос сохранен
-    // В production нужно настроить webhook или polling
-    await supabase
-      .from('menohub_queries')
-      .update({
-        query_status: 'pending',
-        response_text: 'Ваш запрос получен и будет обработан в ближайшее время. Пожалуйста, проверьте ответ в Telegram боте.',
+    try {
+      // Используем единый обработчик сообщений
+      // Это обеспечивает одинаковую логику для Telegram и сайта
+      const { processMessage } = await import('@/lib/ai/message-processor')
+      
+      const response = await processMessage({
+        userId: user.id,
+        message: sanitizedMessage,
+        source: 'website',
+        queryId: queryRecord.id,
       })
-      .eq('id', queryRecord.id)
 
-    return NextResponse.json({
-      success: true,
-      response: 'Ваш запрос получен и будет обработан в ближайшее время. Пожалуйста, проверьте ответ в Telegram боте или обновите страницу через несколько секунд.',
-      messageId: queryRecord.id,
-      note: 'Для полной функциональности настройте n8n webhook или используйте polling из БД',
-    })
+      // Обновляем запрос с ответом
+      await supabase
+        .from('menohub_queries')
+        .update({
+          query_status: 'completed',
+          response_text: response,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', queryRecord.id)
+
+      return NextResponse.json({
+        success: true,
+        response: response,
+        messageId: queryRecord.id,
+      })
+    } catch (error) {
+      console.error('Error processing message:', error)
+
+      // Обновляем статус на ошибку
+      await supabase
+        .from('menohub_queries')
+        .update({
+          query_status: 'failed',
+          response_text: 'Произошла ошибка при обработке запроса.',
+        })
+        .eq('id', queryRecord.id)
+
+      return NextResponse.json(
+        { error: 'Произошла ошибка при обработке вашего запроса. Пожалуйста, попробуйте еще раз.' },
+        { status: 500 }
+      )
+    }
   } catch (error) {
     // Логируем только в development
     if (process.env.NODE_ENV === 'development') {

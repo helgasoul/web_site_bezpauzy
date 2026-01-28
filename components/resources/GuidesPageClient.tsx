@@ -12,6 +12,7 @@ import { BackButton } from '@/components/ui/BackButton'
 import { AskEvaWidget } from '@/components/ui/AskEvaWidget'
 import type { LucideIcon } from 'lucide-react'
 import { assetUrl } from '@/lib/assets'
+import { formatPrice } from '@/lib/utils/format'
 
 interface GuidesPageClientProps {
   resources: Resource[]
@@ -151,7 +152,10 @@ export const GuidesPageClient: FC<GuidesPageClientProps> = ({ resources }) => {
                             </div>
                           </div>
                         ) : resource.isPaid ? (
-                          <div className="mt-auto">
+                          <div className="mt-auto space-y-2">
+                            <p className="text-body font-semibold text-deep-navy">
+                              {formatPrice((resource.priceKopecks ?? 39900) / 100)}
+                            </p>
                             <BuyResourceButton resource={resource} variant="small" />
                           </div>
                         ) : (
@@ -188,7 +192,10 @@ export const GuidesPageClient: FC<GuidesPageClientProps> = ({ resources }) => {
                           </div>
                         </div>
                       ) : resource.isPaid ? (
-                        <div className="mt-auto">
+                        <div className="mt-auto space-y-2">
+                          <p className="text-body font-semibold text-deep-navy">
+                            {formatPrice((resource.priceKopecks ?? 39900) / 100)}
+                          </p>
                           <BuyResourceButton resource={resource} variant="small" />
                         </div>
                       ) : (

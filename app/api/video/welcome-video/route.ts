@@ -5,13 +5,37 @@ import { join } from 'path'
 // Явно указываем, что этот route динамический (использует request.headers)
 export const dynamic = 'force-dynamic'
 
-/** URL видео в Supabase Storage (или любой CDN). Если задан — всегда редирект на него. */
+/** URL видео в Supabase Storage (или любой CDN). Если задан — стримим через API (без редиректа, чтобы плеер стабильно работал). */
 const WELCOME_VIDEO_URL = process.env.WELCOME_VIDEO_URL
 
 export async function GET(request: NextRequest) {
-  // Если задан URL видео в Supabase Storage — редирект на него
+  // Если задан URL видео — проксируем стрим (редирект часто ломает <video> и CORS)
   if (WELCOME_VIDEO_URL?.startsWith('http')) {
-    return NextResponse.redirect(WELCOME_VIDEO_URL, 302)
+    const range = request.headers.get('range')
+    const headers: Record<string, string> = {}
+    if (range) headers['Range'] = range
+    const res = await fetch(WELCOME_VIDEO_URL, { headers })
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: 'Video unavailable', status: res.status },
+        { status: res.status === 404 ? 404 : 502 }
+      )
+    }
+    const contentType = res.headers.get('content-type') || 'video/mp4'
+    const contentLength = res.headers.get('content-length')
+    const acceptRanges = res.headers.get('accept-ranges') || 'bytes'
+    const contentRange = res.headers.get('content-range')
+    const outHeaders: Record<string, string> = {
+      'Content-Type': contentType,
+      'Accept-Ranges': acceptRanges,
+      'Cache-Control': 'public, max-age=3600',
+    }
+    if (contentLength) outHeaders['Content-Length'] = contentLength
+    if (contentRange) outHeaders['Content-Range'] = contentRange
+    return new NextResponse(res.body, {
+      status: res.status,
+      headers: outHeaders,
+    })
   }
 
   try {

@@ -59,9 +59,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Получаем историю запросов по user_id (работает и без telegram_id)
+    // Включаем все сообщения независимо от источника (telegram или website)
     const { data: queries, error: queriesError } = await supabase
       .from('menohub_queries')
-      .select('id, query_text, response_text, created_at, query_status')
+      .select('id, query_text, response_text, created_at, query_status, source')
       .eq('user_id', user.id)
       .order('created_at', { ascending: true })
       .limit(50) // Последние 50 сообщений
@@ -75,6 +76,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Форматируем сообщения: каждому запросу соответствует ответ
+    // Включаем информацию об источнике для отображения в UI
     const messages: any[] = []
     queries?.forEach((query) => {
       if (query.query_text && query.query_text !== 'processing') {
@@ -84,6 +86,7 @@ export async function GET(request: NextRequest) {
           response_text: null,
           created_at: query.created_at,
           type: 'user',
+          source: query.source || 'website', // Источник сообщения
         })
       }
       if (query.response_text && query.response_text !== 'processing' && query.query_status === 'completed') {
@@ -93,6 +96,7 @@ export async function GET(request: NextRequest) {
           response_text: query.response_text,
           created_at: query.created_at,
           type: 'bot',
+          source: query.source || 'website', // Источник ответа
         })
       }
     })

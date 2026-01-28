@@ -25,7 +25,7 @@ export const ConsultationConsentModal: FC<ConsultationConsentModalProps> = ({
 }) => {
   const [step, setStep] = useState<'consent' | 'form'>('consent')
   const [agreeToPersonalData, setAgreeToPersonalData] = useState(false)
-  const [agreeToOncologyConsent, setAgreeToOncologyConsent] = useState(false)
+  const [agreeToThirdPartyConsent, setAgreeToThirdPartyConsent] = useState(false)
   const [error, setError] = useState<string | null>(null)
   
   // Form fields
@@ -40,6 +40,7 @@ export const ConsultationConsentModal: FC<ConsultationConsentModalProps> = ({
   }>({})
 
   const isMammologist = expertCategory === 'mammologist'
+  const canProceed = agreeToPersonalData && agreeToThirdPartyConsent
 
   const handleConsentSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -50,8 +51,8 @@ export const ConsultationConsentModal: FC<ConsultationConsentModalProps> = ({
       return
     }
 
-    if (isMammologist && !agreeToOncologyConsent) {
-      setError('Необходимо дать согласие на передачу персональных данных третьим лицам')
+    if (!agreeToThirdPartyConsent) {
+      setError('Необходимо дать согласие на передачу персональных данных третьему лицу (выбранному эксперту)')
       return
     }
 
@@ -113,7 +114,7 @@ export const ConsultationConsentModal: FC<ConsultationConsentModalProps> = ({
   const handleClose = () => {
     setStep('consent')
     setAgreeToPersonalData(false)
-    setAgreeToOncologyConsent(false)
+    setAgreeToThirdPartyConsent(false)
     setAge('')
     setName('')
     setPhone('')
@@ -185,7 +186,7 @@ export const ConsultationConsentModal: FC<ConsultationConsentModalProps> = ({
                       
                       <div className="bg-soft-white rounded-2xl p-6 border border-lavender-bg space-y-4">
                         <p className="text-body text-deep-navy/80 leading-relaxed">
-                          Для записи на консультацию необходимо ваше согласие на обработку персональных данных и их передачу третьим лицам (врачу-консультанту).
+                          Для записи на консультацию необходимо ваше согласие на обработку персональных данных и их передачу третьему лицу — выбранному эксперту ({expertName}). Данные для записи передаются эксперту в мессенджер Telegram.
                         </p>
 
                         {/* Personal Data Consent */}
@@ -205,7 +206,7 @@ export const ConsultationConsentModal: FC<ConsultationConsentModalProps> = ({
                             </p>
                             <p className="text-body-small text-deep-navy/70 leading-relaxed">
                               Я согласен(а) на обработку моих персональных данных (имя, возраст, контактные данные) 
-                              для организации консультации и передачу этих данных врачу-консультанту в соответствии с{' '}
+                              для организации консультации в соответствии с{' '}
                               <Link 
                                 href="/privacy" 
                                 target="_blank"
@@ -226,33 +227,41 @@ export const ConsultationConsentModal: FC<ConsultationConsentModalProps> = ({
                           </div>
                         </label>
 
-                        {/* Additional Consent for Mammologist (only for mammologist) */}
-                        {isMammologist && (
-                          <div className="pt-4 border-t border-lavender-bg">
-                            <label className="flex items-start gap-4 cursor-pointer group">
-                              <input
-                                type="checkbox"
-                                checked={agreeToOncologyConsent}
-                                onChange={(e) => {
-                                  setAgreeToOncologyConsent(e.target.checked)
-                                  setError(null)
-                                }}
-                                className="mt-1 w-5 h-5 rounded border-2 border-primary-purple/30 text-primary-purple focus:ring-2 focus:ring-primary-purple focus:ring-offset-2 cursor-pointer"
-                              />
-                              <div className="flex-1">
-                                <p className="text-body text-deep-navy font-medium mb-1">
-                                  Согласие на передачу персональных данных третьим лицам
-                                </p>
-                                <p className="text-body-small text-deep-navy/70 leading-relaxed">
-                                  Я даю согласие на передачу моих персональных данных, включая медицинскую информацию, 
-                                  третьим лицам (врачу-консультанту, медицинским учреждениям) для организации консультации 
-                                  и диагностических процедур в области маммологии. Данные будут использованы исключительно 
-                                  для целей медицинской консультации и диагностики.
-                                </p>
-                              </div>
-                            </label>
-                          </div>
-                        )}
+                        {/* Согласие на передачу третьему лицу — для всех экспертов */}
+                        <div className="pt-4 border-t border-lavender-bg">
+                          <label className="flex items-start gap-4 cursor-pointer group">
+                            <input
+                              type="checkbox"
+                              checked={agreeToThirdPartyConsent}
+                              onChange={(e) => {
+                                setAgreeToThirdPartyConsent(e.target.checked)
+                                setError(null)
+                              }}
+                              className="mt-1 w-5 h-5 rounded border-2 border-primary-purple/30 text-primary-purple focus:ring-2 focus:ring-primary-purple focus:ring-offset-2 cursor-pointer"
+                            />
+                            <div className="flex-1">
+                              <p className="text-body text-deep-navy font-medium mb-1">
+                                Согласие на передачу персональных данных третьему лицу
+                              </p>
+                              <p className="text-body-small text-deep-navy/70 leading-relaxed">
+                                {isMammologist ? (
+                                  <>
+                                    Я даю согласие на передачу моих персональных данных, включая медицинскую информацию, 
+                                    третьим лицам (врачу-консультанту {expertName}, медицинским учреждениям) для организации консультации 
+                                    и диагностических процедур. Данные передаются выбранному эксперту в мессенджер Telegram 
+                                    и используются исключительно для целей медицинской консультации и диагностики.
+                                  </>
+                                ) : (
+                                  <>
+                                    Я даю согласие на передачу моих персональных данных выбранному эксперту ({expertName}) — третьему лицу — 
+                                    для организации консультации. Данные передаются эксперту в мессенджер Telegram и используются 
+                                    исключительно для связи и записи на приём.
+                                  </>
+                                )}
+                              </p>
+                            </div>
+                          </label>
+                        </div>
                       </div>
 
                       {error && (
@@ -281,7 +290,7 @@ export const ConsultationConsentModal: FC<ConsultationConsentModalProps> = ({
                         type="submit"
                         variant="primary"
                         className="flex-1 sm:flex-auto flex items-center justify-center gap-2"
-                        disabled={!agreeToPersonalData || (isMammologist && !agreeToOncologyConsent)}
+                        disabled={!canProceed}
                       >
                         <CheckCircle2 className="w-5 h-5" />
                         <span>Продолжить</span>
@@ -303,9 +312,12 @@ export const ConsultationConsentModal: FC<ConsultationConsentModalProps> = ({
                       </button>
                     </div>
 
-                    <h3 className="text-h5 font-bold text-deep-navy mb-6">
+                    <h3 className="text-h5 font-bold text-deep-navy mb-2">
                       Заполните форму для записи
                     </h3>
+                    <p className="text-body-small text-deep-navy/70 mb-6">
+                      После отправки вы будете перенаправлены в Telegram для завершения записи к {expertName}. Данные передаются выбранному эксперту.
+                    </p>
 
                     {/* Age Field */}
                     <div className="space-y-2">

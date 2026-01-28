@@ -81,20 +81,19 @@ export const AskEvaWidget: FC<AskEvaWidgetProps> = ({ articleTitle, articleSlug 
   }
 
   const handleAskEvaClick = async () => {
-    // Всегда проверяем авторизацию перед открытием виджета
     const { authenticated, subscription } = await checkAuth()
 
-    if (authenticated && subscription) {
-      // Пользователь авторизован и имеет подписку - открываем чат
-      router.push('/chat')
-      setIsOpen(false)
-    } else if (authenticated && !subscription) {
-      // Пользователь авторизован, но нет подписки - открываем чат (там покажется сообщение о подписке)
+    if (authenticated) {
+      // Зарегистрированный пользователь — переадресация в чат (в личном кабинете)
       router.push('/chat')
       setIsOpen(false)
     } else {
-      // Пользователь не авторизован - показываем виджет с кнопками регистрации/входа
-      setIsOpen(true)
+      // Не зарегистрирован — предлагаем регистрацию: на десктопе модалка, на мобильных панель
+      if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
+        setShowRegisterModal(true)
+      } else {
+        setIsOpen(true)
+      }
     }
   }
 
@@ -113,16 +112,16 @@ export const AskEvaWidget: FC<AskEvaWidgetProps> = ({ articleTitle, articleSlug 
               transition={{ duration: 0.3 }}
             >
               <div className="w-52 h-52 bg-gradient-to-br from-primary-purple via-primary-purple/90 to-ocean-wave-start rounded-full shadow-2xl border-4 border-white overflow-hidden hover:shadow-3xl transition-all duration-300 hover:-translate-y-1 hover:scale-105 relative">
-                  {/* Background Pattern */}
-                  <div className="absolute inset-0 opacity-10">
+                  {/* Background Pattern — не перехватываем клики */}
+                  <div className="absolute inset-0 opacity-10 pointer-events-none">
                     <div className="absolute inset-0" style={{
                       backgroundImage: `radial-gradient(circle at 30% 40%, rgba(255,255,255,0.3) 0%, transparent 50%),
                                        radial-gradient(circle at 70% 60%, rgba(255,255,255,0.2) 0%, transparent 50%)`
                     }} />
                   </div>
                   
-                {/* Eva Photo - только лицо, обрезано сверху */}
-                <div className="absolute inset-0 flex items-start justify-center pt-5">
+                {/* Eva Photo - только лицо, обрезано сверху; pointer-events-none чтобы клик шёл на overlay */}
+                <div className="absolute inset-0 flex items-start justify-center pt-5 pointer-events-none">
                   {hasEvaPhoto ? (
                     <div className="relative w-28 h-28 rounded-full overflow-hidden ring-2 ring-white/40 shadow-2xl">
                       <Image
@@ -145,8 +144,8 @@ export const AskEvaWidget: FC<AskEvaWidgetProps> = ({ articleTitle, articleSlug 
                   )}
                 </div>
                 
-                {/* Name and Title - внизу */}
-                <div className="absolute bottom-7 left-0 right-0 flex flex-col items-center justify-center px-3 z-10">
+                {/* Name and Title - внизу; pointer-events-none чтобы клик шёл на overlay */}
+                <div className="absolute bottom-7 left-0 right-0 flex flex-col items-center justify-center px-3 z-10 pointer-events-none">
                   <div className="flex items-center gap-2 mb-0.5">
                     {/* Online Indicator - слева от имени */}
                     <div className="relative w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-lg" style={{ 
@@ -166,13 +165,13 @@ export const AskEvaWidget: FC<AskEvaWidgetProps> = ({ articleTitle, articleSlug 
                   </div>
                 )}
                 
-                {/* Clickable Overlay - не должен блокировать бейджи */}
+                {/* Clickable Overlay поверх всего — принимает клики по всему аватару */}
                 {!isCheckingAuth && (
                   <button
+                    type="button"
                     onClick={handleAskEvaClick}
-                    className="absolute inset-0 w-full h-full rounded-full cursor-pointer z-[5]"
+                    className="absolute inset-0 w-full h-full rounded-full cursor-pointer z-30"
                     aria-label="Спросить Еву"
-                    style={{ pointerEvents: 'auto' }}
                   />
                 )}
               </div>

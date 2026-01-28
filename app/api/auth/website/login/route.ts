@@ -45,26 +45,25 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = await createClient()
+    const loginOrEmail = username.toLowerCase().trim()
 
-    // Ищем пользователя по логину
+    // Если введён адрес с @ — ищем по email, иначе по username (чтобы находить и по email, и по логину)
+    const isEmail = loginOrEmail.includes('@')
     const { data: user, error: userError } = await supabase
       .from('menohub_users')
       .select('*')
-      .eq('username', username.toLowerCase().trim())
+      .eq(isEmail ? 'email' : 'username', loginOrEmail)
       .single()
 
     if (userError || !user) {
-      // Отслеживаем неудачную попытку входа
       const clientIP = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown'
       const shouldBlock = trackFailedLogin(clientIP, username)
-      
       if (shouldBlock) {
         return NextResponse.json(
           { error: 'Слишком много неудачных попыток входа. Попробуйте позже.' },
           { status: 429 }
         )
       }
-      
       return NextResponse.json(
         { error: 'Неверный логин или пароль' },
         { status: 401 }
