@@ -15,7 +15,6 @@ interface SubscriptionPlan {
   popular?: boolean
   savings?: string
 }
-
 const plans: SubscriptionPlan[] = [
   {
     id: 'monthly',
@@ -28,6 +27,8 @@ const plans: SubscriptionPlan[] = [
       'Персонализированные ответы',
       'База знаний и статьи',
       'Рекомендации врачей',
+      'Видео уроки от врачей',
+      'Пополняемая база врачей, которым я доверяю',
       'Синхронизация с Telegram',
       'История диалогов',
     ],
@@ -46,20 +47,12 @@ const plans: SubscriptionPlan[] = [
       'Приоритетная поддержка',
       'Ранний доступ к новым функциям',
       'Персональные рекомендации',
+      'Видео уроки от врачей',
+      'Пополняемая база врачей, которым я доверяю',
       'Скидки на консультации экспертов',
     ],
   },
 ]
-
-export default function SubscribePage() {
-  const router = useRouter()
-  const [selectedPlan, setSelectedPlan] = useState<string>('annual')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [checkingAuth, setCheckingAuth] = useState(true)
-
-  useEffect(() => {
     checkAuth()
   }, [])
 
