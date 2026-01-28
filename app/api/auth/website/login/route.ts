@@ -48,13 +48,22 @@ export async function POST(request: NextRequest) {
     const supabase = createServiceRoleClient()
     const loginOrEmail = username.toLowerCase().trim()
 
+    console.log('[Login] Attempting login:', { username: loginOrEmail })
+
+    // Сначала проверим, сколько вообще пользователей в таблице
+    const { count } = await supabase
+      .from('menohub_users')
+      .select('*', { count: 'exact', head: true })
+    console.log('[Login] Total users in table:', count)
+
     // Если введён адрес с @ — ищем по email, иначе по username (чтобы находить и по email, и по логину)
     const isEmail = loginOrEmail.includes('@')
-    
+
     let user = null
     let userError = null
-    
+
     if (isEmail) {
+      console.log('[Login] Searching by email:', loginOrEmail)
       // Поиск по email (с учетом возможных различий в регистре)
       const { data, error } = await supabase
         .from('menohub_users')
@@ -63,7 +72,9 @@ export async function POST(request: NextRequest) {
         .maybeSingle()
       user = data
       userError = error
+      console.log('[Login] Email search result:', { found: !!data, error: error?.message })
     } else {
+      console.log('[Login] Searching by username:', loginOrEmail)
       // Поиск по username
       const { data, error } = await supabase
         .from('menohub_users')
@@ -72,6 +83,12 @@ export async function POST(request: NextRequest) {
         .maybeSingle()
       user = data
       userError = error
+      console.log('[Login] Username search result:', {
+        found: !!data,
+        error: error?.message,
+        userId: data?.id,
+        hasPassword: !!data?.password_hash
+      })
     }
 
     // Логируем для отладки (только в development)
