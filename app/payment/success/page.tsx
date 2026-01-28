@@ -1,22 +1,19 @@
 'use client'
 
-import { FC, useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { CheckCircle2, Loader2, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 
-export default function PaymentSuccessPage() {
-  const router = useRouter()
+function PaymentSuccessContent() {
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(true)
-  const [verified, setVerified] = useState(false)
 
   useEffect(() => {
     // Небольшая задержка для обработки webhook
     const timer = setTimeout(() => {
       setLoading(false)
-      setVerified(true)
     }, 2000)
 
     return () => clearTimeout(timer)
@@ -99,5 +96,22 @@ export default function PaymentSuccessPage() {
         </div>
       </motion.div>
     </div>
+  )
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-lavender-bg to-white">
+          <div className="text-center">
+            <Loader2 className="w-16 h-16 text-primary-purple animate-spin mx-auto mb-4" />
+            <p className="text-lg text-deep-navy/70">Загрузка...</p>
+          </div>
+        </div>
+      }
+    >
+      <PaymentSuccessContent />
+    </Suspense>
   )
 }
