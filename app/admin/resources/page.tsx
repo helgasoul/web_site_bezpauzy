@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Search, Filter, Plus } from 'lucide-react'
@@ -34,7 +34,7 @@ interface Pagination {
   totalPages: number
 }
 
-export default function ResourcesPage() {
+function ResourcesPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -223,5 +223,22 @@ export default function ResourcesPage() {
         loading={loading}
       />
     </div>
+  )
+}
+
+export default function ResourcesPage() {
+  return (
+    <Suspense fallback={
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Ресурсы</h1>
+            <p className="text-gray-600 mt-2">Загрузка...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <ResourcesPageContent />
+    </Suspense>
   )
 }

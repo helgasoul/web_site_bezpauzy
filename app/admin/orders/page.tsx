@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Search, Filter } from 'lucide-react'
 import { OrdersTable } from '@/components/admin/OrdersTable'
@@ -26,7 +26,7 @@ interface Pagination {
   totalPages: number
 }
 
-export default function OrdersPage() {
+function OrdersPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -190,5 +190,20 @@ export default function OrdersPage() {
         loading={loading}
       />
     </div>
+  )
+}
+
+export default function OrdersPage() {
+  return (
+    <Suspense fallback={
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Заказы книг</h1>
+          <p className="text-gray-600 mt-2">Загрузка...</p>
+        </div>
+      </div>
+    }>
+      <OrdersPageContent />
+    </Suspense>
   )
 }

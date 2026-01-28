@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/server'
 import bcrypt from 'bcryptjs'
 import { setSessionCookie } from '@/lib/auth/session'
 import { trackFailedLogin, resetFailedLoginAttempts } from '@/lib/security/monitoring'
@@ -44,18 +44,43 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
+    // Используем service role client для обхода RLS при поиске пользователя
+    const supabase = createServiceRoleClient()
     const loginOrEmail = username.toLowerCase().trim()
 
     // Если введён адрес с @ — ищем по email, иначе по username (чтобы находить и по email, и по логину)
     const isEmail = loginOrEmail.includes('@')
-    const { data: user, error: userError } = await supabase
-      .from('menohub_users')
-      .select('*')
-      .eq(isEmail ? 'email' : 'username', loginOrEmail)
-      .single()
+    
+    let user = null
+    let userError = null
+    
+    if (isEmail) {
+      // Поиск по email (с учетом возможных различий в регистре)
+      const { data, error } = await supabase
+        .from('menohub_users')
+        .select('*')
+        .ilike('email', loginOrEmail) // ilike для case-insensitive поиска
+        .maybeSingle()
+      user = data
+      userError = error
+    } else {
+      // Поиск по username
+      const { data, error } = await supabase
+        .from('menohub_users')
+        .select('*')
+        .ilike('username', loginOrEmail) // ilike для case-insensitive поиска
+        .maybeSingle()
+      user = data
+      userError = error
+    }
 
-    if (userError || !user) {
+    // Логируем для отладки (только в development)
+    if (process.env.NODE_ENV === 'development') {
+      logger.info('Login attempt:', { loginOrEmail, isEmail, found: !!user, error: userError?.message })
+    }
+
+    if (userError) {
+      logger.error('Error searching for user:', userError)
       const clientIP = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown'
       const shouldBlock = trackFailedLogin(clientIP, username)
       if (shouldBlock) {
@@ -66,6 +91,21 @@ export async function POST(request: NextRequest) {
       }
       return NextResponse.json(
         { error: 'Неверный логин или пароль' },
+        { status: 401 }
+      )
+    }
+
+    if (!user) {
+      const clientIP = request.ip || request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown'
+      const shouldBlock = trackFailedLogin(clientIP, username)
+      if (shouldBlock) {
+        return NextResponse.json(
+          { error: 'Слишком много неудачных попыток входа. Попробуйте позже.' },
+          { status: 429 }
+        )
+      }
+      return NextResponse.json(
+        { error: 'Пользователь с таким логином или email не найден. Хотите зарегистрироваться?' },
         { status: 401 }
       )
     }
@@ -134,4 +174,6 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
+export const dynamic = 'force-dynamic'
 
