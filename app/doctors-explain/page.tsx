@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { createServerClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { PlayCircle, Clock, Eye, User, Sparkles } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -20,7 +20,7 @@ interface DoctorVideo {
 }
 
 async function getDoctorVideos(): Promise<DoctorVideo[]> {
-  const supabase = createServerClient()
+  const supabase = await createClient()
   
   const { data, error } = await supabase
     .from('menohub_video_content')
