@@ -146,14 +146,22 @@ export const AskEvaWidget: FC<AskEvaWidgetProps> = ({ articleTitle, articleSlug 
   }
 
   const handleAskEvaClick = async () => {
-    const { authenticated, subscription } = await checkAuth()
+    const { authenticated, subscription, telegramId } = await checkAuth()
 
     if (authenticated) {
-      // Зарегистрированный пользователь — переадресация в чат (в личном кабинете)
-      router.push('/chat')
-      setIsOpen(false)
+      // Проверяем наличие активной подписки
+      if (subscription) {
+        // Есть подписка — переходим в чат в личном кабинете
+        router.push('/chat')
+        setIsOpen(false)
+      } else {
+        // Нет подписки — переходим на страницу оплаты
+        router.push('/payment/subscribe')
+        setIsOpen(false)
+      }
     } else {
-      // Не зарегистрирован — предлагаем регистрацию: на десктопе модалка, на мобильных панель
+      // Не зарегистрирован на сайте — предлагаем регистрацию/вход
+      // На десктопе открываем модалку, на мобильных — боковую панель
       if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
         setShowRegisterModal(true)
       } else {
