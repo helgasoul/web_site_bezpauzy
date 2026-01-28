@@ -48,75 +48,89 @@ export async function POST(request: NextRequest) {
     const supabase = createServiceRoleClient()
     const loginOrEmail = username.toLowerCase().trim()
 
-    // Если введён адрес с @ — ищем по email, иначе по username (чтобы находить и по email, и по логину)
-    const isEmail = loginOrEmail.includes('@')
-
+    // Сначала всегда пробуем поиск по username (так как при регистрации сохраняется только username)
     let user = null
     let userError = null
 
-    if (isEmail) {
-      // Поиск по email - используем точное совпадение, так как email уже в нижнем регистре
-      const { data, error } = await supabase
-        .from('menohub_users')
-        .select('*')
-        .eq('email', loginOrEmail) // Точное совпадение, так как loginOrEmail уже в нижнем регистре
-        .not('email', 'is', null) // Исключаем записи с NULL email
-        .maybeSingle()
-      
-      // Если не нашли, пробуем поиск без учета регистра через ilike (на случай, если в БД другой регистр)
-      if (!data && !error) {
-        const { data: dataIlike, error: errorIlike } = await supabase
-          .from('menohub_users')
-          .select('*')
-          .ilike('email', loginOrEmail)
-          .not('email', 'is', null)
-          .maybeSingle()
-        user = dataIlike
-        userError = errorIlike
-      } else {
-        user = data
-        userError = error
-      }
-      
-      // Если не нашли по email, пробуем поиск по username (на случай, если пользователь ввел email, но в БД только username)
-      if (!user && !userError) {
-        const { data: dataByUsername, error: errorByUsername } = await supabase
-          .from('menohub_users')
-          .select('*')
-          .eq('username', loginOrEmail)
-          .maybeSingle()
-        if (dataByUsername) {
-          user = dataByUsername
-          userError = errorByUsername
-        }
-      }
+    // Поиск по username - используем точное совпадение, так как username уже в нижнем регистре
+    logger.info('Searching for user by username:', { loginOrEmail })
+    const { data: usernameData, error: usernameError } = await supabase
+      .from('menohub_users')
+      .select('*')
+      .eq('username', loginOrEmail)
+      .maybeSingle()
+
+    logger.info('Username search result:', { 
+      found: !!usernameData, 
+      error: usernameError?.message,
+      userId: usernameData?.id,
+      username: usernameData?.username,
+      hasPassword: !!usernameData?.password_hash
+    })
+
+    if (usernameData) {
+      user = usernameData
+      userError = usernameError
+      logger.info('User found by username:', { userId: user.id, username: user.username })
+    } else if (usernameError) {
+      userError = usernameError
+      logger.error('Error searching by username:', usernameError)
     } else {
-      // Поиск по username - используем точное совпадение, так как username уже в нижнем регистре
-      const { data, error } = await supabase
+      // Пользователь не найден - попробуем найти всех пользователей с похожим username для диагностики
+      const { data: allUsers, error: allUsersError } = await supabase
+        .from('menohub_users')
+        .select('id, username, email')
+        .limit(10)
+      logger.info('Sample users in database:', { 
+        count: allUsers?.length, 
+        users: allUsers?.map(u => ({ id: u.id, username: u.username, email: u.email }))
+      })
+    }
+
+    // Если не нашли по username и введен email, пробуем поиск по email
+    if (!user && !userError && loginOrEmail.includes('@')) {
+      const { data: emailData, error: emailError } = await supabase
         .from('menohub_users')
         .select('*')
-        .eq('username', loginOrEmail) // Точное совпадение, так как loginOrEmail уже в нижнем регистре
+        .eq('email', loginOrEmail)
+        .not('email', 'is', null)
         .maybeSingle()
-      
-      // Если не нашли, пробуем поиск без учета регистра через ilike (на случай, если в БД другой регистр)
-      if (!data && !error) {
-        const { data: dataIlike, error: errorIlike } = await supabase
-          .from('menohub_users')
-          .select('*')
-          .ilike('username', loginOrEmail)
-          .maybeSingle()
-        user = dataIlike
-        userError = errorIlike
-      } else {
-        user = data
-        userError = error
+
+      if (emailData) {
+        user = emailData
+        userError = emailError
+        logger.info('User found by email:', { userId: user.id, email: user.email })
+      } else if (emailError) {
+        userError = emailError
+        logger.error('Error searching by email:', emailError)
       }
     }
 
-    // Логируем для отладки (только в development)
-    if (process.env.NODE_ENV === 'development') {
-      logger.info('Login attempt:', { loginOrEmail, isEmail, found: !!user, error: userError?.message })
+    // Если все еще не нашли, пробуем поиск без учета регистра через ilike
+    if (!user && !userError) {
+      const { data: ilikeData, error: ilikeError } = await supabase
+        .from('menohub_users')
+        .select('*')
+        .ilike('username', loginOrEmail)
+        .maybeSingle()
+
+      if (ilikeData) {
+        user = ilikeData
+        userError = ilikeError
+        logger.info('User found by username (case-insensitive):', { userId: user.id, username: user.username })
+      }
     }
+
+    // Детальное логирование для диагностики
+    logger.info('Login attempt:', { 
+      loginOrEmail, 
+      isEmail: loginOrEmail.includes('@'),
+      found: !!user,
+      userId: user?.id,
+      username: user?.username,
+      hasPassword: !!user?.password_hash,
+      error: userError?.message 
+    })
 
     if (userError) {
       logger.error('Error searching for user:', userError)
@@ -158,7 +172,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Проверяем пароль
+    logger.info('Checking password for user:', { userId: user.id, username: user.username })
     const isPasswordValid = await bcrypt.compare(password, user.password_hash)
+    logger.info('Password check result:', { isValid: isPasswordValid })
 
     if (!isPasswordValid) {
       // Отслеживаем неудачную попытку входа

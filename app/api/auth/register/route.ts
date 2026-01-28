@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import { setSessionCookie, getSession } from '@/lib/auth/session'
 import bcrypt from 'bcryptjs'
@@ -43,7 +43,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
+    // Используем service role client для обхода RLS
+    const supabase = createServiceRoleClient()
 
     // Проверяем, не занят ли логин
     const { data: existingUserByUsername } = await supabase
@@ -130,10 +131,13 @@ export async function POST(request: NextRequest) {
     const passwordHash = await bcrypt.hash(password, 10)
 
     // Создаем нового пользователя
+    const usernameToSave = username.toLowerCase().trim()
+    logger.info('Creating new user:', { username: usernameToSave })
+    
     const { data: newUser, error: createError } = await supabase
       .from('menohub_users')
       .insert({
-        username: username.toLowerCase().trim(),
+        username: usernameToSave,
         password_hash: passwordHash,
         // telegram_id будет NULL или 0, если пользователь еще не в боте
         telegram_id: 0,
@@ -141,8 +145,16 @@ export async function POST(request: NextRequest) {
         query_count_daily: 0,
         query_count_total: 0,
       })
-      .select('id, username, telegram_id')
+      .select('id, username, telegram_id, password_hash')
       .single()
+
+    logger.info('User creation result:', { 
+      success: !!newUser, 
+      error: createError?.message,
+      userId: newUser?.id,
+      username: newUser?.username,
+      hasPassword: !!newUser?.password_hash
+    })
 
     if (createError) {
       logger.error('Error creating user:', createError)
