@@ -185,7 +185,7 @@ export default function TopicPage({ params }: TopicPageProps) {
             <p className="text-body-large text-white/90 mb-8">
               Ева — ваш AI-консультант по менопаузе — готова ответить на вопросы по этой теме
             </p>
-            <a href="/bot">
+            <a href="/chat">
               <button className="px-8 py-4 rounded-pill font-semibold transition-all duration-300 bg-white text-primary-purple shadow-button hover:shadow-button-hover hover:-translate-y-0.5">
                 Задать вопрос Еве
               </button>

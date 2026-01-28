@@ -151,7 +151,7 @@ export const CommunityMemberModal: FC<CommunityMemberModalProps> = ({
 
                 {/* AI Assistant */}
                 <Link
-                  href="/bot"
+                  href="/chat"
                   className="group p-6 bg-gradient-to-br from-primary-purple/5 to-warm-accent/5 rounded-card border border-primary-purple/10 hover:border-primary-purple/30 hover:shadow-md transition-all"
                 >
                   <div className="flex items-start gap-4">

@@ -134,7 +134,7 @@ export default async function NoPausePodcastPage() {
               Задайте вопрос AI-ассистенту Еве — она ответит на ваши вопросы о менопаузе и здоровье
             </p>
             <Link
-              href="/bot"
+              href="/chat"
               className="inline-block px-8 py-4 bg-gradient-primary text-soft-white rounded-full font-semibold hover:shadow-button-hover transition-all duration-300"
             >
               Задать вопрос Еве

@@ -210,7 +210,7 @@ export const MRSResults: FC<MRSResultsProps> = ({ results }) => {
             Сохранить мои результаты
           </button>
           <Link
-            href="/bot"
+            href="/chat"
             className="inline-flex items-center justify-center gap-2 bg-white border-2 border-primary-purple text-primary-purple px-8 py-4 rounded-full text-lg font-semibold hover:bg-primary-purple hover:text-white transition-all duration-300"
           >
             Спросить Еву

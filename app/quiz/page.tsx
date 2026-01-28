@@ -90,7 +90,7 @@ export default function QuizListPage() {
             <p className="text-body text-deep-navy/70 mb-8">
               Ева — ваш AI-консультант по менопаузе — готова ответить на вопросы о симптомах, здоровье и образе жизни
             </p>
-            <a href="/bot">
+            <a href="/chat">
               <button className="px-8 py-4 rounded-pill font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-purple focus:ring-offset-2 bg-gradient-primary text-soft-white shadow-button hover:shadow-button-hover hover:-translate-y-0.5">
                 Задать вопрос Еве
               </button>

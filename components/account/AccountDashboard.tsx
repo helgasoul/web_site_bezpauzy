@@ -363,7 +363,7 @@ export const AccountDashboard: FC = () => {
               </motion.div>
             </Link>
 
-            <Link href="/bot">
+            <Link href="/chat">
               <motion.div
                 whileHover={{ scale: 1.02, y: -5 }}
                 whileTap={{ scale: 0.98 }}

@@ -108,7 +108,7 @@ export default async function EvaExplainsPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/bot"
+                href="/chat"
                 className="inline-block px-8 py-4 bg-gradient-primary text-soft-white rounded-full font-semibold hover:shadow-button-hover transition-all duration-300"
               >
                 Задать вопрос Еве

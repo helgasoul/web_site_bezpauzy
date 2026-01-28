@@ -80,7 +80,7 @@ export const EnhancedArticleContent: FC<ArticleContentProps> = ({ article }) => 
 
             {/* Ask Eva Button */}
             <div className="flex justify-center">
-              <Link href="/bot">
+              <Link href="/chat">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}

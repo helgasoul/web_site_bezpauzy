@@ -588,7 +588,7 @@ export const CommunityDashboard: FC<CommunityDashboardProps> = () => {
                       <ArrowRight className="w-4 h-4" />
                     </Link>
                     <Link
-                      href="/bot"
+                      href="/chat"
                       className="inline-flex items-center gap-2 text-ocean-wave-start hover:underline font-semibold"
                     >
                       <MessageCircle className="w-4 h-4" />

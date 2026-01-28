@@ -369,7 +369,7 @@ export const AskEvaWidget: FC<AskEvaWidgetProps> = ({ articleTitle, articleSlug 
                       {userTelegramId && userTelegramId !== 0 ? (
                         <>
                           <Link
-                            href="/bot"
+                            href="/chat"
                             className="block w-full"
                             onClick={() => setIsOpen(false)}
                           >

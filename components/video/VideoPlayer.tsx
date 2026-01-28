@@ -179,7 +179,7 @@ export const VideoPlayer: FC<VideoPlayerProps> = ({ video }) => {
                   <p className="text-body text-deep-navy/80 mb-4">
                     Это видео доступно только для подписчиков {video.accessLevel === 'paid1' ? 'Paid1 (800₽/мес)' : 'Paid2 (2500₽/мес)'}.
                   </p>
-                  <Link href="/bot">
+                  <Link href="/chat">
                     <Button
                       variant="primary"
                       className="inline-flex items-center gap-2"

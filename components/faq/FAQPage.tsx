@@ -322,7 +322,7 @@ export const FAQPage: FC = () => {
                 Спросите Еву в боте — она ответит на любой вопрос о менопаузе 24/7
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/bot">
+                <Link href="/chat">
                   <Button variant="ghost" className="bg-white text-primary-purple hover:bg-white/90">
                     Начать диалог с Евой →
                   </Button>
