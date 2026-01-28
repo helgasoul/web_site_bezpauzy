@@ -7,23 +7,50 @@ import { useRouter } from 'next/navigation'
 import { ArrowRight, Sparkles, MessageCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { assetUrl } from '@/lib/assets'
+import { RegisterModal } from '@/components/auth/RegisterModal'
 
 interface BotHeroProps {}
 
 export const BotHero: FC<BotHeroProps> = () => {
   const router = useRouter()
   const [isChecking, setIsChecking] = useState(false)
+  const [showRegisterModal, setShowRegisterModal] = useState(false)
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch('/api/auth/telegram/get-session')
+      const data = await response.json()
+      const authenticated = data.authenticated || false
+      const subscription = data.user?.subscriptionStatus === 'active' || false
+      return { authenticated, subscription }
+    } catch (error) {
+      return { authenticated: false, subscription: false }
+    }
+  }
 
   const handleStartDialog = async (e: React.MouseEvent) => {
     e.preventDefault()
     setIsChecking(true)
 
     try {
-      // Всегда ведем в чат - там ChatAuthGate проверит авторизацию и покажет нужный экран
-      router.push('/chat')
+      const { authenticated, subscription } = await checkAuth()
+
+      if (authenticated) {
+        // Проверяем наличие активной подписки
+        if (subscription) {
+          // Есть подписка — переходим в чат
+          router.push('/chat')
+        } else {
+          // Нет подписки — переходим на страницу оплаты
+          router.push('/payment/subscribe')
+        }
+      } else {
+        // Не зарегистрирован — показываем модалку регистрации
+        setShowRegisterModal(true)
+      }
     } catch (error) {
-      // В случае ошибки просто переходим в чат
-      router.push('/chat')
+      // В случае ошибки показываем модалку регистрации
+      setShowRegisterModal(true)
     } finally {
       setIsChecking(false)
     }
@@ -168,6 +195,23 @@ export const BotHero: FC<BotHeroProps> = () => {
           </motion.div>
         </div>
       </div>
+
+      {/* Registration Modal */}
+      <RegisterModal
+        isOpen={showRegisterModal}
+        onClose={() => setShowRegisterModal(false)}
+        onSuccess={() => {
+          setShowRegisterModal(false)
+          // После успешной регистрации проверяем подписку
+          checkAuth().then(({ subscription }) => {
+            if (subscription) {
+              router.push('/chat')
+            } else {
+              router.push('/payment/subscribe')
+            }
+          })
+        }}
+      />
     </section>
   )
 }
