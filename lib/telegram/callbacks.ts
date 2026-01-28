@@ -248,6 +248,8 @@ async function handleAgeSelection(
   await supabase.from('menohub_users').update({ age_range: ageRange }).eq('id', user.id)
 
   // Отправляем бесплатные темы
+  const websiteUrl = `https://bez-pauzy.ru?tg_id=${userId}`
+
   await sendTelegramBotMessage(
     chatId,
     `Отлично! Информация сохранена 📝
@@ -264,6 +266,7 @@ async function handleAgeSelection(
           { text: '⚖️ Вес', callbackData: 'free_topic_weight' },
         ],
         [{ text: '💬 Задать свой вопрос', callbackData: 'select_another_topic' }],
+        [{ text: '🌐 Перейти на сайт', url: websiteUrl }],
       ],
     }
   )
@@ -343,6 +346,9 @@ async function handleSelectAnotherTopic(chatId: number): Promise<void> {
  * ВСЁ ПОНЯТНО (завершение)
  */
 async function handleThankYou(chatId: number): Promise<void> {
+  // Получаем telegram_id пользователя из chatId (они совпадают в приватном чате)
+  const websiteUrl = `https://bez-pauzy.ru?tg_id=${chatId}`
+
   await sendTelegramBotMessage(
     chatId,
     `Рада была помочь! 🌸
@@ -355,7 +361,10 @@ async function handleThankYou(chatId: number): Promise<void> {
 /history - история ваших вопросов
 /export_my_data - экспорт ваших данных
 /delete_my_data - удалить все данные`,
-    { parseMode: 'HTML' }
+    {
+      parseMode: 'HTML',
+      buttons: [[{ text: '🌐 Перейти на сайт', url: websiteUrl }]],
+    }
   )
 }
 
